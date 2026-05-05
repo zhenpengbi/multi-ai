@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>多AI聚合助手</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f7fa; color: #333; min-height: 100vh; }
+
+  .header { background: #1a1a2e; color: #fff; padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; }
+  .header-left h1 { font-size: 18px; font-weight: 600; }
+  .header-left p { font-size: 12px; color: #aaa; margin-top: 2px; }
+  .key-btn { background: #2d2d4e; border: 1px solid #444; color: #ccc; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 13px; transition: all 0.2s; }
+  .key-btn:hover { background: #3d3d6e; color: #fff; }
+
+  .main { max-width: 1400px; margin: 0 auto; padding: 20px 16px; }
+
+  .input-section { background: #fff; border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+  label { font-size: 13px; color: #666; font-weight: 500; margin-bottom: 6px; display: block; }
+  .sys-prompt { width: 100%; border: 1px solid #e0e0e0; border-radius: 8px; padding: 10px 12px; font-size: 14px; resize: vertical; min-height: 72px; font-family: inherit; transition: border 0.2s; }
+  .sys-prompt:focus { outline: none; border-color: #667eea; }
+
+  .model-toggle-wrap { margin-top: 14px; }
+  .model-toggle { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+  .model-tag { padding: 5px 13px; border-radius: 20px; font-size: 12px; cursor: pointer; border: 1.5px solid #ddd; background: #fff; transition: all 0.2s; user-select: none; }
+  .model-tag.active { background: #667eea; color: #fff; border-color: #667eea; }
+  .model-tag:hover { border-color: #667eea; }
+
+  .user-input-wrap { display: flex; gap: 12px; margin-top: 14px; align-items: flex-end; }
+  .user-input { flex: 1; border: 1.5px solid #e0e0e0; border-radius: 8px; padding: 10px 12px; font-size: 15px; resize: vertical; min-height: 80px; font-family: inherit; transition: border 0.2s; }
+  .user-input:focus { outline: none; border-color: #667eea; }
+  .btn-group { display: flex; flex-direction: column; gap: 8px; }
+  .send-btn { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; border: none; border-radius: 8px; padding: 0 28px; font-size: 15px; cursor: pointer; transition: opacity 0.2s; height: 44px; white-space: nowrap; }
+  .send-btn:hover { opacity: 0.9; }
+  .send-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+  .clear-btn { background: #f5f5f5; color: #666; border: 1px solid #e0e0e0; border-radius: 8px; padding: 0 18px; font-size: 14px; cursor: pointer; height: 44px; transition: all 0.2s; }
+  .clear-btn:hover { background: #eee; }
+  .tips { font-size: 12px; color: #bbb; margin-top: 8px; }
+
+  .results-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  @media (max-width: 900px) { .results-grid { grid-template-columns: 1fr; } }
+
+  .card { background: #fff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); overflow: hidden; display: flex; flex-direction: column; }
+  .card-header { padding: 14px 16px 10px; display: flex; align-items: flex-start; justify-content: space-between; border-bottom: 1px solid #f0f0f0; }
+  .card-model { font-size: 13px; font-weight: 700; color: #333; }
+  .card-company { font-size: 11px; color: #999; margin-top: 2px; }
+  .card-meta { font-size: 11px; color: #bbb; text-align: right; }
+  .card-body { padding: 16px; flex: 1; font-size: 14px; line-height: 1.75; color: #444; white-space: pre-wrap; word-break: break-word; min-height: 100px; }
+  .card-body.loading { color: #aaa; font-style: italic; }
+  .card-body.error { color: #e53e3e; }
+  .card-footer { padding: 10px 16px; border-top: 1px solid #f5f5f5; display: flex; align-items: center; gap: 4px; }
+  .action-btn { background: none; border: none; cursor: pointer; font-size: 17px; padding: 3px 8px; border-radius: 6px; transition: background 0.15s; opacity: 0.55; }
+  .action-btn:hover { background: #f0f0f0; opacity: 1; }
+  .action-btn.voted { opacity: 1; }
+  .char-count { margin-left: auto; font-size: 12px; color: #ccc; }
+
+  .streaming-cursor::after { content: '▋'; display: inline-block; animation: blink 0.8s infinite; margin-left: 2px; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+  /* Card accent colors */
+  .accent-0 { border-top: 3px solid #667eea; }
+  .accent-1 { border-top: 3px solid #48bb78; }
+  .accent-2 { border-top: 3px solid #ed8936; }
+  .accent-3 { border-top: 3px solid #9f7aea; }
+  .accent-4 { border-top: 3px solid #38b2ac; }
+  .accent-5 { border-top: 3px solid #f56565; }
+  .accent-6 { border-top: 3px solid #4299e1; }
+  .accent-7 { border-top: 3px solid #ecc94b; }
+
+  /* Modal */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 100; }
+  .modal-overlay.hidden { display: none; }
+  .modal { background: #fff; border-radius: 14px; padding: 28px; width: 460px; max-width: 95vw; }
+  .modal h2 { font-size: 17px; margin-bottom: 8px; }
+  .modal .hint { font-size: 13px; color: #888; margin-bottom: 16px; line-height: 1.6; }
+  .modal .hint a { color: #667eea; }
+  .modal input { width: 100%; border: 1.5px solid #e0e0e0; border-radius: 8px; padding: 10px 12px; font-size: 14px; margin-bottom: 16px; font-family: inherit; }
+  .modal input:focus { outline: none; border-color: #667eea; }
+  .modal-btns { display: flex; gap: 10px; justify-content: flex-end; }
+  .modal-btns button { padding: 8px 22px; border-radius: 8px; border: none; cursor: pointer; font-size: 14px; }
+  .btn-cancel { background: #f0f0f0; color: #666; }
+  .btn-save { background: #667eea; color: #fff; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <h1>🤖 多AI聚合助手</h1>
+    <p>同时问多个AI，对比最佳答案</p>
+  </div>
+  <button class="key-btn" onclick="openKeyModal()">⚙️ API Key</button>
+</div>
+
+<div class="main">
+  <div class="input-section">
+    <label>系统提示词（可自行修改）</label>
+    <textarea class="sys-prompt" id="sysPrompt">你是一个专业的文案写作助手，请用简洁、有创意的方式回答用户的问题。回答要有逻辑性，语言流畅自然。</textarea>
+
+    <div class="model-toggle-wrap">
+      <label>选择模型（点击开启/关闭，至少选1个）</label>
+      <div class="model-toggle" id="modelToggle"></div>
+    </div>
+
+    <div class="user-input-wrap">
+      <textarea class="user-input" id="userInput" placeholder="输入你的问题，多个AI将同时为你解答..." rows="3"></textarea>
+      <div class="btn-group">
+        <button class="send-btn" id="sendBtn" onclick="sendAll()">🚀 开始回答</button>
+        <button class="clear-btn" onclick="clearAll()">清空</button>
+      </div>
+    </div>
+    <div class="tips">💡 Ctrl+Enter 快捷发送</div>
+  </div>
+
+  <div class="results-grid" id="resultsGrid"></div>
+</div>
+
+<!-- Key Modal -->
+<div class="modal-overlay hidden" id="keyModal">
+  <div class="modal">
+    <h2>🔑 设置 OpenRouter API Key</h2>
+    <p class="hint">Key 仅存在你的浏览器本地，不会上传任何服务器。<br>
+    免费获取：<a href="https://openrouter.ai/keys" target="_blank">openrouter.ai/keys</a> → 注册 → Create Key</p>
+    <input type="password" id="keyInput" placeholder="sk-or-v1-..." />
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeKeyModal()">取消</button>
+      <button class="btn-save" onclick="saveKey()">保存</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== 模型列表（当前 OpenRouter 最优免费模型）=====
+const MODELS = [
+  { id: 'google/gemini-2.0-flash-exp:free',                         name: 'Gemini 2.0 Flash',      company: 'Google'     },
+  { id: 'deepseek/deepseek-chat-v3-0324:free',                      name: 'DeepSeek V3',            company: 'DeepSeek'   },
+  { id: 'meta-llama/llama-4-maverick:free',                         name: 'Llama 4 Maverick',       company: 'Meta'       },
+  { id: 'meta-llama/llama-4-scout:free',                            name: 'Llama 4 Scout',          company: 'Meta'       },
+  { id: 'mistralai/mistral-small-3.1-24b-instruct:free',            name: 'Mistral Small 3.1',      company: 'Mistral'    },
+  { id: 'qwen/qwen3-8b:free',                                       name: 'Qwen3 8B',               company: 'Alibaba'    },
+  { id: 'microsoft/phi-4-reasoning-plus:free',                      name: 'Phi-4 Reasoning+',       company: 'Microsoft'  },
+  { id: 'nvidia/llama-3.1-nemotron-ultra-253b-v1:free',             name: 'Nemotron Ultra 253B',    company: 'NVIDIA'     },
+];
+
+// ===== 状态 =====
+let activeModels = new Set(MODELS.map(m => m.id));
+let apiKey = localStorage.getItem('multi_ai_key') || '';
+let abortControllers = [];
+
+// ===== 初始化 =====
+function init() {
+  if (!apiKey) setTimeout(openKeyModal, 600);
+  renderModelToggle();
+  document.getElementById('userInput').addEventListener('keydown', e => {
+    if (e.ctrlKey && e.key === 'Enter') sendAll();
+  });
+}
+
+function renderModelToggle() {
+  const wrap = document.getElementById('modelToggle');
+  wrap.innerHTML = '';
+  MODELS.forEach(m => {
+    const tag = document.createElement('span');
+    tag.className = 'model-tag' + (activeModels.has(m.id) ? ' active' : '');
+    tag.textContent = `${m.name} · ${m.company}`;
+    tag.dataset.id = m.id;
+    tag.onclick = () => toggleModel(m.id, tag);
+    wrap.appendChild(tag);
+  });
+}
+
+function toggleModel(id, tag) {
+  if (activeModels.has(id)) {
+    if (activeModels.size <= 1) return; // 至少保留1个
+    activeModels.delete(id);
+    tag.classList.remove('active');
+  } else {
+    activeModels.add(id);
+    tag.classList.add('active');
+  }
+}
+
+// ===== Key =====
+function openKeyModal() {
+  document.getElementById('keyInput').value = apiKey;
+  document.getElementById('keyModal').classList.remove('hidden');
+  setTimeout(() => document.getElementById('keyInput').focus(), 100);
+}
+function closeKeyModal() { document.getElementById('keyModal').classList.add('hidden'); }
+function saveKey() {
+  const val = document.getElementById('keyInput').value.trim();
+  if (val) { apiKey = val; localStorage.setItem('multi_ai_key', val); }
+  closeKeyModal();
+}
+
+// ===== 发送 =====
+async function sendAll() {
+  const question = document.getElementById('userInput').value.trim();
+  if (!question) { document.getElementById('userInput').focus(); return; }
+  if (!apiKey) { openKeyModal(); return; }
+
+  abortControllers.forEach(c => c.abort());
+  abortControllers = [];
+
+  const selected = MODELS.filter(m => activeModels.has(m.id));
+  const grid = document.getElementById('resultsGrid');
+  grid.innerHTML = '';
+  document.getElementById('sendBtn').disabled = true;
+
+  const sysPrompt = document.getElementById('sysPrompt').value.trim();
+
+  selected.forEach((model, idx) => {
+    const card = createCard(model, idx);
+    grid.appendChild(card);
+    const ctrl = new AbortController();
+    abortControllers.push(ctrl);
+    callModel(model, question, sysPrompt, idx, ctrl.signal);
+  });
+}
+
+function safeId(str) { return str.replace(/[^a-zA-Z0-9]/g, '_'); }
+
+function createCard(model, idx) {
+  const card = document.createElement('div');
+  card.className = `card accent-${idx % 8}`;
+  const sid = safeId(model.id);
+  card.innerHTML = `
+    <div class="card-header">
+      <div>
+        <div class="card-model">${model.name}</div>
+        <div class="card-company">${model.company}</div>
+      </div>
+      <div class="card-meta" id="meta-${sid}">等待中…</div>
+    </div>
+    <div class="card-body loading" id="body-${sid}">正在连接模型…</div>
+    <div class="card-footer">
+      <button class="action-btn" title="赞" onclick="vote(this)">👍</button>
+      <button class="action-btn" title="踩" onclick="vote(this)">👎</button>
+      <button class="action-btn" title="复制" onclick="copyText('body-${sid}', this)">📋</button>
+      <span class="char-count" id="count-${sid}">0字</span>
+    </div>
+  `;
+  return card;
+}
+
+async function callModel(model, question, sysPrompt, idx, signal) {
+  const sid = safeId(model.id);
+  const bodyEl = document.getElementById(`body-${sid}`);
+  const metaEl = document.getElementById(`meta-${sid}`);
+  const countEl = document.getElementById(`count-${sid}`);
+  const t0 = Date.now();
+
+  bodyEl.className = 'card-body loading streaming-cursor';
+  bodyEl.textContent = '';
+
+  try {
+    const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      signal,
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+        'HTTP-Referer': location.href,
+        'X-Title': '多AI聚合助手',
+      },
+      body: JSON.stringify({
+        model: model.id,
+        stream: true,
+        messages: [
+          ...(sysPrompt ? [{ role: 'system', content: sysPrompt }] : []),
+          { role: 'user', content: question }
+        ]
+      })
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error?.message || `HTTP ${res.status}`);
+    }
+
+    const reader = res.body.getReader();
+    const dec = new TextDecoder();
+    let buf = '', full = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buf += dec.decode(value, { stream: true });
+      const lines = buf.split('\n');
+      buf = lines.pop();
+      for (const line of lines) {
+        if (!line.startsWith('data: ')) continue;
+        const d = line.slice(6).trim();
+        if (d === '[DONE]') continue;
+        try {
+          const delta = JSON.parse(d).choices?.[0]?.delta?.content || '';
+          if (delta) { full += delta; bodyEl.textContent = full; countEl.textContent = full.length + '字'; }
+        } catch {}
+      }
+    }
+
+    const sec = ((Date.now() - t0) / 1000).toFixed(1);
+    metaEl.textContent = `${sec}s · ${full.length}字`;
+    bodyEl.className = 'card-body';
+    if (!full) { bodyEl.textContent = '（未返回内容，可能该模型暂时不可用）'; bodyEl.className = 'card-body error'; }
+
+  } catch (e) {
+    if (e.name === 'AbortError') { bodyEl.className = 'card-body'; bodyEl.textContent = '已终止'; return; }
+    bodyEl.className = 'card-body error';
+    bodyEl.textContent = `❌ 请求失败：${e.message}`;
+    metaEl.textContent = '失败';
+  }
+
+  checkAllDone();
+}
+
+function checkAllDone() {
+  const running = document.querySelectorAll('.card-body.loading, .streaming-cursor');
+  if (running.length === 0) document.getElementById('sendBtn').disabled = false;
+}
+
+// ===== 交互 =====
+function vote(btn) {
+  btn.classList.toggle('voted');
+}
+
+function copyText(id, btn) {
+  const text = document.getElementById(id)?.textContent || '';
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '✅';
+    setTimeout(() => btn.textContent = '📋', 1800);
+  }).catch(() => {
+    // fallback
+    const ta = document.createElement('textarea');
+    ta.value = text; document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta);
+    btn.textContent = '✅'; setTimeout(() => btn.textContent = '📋', 1800);
+  });
+}
+
+function clearAll() {
+  abortControllers.forEach(c => c.abort());
+  abortControllers = [];
+  document.getElementById('userInput').value = '';
+  document.getElementById('resultsGrid').innerHTML = '';
+  document.getElementById('sendBtn').disabled = false;
+}
+
+// 点 overlay 关闭弹窗
+document.getElementById('keyModal').addEventListener('click', e => {
+  if (e.target === e.currentTarget) closeKeyModal();
+});
+
+init();
+</script>
+</body>
+</html>
