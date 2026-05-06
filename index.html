@@ -80,7 +80,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .key-btn:hover{background:var(--bg-hover);color:var(--text-primary)}
 .model-bar{padding:12px 20px;border-bottom:1px solid var(--border);background:var(--bg-secondary);flex-shrink:0;transition:background var(--transition-speed),border-color var(--transition-speed)}
 .model-bar-label{font-size:12px;color:var(--text-muted);margin-bottom:8px}
-.model-toggle{display:flex;flex-wrap:wrap;gap:6px}
+.model-tier{margin-bottom:8px}
+.model-tier:last-child{margin-bottom:0}
+.model-tier-label{font-size:11px;color:var(--text-muted);margin-bottom:4px;letter-spacing:.3px}
+.model-tier-tags{display:flex;flex-wrap:wrap;gap:6px}
 .model-tag{padding:5px 12px;border-radius:16px;font-size:12px;cursor:pointer;border:1px solid var(--border);background:var(--bg-input);color:var(--text-secondary);transition:all .2s;user-select:none}
 .model-tag.active{background:var(--accent);color:#fff;border-color:var(--accent)}
 .model-tag:hover{border-color:var(--accent)}
@@ -110,9 +113,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .multi-column-input textarea{flex:1;background:var(--bg-input);border:1px solid var(--border);border-radius:8px;padding:7px 10px;font-size:12px;color:var(--text-primary);resize:none;min-height:32px;max-height:70px;font-family:inherit;line-height:1.4;transition:border .2s}
 .multi-column-input textarea:focus{outline:none;border-color:var(--accent)}
 .multi-column-input textarea::placeholder{color:var(--text-muted)}
-.multi-column-input button{background:var(--accent);color:#fff;border:none;border-radius:6px;padding:6px 10px;font-size:11px;cursor:pointer;transition:background .2s;white-space:nowrap;height:32px}
-.multi-column-input button:hover{background:var(--accent-hover)}
-.multi-column-input button:disabled{opacity:.4;cursor:not-allowed}
+.multi-column-input button.col-send-btn{background:var(--accent);color:#fff;border:none;border-radius:6px;padding:6px 10px;font-size:11px;cursor:pointer;transition:background .2s;white-space:nowrap;height:32px}
+.multi-column-input button.col-send-btn:hover{background:var(--accent-hover)}
+.multi-column-input button.col-send-btn:disabled{opacity:.4;cursor:not-allowed}
 .streaming-cursor::after{content:'▋';display:inline-block;animation:blink .8s infinite;margin-left:2px}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
 .empty-state{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--text-muted);gap:12px}
@@ -127,6 +130,20 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .send-btn:hover{background:var(--accent-hover)}
 .send-btn:disabled{opacity:.4;cursor:not-allowed}
 .input-hint{font-size:11px;color:var(--text-muted);margin-top:6px;text-align:center}
+/* Tool button styles */
+.tool-btn-wrap{position:relative}
+.tool-btn{background:var(--bg-input);border:1px solid var(--border);color:var(--text-secondary);border-radius:10px;padding:12px 14px;font-size:16px;cursor:pointer;transition:all .2s;height:48px;display:flex;align-items:center;justify-content:center}
+.tool-btn:hover{background:var(--bg-hover);color:var(--text-primary);border-color:var(--accent)}
+.tool-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.tool-btn-sm-wrap{position:relative}
+.tool-btn-sm{background:var(--bg-input);border:1px solid var(--border);color:var(--text-secondary);border-radius:6px;padding:6px 8px;font-size:13px;cursor:pointer;transition:all .2s;height:32px;display:flex;align-items:center;justify-content:center}
+.tool-btn-sm:hover{background:var(--bg-hover);color:var(--text-primary);border-color:var(--accent)}
+.tool-btn-sm.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.tool-dropdown{position:absolute;bottom:100%;left:0;margin-bottom:6px;background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:6px;z-index:200;min-width:160px;box-shadow:0 4px 16px rgba(0,0,0,.35);display:none}
+.tool-dropdown.show{display:block}
+.tool-dropdown-item{padding:8px 12px;font-size:13px;color:var(--text-primary);cursor:pointer;border-radius:6px;transition:background .1s;display:flex;align-items:center;gap:8px;white-space:nowrap}
+.tool-dropdown-item:hover{background:var(--bg-hover)}
+.tool-dropdown-item.active{color:var(--accent);font-weight:600;background:var(--bg-hover)}
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:200}
 .modal-overlay.hidden{display:none}
 .modal{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:28px;width:460px;max-width:95vw}
@@ -191,8 +208,17 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   </div>
   <div class="input-area">
     <div class="input-row">
+      <div class="tool-btn-wrap">
+        <button class="tool-btn" id="globalToolBtn" onclick="toggleToolMenu('global')">⚡</button>
+        <div class="tool-dropdown" id="toolDropdown-global">
+          <div class="tool-dropdown-item" data-tool="联网搜索" onclick="selectTool('global','联网搜索')">🌐 联网搜索</div>
+          <div class="tool-dropdown-item" data-tool="写作" onclick="selectTool('global','写作')">✍️ 写作</div>
+          <div class="tool-dropdown-item" data-tool="编程" onclick="selectTool('global','编程')">💻 编程</div>
+          <div class="tool-dropdown-item" data-tool="解题" onclick="selectTool('global','解题')">🧩 解题</div>
+        </div>
+      </div>
       <textarea class="input-textarea" id="userInput" placeholder="输入消息..." rows="1"></textarea>
-      <button class="send-btn" id="sendBtn" onclick="sendMessage()">发送</button>
+      <button class="send-btn" id="sendBtn">发送</button>
     </div>
     <div class="input-hint">Ctrl+Enter 发送 · 单模型深度对话 · 多模型并排对比（各列可独立追问）</div>
   </div>
@@ -231,6 +257,24 @@ const MODELS=[
 {id:'z-ai/glm-4.5-air:free',name:'GLM 4.5 Air',company:'Zhipu AI'},
 {id:'nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free',name:'Nemotron Nano Reasoning',company:'NVIDIA'}
 ];
+
+// Model tiers for display grouping
+const MODEL_TIERS=[
+  {label:'\u{1F947} 旗舰级',ids:['nvidia/nemotron-3-super-120b-a12b:free','openai/gpt-oss-120b:free','nousresearch/hermes-3-llama-3.1-405b:free','inclusionai/ling-2.6-1t:free']},
+  {label:'\u{1F948} 主力级',ids:['minimax/minimax-m2.5:free','tencent/hy3-preview:free','z-ai/glm-4.5-air:free']},
+  {label:'\u{1F949} 轻量级',ids:['nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free']}
+];
+
+// Tool prefixes
+const TOOL_OPTIONS=[
+  {key:'联网搜索',icon:'🌐',prefix:'[联网搜索] '},
+  {key:'写作',icon:'✍️',prefix:'[写作] '},
+  {key:'编程',icon:'💻',prefix:'[编程] '},
+  {key:'解题',icon:'🧩',prefix:'[解题] '}
+];
+
+// Track active tool per input context
+let activeTools={};  // key: 'global' or modelId => tool key or null
 
 const MAX_RETRIES=2,RETRY_DELAY=1500,MAX_HISTORY=10,REQUEST_TIMEOUT=30000;
 
@@ -282,6 +326,103 @@ function loadFolders(){try{folders=JSON.parse(localStorage.getItem('multi_ai_fol
 function saveFolders(){localStorage.setItem('multi_ai_folders',JSON.stringify(folders));localStorage.setItem('multi_ai_collapsed_folders',JSON.stringify([...collapsedFolders]));}
 function getCurrentChat(){return conversations.find(c=>c.id===currentChatId);}
 
+// ========== TOOL MENU ==========
+function toggleToolMenu(context){
+  const dropdown=document.getElementById('toolDropdown-'+context);
+  if(!dropdown)return;
+  // Close all other dropdowns first
+  document.querySelectorAll('.tool-dropdown.show').forEach(el=>{
+    if(el.id!=='toolDropdown-'+context)el.classList.remove('show');
+  });
+  dropdown.classList.toggle('show');
+  if(dropdown.classList.contains('show')){
+    // Update active state
+    const currentTool=activeTools[context]||null;
+    dropdown.querySelectorAll('.tool-dropdown-item').forEach(item=>{
+      item.classList.toggle('active',item.dataset.tool===currentTool);
+    });
+  }
+}
+
+function selectTool(context,toolKey){
+  // Toggle: if same tool selected, deselect
+  if(activeTools[context]===toolKey){
+    activeTools[context]=null;
+  }else{
+    activeTools[context]=toolKey;
+  }
+  // Close dropdown
+  const dropdown=document.getElementById('toolDropdown-'+context);
+  if(dropdown)dropdown.classList.remove('show');
+  // Update button visual
+  updateToolBtnState(context);
+  // Update textarea prefix
+  updateToolPrefix(context);
+  // Focus the textarea
+  const textarea=getTextareaForContext(context);
+  if(textarea)textarea.focus();
+}
+
+function updateToolBtnState(context){
+  let btn;
+  if(context==='global'){
+    btn=document.getElementById('globalToolBtn');
+  }else{
+    btn=document.getElementById('toolbtn-'+safeId(context));
+  }
+  if(!btn)return;
+  if(activeTools[context]){
+    btn.classList.add('active');
+  }else{
+    btn.classList.remove('active');
+  }
+}
+
+function getTextareaForContext(context){
+  if(context==='global')return document.getElementById('userInput');
+  return document.getElementById('colinput-'+safeId(context));
+}
+
+function updateToolPrefix(context){
+  const textarea=getTextareaForContext(context);
+  if(!textarea)return;
+  const tool=activeTools[context];
+  // Remove any existing prefix
+  let val=textarea.value;
+  TOOL_OPTIONS.forEach(t=>{
+    if(val.startsWith(t.prefix))val=val.slice(t.prefix.length);
+  });
+  // Add new prefix if tool is selected
+  if(tool){
+    const opt=TOOL_OPTIONS.find(t=>t.key===tool);
+    if(opt)val=opt.prefix+val;
+  }
+  textarea.value=val;
+}
+
+function getMessageWithToolPrefix(context,rawText){
+  // If tool is active, ensure prefix is in the message
+  const tool=activeTools[context];
+  if(!tool)return rawText;
+  const opt=TOOL_OPTIONS.find(t=>t.key===tool);
+  if(!opt)return rawText;
+  // If prefix already in text (user typed in it), keep as is
+  if(rawText.startsWith(opt.prefix))return rawText;
+  return opt.prefix+rawText;
+}
+
+function stripToolPrefix(text){
+  let val=text;
+  TOOL_OPTIONS.forEach(t=>{
+    if(val.startsWith(t.prefix))val=val.slice(t.prefix.length);
+  });
+  return val;
+}
+
+function closeAllToolDropdowns(){
+  document.querySelectorAll('.tool-dropdown.show').forEach(el=>el.classList.remove('show'));
+}
+
 // ========== CONFIRM MODAL ==========
 function showConfirm(title,text,btnText,cb){
   document.getElementById('confirmTitle').textContent=title;
@@ -308,7 +449,6 @@ function hideContextMenu(){document.getElementById('contextMenu').style.display=
 function createFolder(){
   const folder={id:genId(),name:'新文件夹',chatIds:[]};
   folders.push(folder);saveFolders();renderChatList();
-  // Auto start rename
   setTimeout(()=>{const el=document.getElementById('fname-'+folder.id);if(el)startRenameFolder(folder.id);},50);
 }
 function startRenameFolder(fid){
@@ -330,7 +470,6 @@ function toggleFolderCollapse(fid){
   saveFolders();renderChatList();
 }
 function moveChatToFolder(chatId,folderId){
-  // Remove from all folders first
   folders.forEach(f=>{f.chatIds=f.chatIds.filter(id=>id!==chatId);});
   if(folderId){const folder=folders.find(f=>f.id===folderId);if(folder)folder.chatIds.push(chatId);}
   saveFolders();renderChatList();
@@ -349,7 +488,6 @@ function renderChatList(){
   if(conversations.length===0&&folders.length===0){list.innerHTML='<div style="padding:20px;text-align:center;color:var(--text-muted);font-size:13px;">暂无对话</div>';return;}
   
   let html='';
-  // Render folders
   folders.forEach(folder=>{
     const isCollapsed=collapsedFolders.has(folder.id);
     const chats=folder.chatIds.map(cid=>conversations.find(c=>c.id===cid)).filter(Boolean);
@@ -369,7 +507,6 @@ function renderChatList(){
     </div>`;
   });
   
-  // Ungrouped chats
   const groupedIds=new Set(folders.flatMap(f=>f.chatIds));
   const ungrouped=conversations.filter(c=>!groupedIds.has(c.id));
   if(ungrouped.length>0&&folders.length>0){
@@ -399,7 +536,6 @@ function showChatContextMenu(e,chatId){
     {label:'🗑️ 删除',action:`()=>deleteChatConfirm('${chatId}')`,danger:true},
     {separator:true}
   ];
-  // Move to folder options
   if(folders.length>0){
     folders.forEach(f=>{
       items.push({label:`📁 移到「${f.name}」`,action:`()=>moveChatToFolder('${chatId}','${f.id}')`});
@@ -414,12 +550,9 @@ function showChatContextMenu(e,chatId){
 
 function startEditChatTitle(chatId){
   const chat=conversations.find(c=>c.id===chatId);if(!chat)return;
-  const el=document.querySelector(`.chat-item.active .chat-item-title, .chat-item .chat-item-title`);
-  // Find the right element
   const items=document.querySelectorAll('.chat-item');
   let targetItem=null;
   items.forEach(item=>{if(item.onclick&&item.onclick.toString().includes(chatId))targetItem=item;});
-  // Simpler approach: re-render with input
   const titleEl=targetItem?.querySelector('.chat-item-title');
   if(!titleEl)return;
   const input=document.createElement('input');
@@ -456,14 +589,24 @@ function switchChat(chatId){
   renderChatList();renderChatArea();
 }
 
-// ========== MODEL TOGGLE ==========
+// ========== MODEL TOGGLE (with tiers) ==========
 function renderModelToggle(){
   const wrap=document.getElementById('modelToggle');wrap.innerHTML='';
-  MODELS.forEach(m=>{
-    const tag=document.createElement('span');
-    tag.className='model-tag'+(activeModels.has(m.id)?' active':'');
-    tag.textContent=m.name;tag.title=m.company;
-    tag.onclick=()=>toggleModel(m.id);wrap.appendChild(tag);
+  MODEL_TIERS.forEach(tier=>{
+    const tierDiv=document.createElement('div');tierDiv.className='model-tier';
+    const labelDiv=document.createElement('div');labelDiv.className='model-tier-label';labelDiv.textContent=tier.label;
+    tierDiv.appendChild(labelDiv);
+    const tagsDiv=document.createElement('div');tagsDiv.className='model-tier-tags';
+    tier.ids.forEach(mid=>{
+      const model=MODELS.find(m=>m.id===mid);if(!model)return;
+      const tag=document.createElement('span');
+      tag.className='model-tag'+(activeModels.has(mid)?' active':'');
+      tag.textContent=model.name;tag.title=model.company;
+      tag.onclick=()=>toggleModel(mid);
+      tagsDiv.appendChild(tag);
+    });
+    tierDiv.appendChild(tagsDiv);
+    wrap.appendChild(tierDiv);
   });
 }
 function toggleModel(id){
@@ -489,14 +632,24 @@ function renderChatArea(){
     area.className='chat-area multi-mode';
     area.innerHTML=sel.map(mid=>{
       const model=MODELS.find(m=>m.id===mid);const msgs=chat.models[mid]||[];
-      return `<div class="multi-column" id="col-${safeId(mid)}">
+      const sid=safeId(mid);
+      return `<div class="multi-column" id="col-${sid}">
         <div class="multi-column-header"><div class="model-name">${model?model.name:mid}</div><div class="model-company">${model?model.company:''}</div></div>
-        <div class="multi-column-body" id="colbody-${safeId(mid)}">
+        <div class="multi-column-body" id="colbody-${sid}">
           ${msgs.length===0?'<div style="color:var(--text-muted);font-size:13px;text-align:center;padding:20px;">等待消息...</div>':msgs.map(msg=>`<div class="multi-msg ${msg.role}${msg.error?' error':''}">${escHtml(msg.content)}</div>`).join('')}
         </div>
         <div class="multi-column-input">
-          <textarea placeholder="追问此模型..." rows="1" id="colinput-${safeId(mid)}" onkeydown="if(event.ctrlKey&&event.key==='Enter'){event.preventDefault();sendToSingleModel('${mid}')}"></textarea>
-          <button onclick="sendToSingleModel('${mid}')">发送</button>
+          <div class="tool-btn-sm-wrap">
+            <button class="tool-btn-sm${activeTools[mid]?' active':''}" id="toolbtn-${sid}" onclick="toggleToolMenu('${mid}')">⚡</button>
+            <div class="tool-dropdown" id="toolDropdown-${mid}">
+              <div class="tool-dropdown-item" data-tool="联网搜索" onclick="selectTool('${mid}','联网搜索')">🌐 联网搜索</div>
+              <div class="tool-dropdown-item" data-tool="写作" onclick="selectTool('${mid}','写作')">✍️ 写作</div>
+              <div class="tool-dropdown-item" data-tool="编程" onclick="selectTool('${mid}','编程')">💻 编程</div>
+              <div class="tool-dropdown-item" data-tool="解题" onclick="selectTool('${mid}','解题')">🧩 解题</div>
+            </div>
+          </div>
+          <textarea placeholder="追问此模型..." rows="1" id="colinput-${sid}" onkeydown="if(event.ctrlKey&&event.key==='Enter'){event.preventDefault();sendToSingleModel('${mid}')}"></textarea>
+          <button class="col-send-btn" onclick="sendToSingleModel('${mid}')">发送</button>
         </div>
       </div>`;
     }).join('');
@@ -514,14 +667,23 @@ function scrollToBottom(){
 function abortAll(){abortControllers.forEach(c=>c.abort());abortControllers=[];isSending=false;document.getElementById('sendBtn').disabled=false;}
 
 async function sendMessage(){
-  const input=document.getElementById('userInput');const question=input.value.trim();
-  if(!question||isSending)return;
+  const input=document.getElementById('userInput');
+  let rawText=input.value.trim();
+  if(!rawText||isSending)return;
   if(!apiKey){openKeyModal();return;}
   if(!currentChatId)newChat();
   const chat=getCurrentChat();if(!chat)return;
+
+  // Apply tool prefix
+  const question=getMessageWithToolPrefix('global',stripToolPrefix(rawText));
+
   isSending=true;document.getElementById('sendBtn').disabled=true;
   input.value='';input.style.height='auto';
-  if(chat.title==='新对话'){chat.title=question.slice(0,20);renderChatList();}
+  // Reset tool after sending
+  activeTools['global']=null;
+  updateToolBtnState('global');
+
+  if(chat.title==='新对话'){chat.title=stripToolPrefix(question).slice(0,20);renderChatList();}
   const sel=Array.from(activeModels);
   sel.forEach(mid=>{if(!chat.models[mid])chat.models[mid]=[];});
   sel.forEach(mid=>{chat.models[mid].push({role:'user',content:question});});
@@ -538,10 +700,18 @@ async function sendToSingleModel(modelId){
   if(!apiKey){openKeyModal();return;}
   const chat=getCurrentChat();if(!chat)return;
   const inputEl=document.getElementById('colinput-'+safeId(modelId));if(!inputEl)return;
-  const question=inputEl.value.trim();if(!question)return;
+  let rawText=inputEl.value.trim();if(!rawText)return;
+
+  // Apply tool prefix
+  const question=getMessageWithToolPrefix(modelId,stripToolPrefix(rawText));
+
   inputEl.value='';inputEl.style.height='auto';
+  // Reset tool after sending
+  activeTools[modelId]=null;
+  updateToolBtnState(modelId);
+
   // Disable button
-  const btn=inputEl.nextElementSibling;if(btn)btn.disabled=true;
+  const btn=inputEl.parentElement.querySelector('.col-send-btn');if(btn)btn.disabled=true;
   if(!chat.models[modelId])chat.models[modelId]=[];
   chat.models[modelId].push({role:'user',content:question});
   saveConversations();
@@ -568,11 +738,9 @@ async function callModel(modelId,chat,outerSignal){
   for(let attempt=0;attempt<=MAX_RETRIES;attempt++){
     if(outerSignal.aborted){msgs.splice(assistantIdx,1);saveConversations();return;}
     const attemptCtrl=new AbortController();
-    // If outer signal aborts, abort this attempt too
     const onOuterAbort=()=>attemptCtrl.abort();
     outerSignal.addEventListener('abort',onOuterAbort,{once:true});
     const timeoutId=setTimeout(()=>attemptCtrl.abort(),REQUEST_TIMEOUT);
-    let timedOut=false;
     try{
       res=await fetch('https://openrouter.ai/api/v1/chat/completions',{
         method:'POST',signal:attemptCtrl.signal,
@@ -592,8 +760,7 @@ async function callModel(modelId,chat,outerSignal){
       clearTimeout(timeoutId);outerSignal.removeEventListener('abort',onOuterAbort);
       if(e.name==='AbortError'){
         if(outerSignal.aborted){msgs.splice(assistantIdx,1);saveConversations();return;}
-        // Timeout
-        timedOut=true;lastErr='⏱ 请求超时，请重试';
+        lastErr='⏱ 请求超时，请重试';
         if(attempt<MAX_RETRIES){await new Promise(r=>setTimeout(r,RETRY_DELAY));continue;}
         msgs[assistantIdx]={role:'assistant',content:lastErr,error:true};
         delete msgs[assistantIdx].streaming;saveConversations();
@@ -628,7 +795,6 @@ async function callModel(modelId,chat,outerSignal){
           const parsed=JSON.parse(d);
           const delta=parsed.choices?.[0]?.delta?.content||'';
           if(delta){fullText+=delta;updateStreamingEl(modelId,fullText,isSingle);}
-          // Check for error in stream
           if(parsed.error){throw new Error(parsed.error.message||'Stream error');}
         }catch(parseErr){
           if(parseErr.message&&parseErr.message!=='Stream error'&&!parseErr.message.includes('JSON'))continue;
@@ -694,9 +860,46 @@ document.getElementById('confirmModal').addEventListener('click',e=>{if(e.target
 document.addEventListener('click',e=>{
   if(!e.target.closest('.theme-wrapper'))hideThemeMenu();
   if(!e.target.closest('.context-menu'))hideContextMenu();
+  if(!e.target.closest('.tool-btn-wrap')&&!e.target.closest('.tool-btn-sm-wrap'))closeAllToolDropdowns();
+});
+
+// ========== INPUT EVENT BINDINGS ==========
+document.getElementById('sendBtn').addEventListener('click',sendMessage);
+document.getElementById('userInput').addEventListener('keydown',function(e){
+  if(e.ctrlKey&&e.key==='Enter'){e.preventDefault();sendMessage();}
+});
+// Auto-resize textarea
+document.getElementById('userInput').addEventListener('input',function(){
+  this.style.height='auto';
+  this.style.height=Math.min(this.scrollHeight,150)+'px';
 });
 
 // ========== INIT ==========
+function init(){
+  initTheme();
+  loadConversations();
+  loadFolders();
+  // Default model selection
+  if(conversations.length>0){
+    const lastChat=conversations[0];
+    if(lastChat.selectedModels&&lastChat.selectedModels.length>0){
+      activeModels=new Set(lastChat.selectedModels);
+    }else{
+      activeModels=new Set([MODELS[0].id]);
+    }
+  }else{
+    activeModels=new Set([MODELS[0].id]);
+  }
+  renderModelToggle();
+  renderChatList();
+  if(conversations.length>0){
+    currentChatId=conversations[0].id;
+    const chat=getCurrentChat();
+    if(chat&&chat.selectedModels){activeModels=new Set(chat.selectedModels);renderModelToggle();}
+  }
+  renderChatArea();
+}
+
 init();
 </script>
 </body>
