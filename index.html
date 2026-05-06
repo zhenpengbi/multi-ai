@@ -189,7 +189,8 @@ function openKeyModal() {
 }
 function closeKeyModal() { document.getElementById('keyModal').classList.add('hidden'); }
 function saveKey() {
-  const val = document.getElementById('keyInput').value.trim();
+  // 过滤掉所有非 ASCII 字符，避免 fetch headers 报 non ISO-8859-1 错误
+  const val = document.getElementById('keyInput').value.trim().replace(/[^\x00-\x7F]/g, '');
   if (val) { apiKey = val; localStorage.setItem('multi_ai_key', val); }
   closeKeyModal();
 }
