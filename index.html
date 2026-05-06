@@ -263,7 +263,7 @@ async function callModel(model, question, sysPrompt, idx, signal) {
         'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
         'HTTP-Referer': location.href,
-        'X-Title': '多AI聚合助手',
+        'X-Title': 'Multi-AI Assistant',
       },
       body: JSON.stringify({
         model: model.id,
