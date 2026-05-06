@@ -145,7 +145,7 @@ const MODELS = [
 
 // ===== 状态 =====
 let activeModels = new Set(MODELS.map(m => m.id));
-let apiKey = localStorage.getItem('multi_ai_key') || '';
+let apiKey = (localStorage.getItem('multi_ai_key') || '').replace(/[^\x00-\x7F]/g, '');
 let abortControllers = [];
 
 // ===== 初始化 =====
