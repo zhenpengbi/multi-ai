@@ -168,6 +168,11 @@ button{font-family:inherit;border:none;background:none;cursor:pointer;color:inhe
 .col-tbtn:hover{color:var(--accent);background:var(--accent-light)}
 .col-tbtn.active{color:var(--accent)}
 .col-tbtn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.col-badge{display:inline-flex;align-items:center;gap:2px;padding:2px 8px;border-radius:12px;font-size:11px;color:var(--accent);border:1px solid var(--accent);background:var(--accent-light);margin-left:4px}
+.col-badge .rx{cursor:pointer;margin-left:2px;font-size:12px}
+.col-tool-popup{background:var(--bg-primary);border:1px solid var(--border);border-radius:var(--radius-sm);box-shadow:var(--shadow-md);padding:4px;min-width:80px}
+.ctp-item{padding:6px 12px;font-size:12px;cursor:pointer;border-radius:4px;white-space:nowrap}
+.ctp-item:hover{background:var(--accent-light);color:var(--accent)}
 /* Input Area */
 .input-area{padding:14px 24px 20px;background:var(--bg-primary);border-top:1px solid var(--border)}
 .input-wrap{max-width:800px;margin:0 auto;position:relative}
@@ -436,6 +441,7 @@ let state={
   currentFolderId:null,
   selectedModels:[],
   activeTools:[],
+  colTools:{},
   deepThink:false,
   abortControllers:{},
   streaming:{},
@@ -868,9 +874,6 @@ function renderChatArea(){
   }
   if(state.selectedModels.length===1){area.style.padding='24px';renderSingleMode(area,chat)}
   else{area.style.padding='0';renderMultiMode(area,chat)}
-  // Hide global input area in multi-column mode (each column has its own input)
-  const inputArea=document.querySelector('.input-area');
-  if(inputArea)inputArea.style.display=state.selectedModels.length>1?'none':'';
 }
 
 function msgActionsHTML(msgIdx){
@@ -885,9 +888,11 @@ function msgActionsHTML(msgIdx){
 function renderSingleMode(area,chat){
   const modelId=state.selectedModels[0];
   const sDeep=state.colDeepThink&&state.colDeepThink[modelId];
+  const colBadges=(state.colTools[modelId]&&state.colTools[modelId].length)?state.colTools[modelId].map(t=>`<span class="col-badge">${t}<span class="rx" onclick="removeColTool('${modelId}','${t}')">×</span></span>`).join(''):'';
   let html=`<div class="chat-wrap"><div class="col-tools" style="margin-bottom:12px">
     <button class="col-tbtn${sDeep?' active':''}" onclick="toggleColDeepThink('${modelId}')" title="深度思考"><svg viewBox="0 0 14 14"><circle cx="7" cy="7" r="2.5"/><circle cx="7" cy="7" r="5" stroke-dasharray="2 2"/></svg></button>
-    <button class="col-tbtn" onclick="toggleToolMenu(event)" title="工具"><svg viewBox="0 0 14 14"><path d="M3 2h8v1.5H3zM2.5 3.5h9v8.5a1.5 1.5 0 01-1.5 1.5H4a1.5 1.5 0 01-1.5-1.5V3.5z"/><path d="M5.5 6.5h3M5.5 9h3"/></svg></button>
+    <button class="col-tbtn" onclick="toggleColToolMenu(event,'${modelId}')" title="工具"><svg viewBox="0 0 14 14"><path d="M3 2h8v1.5H3zM2.5 3.5h9v8.5a1.5 1.5 0 01-1.5 1.5H4a1.5 1.5 0 01-1.5-1.5V3.5z"/><path d="M5.5 6.5h3M5.5 9h3"/></svg></button>
+    ${colBadges}
   </div>`;
   chat.messages.forEach((m,i)=>{
     if(m.role==='system') return; // skip system messages in display
@@ -938,7 +943,8 @@ function renderMultiMode(area,chat){
       </div>
       <div class="col-tools">
         <button class="col-tbtn${colDeepActive?' active':''}" onclick="toggleColDeepThink('${modelId}')" title="深度思考"><svg viewBox="0 0 14 14"><circle cx="7" cy="7" r="2.5"/><circle cx="7" cy="7" r="5" stroke-dasharray="2 2"/></svg></button>
-        <button class="col-tbtn" onclick="toggleToolMenu(event)" title="工具"><svg viewBox="0 0 14 14"><path d="M3 2h8v1.5H3zM2.5 3.5h9v8.5a1.5 1.5 0 01-1.5 1.5H4a1.5 1.5 0 01-1.5-1.5V3.5z"/><path d="M5.5 6.5h3M5.5 9h3"/></svg></button>
+        <button class="col-tbtn" onclick="toggleColToolMenu(event,'${modelId}')" title="工具"><svg viewBox="0 0 14 14"><path d="M3 2h8v1.5H3zM2.5 3.5h9v8.5a1.5 1.5 0 01-1.5 1.5H4a1.5 1.5 0 01-1.5-1.5V3.5z"/><path d="M5.5 6.5h3M5.5 9h3"/></svg></button>
+        ${(state.colTools[modelId]&&state.colTools[modelId].length)?state.colTools[modelId].map(t=>`<span class="col-badge">${t}<span class="rx" onclick="removeColTool('${modelId}','${t}')">×</span></span>`).join(''):''}
       </div></div></div>`;
   });
   html+='</div>';area.innerHTML=html;
@@ -973,6 +979,33 @@ function toggleToolMenu(e){
   e.stopPropagation();const menu=document.getElementById('toolMenu');
   menu.classList.toggle('show');
   if(menu.classList.contains('show'))setTimeout(()=>document.addEventListener('click',()=>menu.classList.remove('show'),{once:true}),0);
+}
+// Per-column tool menu (independent from global)
+let _colToolMenuEl=null;
+function toggleColToolMenu(e,modelId){
+  e.stopPropagation();
+  if(_colToolMenuEl){_colToolMenuEl.remove();_colToolMenuEl=null;return}
+  const tools=['联网搜索','写作','编程','解题'];
+  const menu=document.createElement('div');
+  menu.className='col-tool-popup';
+  menu.innerHTML=tools.map(t=>`<div class="ctp-item" onclick="toggleColTool('${modelId}','${t}')">${t}</div>`).join('');
+  const rect=e.currentTarget.getBoundingClientRect();
+  menu.style.cssText=`position:fixed;left:${rect.left}px;top:${rect.bottom+4}px;z-index:9999`;
+  document.body.appendChild(menu);
+  _colToolMenuEl=menu;
+  setTimeout(()=>document.addEventListener('click',()=>{if(_colToolMenuEl){_colToolMenuEl.remove();_colToolMenuEl=null}},{once:true}),0);
+}
+function toggleColTool(modelId,name){
+  if(!state.colTools[modelId])state.colTools[modelId]=[];
+  const idx=state.colTools[modelId].indexOf(name);
+  if(idx>=0)state.colTools[modelId].splice(idx,1);else state.colTools[modelId].push(name);
+  if(_colToolMenuEl){_colToolMenuEl.remove();_colToolMenuEl=null}
+  renderChatArea();
+}
+function removeColTool(modelId,name){
+  if(!state.colTools[modelId])return;
+  state.colTools[modelId]=state.colTools[modelId].filter(t=>t!==name);
+  renderChatArea();
 }
 function toggleTool(name){
   const idx=state.activeTools.indexOf(name);
@@ -1015,7 +1048,12 @@ function sendMessage(){
   renderChatArea();
 }
 function colSend(modelId,inputEl){
-  const text=inputEl.value.trim();if(!text)return;inputEl.value='';
+  let text=inputEl.value.trim();if(!text)return;inputEl.value='';
+  // Prepend per-column tools if any
+  if(state.colTools[modelId]&&state.colTools[modelId].length){
+    text=`[${state.colTools[modelId].join(',')}] ${text}`;
+    state.colTools[modelId]=[];
+  }
   const chat=getCurrentChat();if(!chat)return;
   chat.messages.push({role:'user',content:text,ts:Date.now(),targetModelId:modelId});
   saveChats();
