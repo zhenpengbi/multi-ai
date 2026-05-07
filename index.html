@@ -302,7 +302,7 @@ button{font-family:inherit;border:none;background:none;cursor:pointer;color:inhe
 .chat-area{padding:14px 12px}
 .bubble{max-width:88vw;font-size:14px;line-height:1.6}
 .empty{padding:0 20px}.ei svg{width:48px;height:48px}.et{font-size:16px}.es{font-size:13px}
-.input-area{padding:8px 10px calc(8px + env(safe-area-inset-bottom,0px))}
+.input-area{padding:8px 10px calc(12px + env(safe-area-inset-bottom,16px))}
 .input-box{border-radius:16px}
 #mainInput{font-size:16px}
 .input-toolbar{gap:2px;padding:4px 8px}
@@ -321,6 +321,8 @@ button{font-family:inherit;border:none;background:none;cursor:pointer;color:inhe
 .msg-time{font-size:10px}
 .code-wrap{margin:8px -8px}.code-wrap pre{font-size:12px;padding:10px}
 .ctx-warn{margin:0 12px 6px;font-size:11px;padding:4px 10px}
+.sb-foot{padding-bottom:calc(10px + env(safe-area-inset-bottom,8px))}
+.model-panel-body{max-height:70vh;padding-bottom:calc(16px + env(safe-area-inset-bottom,0px))}
 }
 @media(min-width:769px){.btn-hamburger{display:none}.sidebar-overlay{display:none!important}}
 .msg-time{font-size:11px;color:var(--text-tertiary);margin-left:auto}
@@ -845,7 +847,7 @@ function renderSidebar(){
     let shownToday=false,shownYesterday=false,shownEarlier=false;
     ungrouped.forEach(c=>{
       const msgs=c.messages||[];const lastTs=c.ts||(msgs.length?msgs[msgs.length-1].ts:0)||0;
-      if(lastTs>=todayStart){if(!shownToday){html+='<div class="date-sep">今天</div>';shownToday=true}}
+      if(!lastTs||lastTs>=todayStart){if(!shownToday){html+='<div class="date-sep">今天</div>';shownToday=true}}
       else if(lastTs>=yesterdayStart){if(!shownYesterday){html+='<div class="date-sep">昨天</div>';shownYesterday=true}}
       else{if(!shownEarlier){html+='<div class="date-sep">更早</div>';shownEarlier=true}}
       html+=chatItemHTML(c);
