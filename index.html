@@ -552,6 +552,15 @@ function getModelName(id){
 
 // ===== DEEP THINK =====
 function toggleDeepThink(){
+  // In single model mode, toggle per-model state instead of global
+  if(state.selectedModels.length===1){
+    const mid=state.selectedModels[0];
+    if(!state.colDeepThink)state.colDeepThink={};
+    state.colDeepThink[mid]=!state.colDeepThink[mid];
+    document.getElementById('deepThinkBtn').classList.toggle('active',!!state.colDeepThink[mid]);
+    renderChatArea();
+    return;
+  }
   state.deepThink=!state.deepThink;
   document.getElementById('deepThinkBtn').classList.toggle('active',state.deepThink);
 }
@@ -872,7 +881,11 @@ function msgActionsHTML(msgIdx){
 
 function renderSingleMode(area,chat){
   const modelId=state.selectedModels[0];
-  let html='<div class="chat-wrap">';
+  const sDeep=state.colDeepThink&&state.colDeepThink[modelId];
+  let html=`<div class="chat-wrap"><div class="col-tools" style="margin-bottom:12px">
+    <button class="col-tbtn${sDeep?' active':''}" onclick="toggleColDeepThink('${modelId}')" title="深度思考"><svg viewBox="0 0 14 14"><circle cx="7" cy="7" r="2.5"/><circle cx="7" cy="7" r="5" stroke-dasharray="2 2"/></svg></button>
+    <button class="col-tbtn" onclick="toggleToolMenu(event)" title="工具"><svg viewBox="0 0 14 14"><path d="M3 2h8v1.5H3zM2.5 3.5h9v8.5a1.5 1.5 0 01-1.5 1.5H4a1.5 1.5 0 01-1.5-1.5V3.5z"/><path d="M5.5 6.5h3M5.5 9h3"/></svg></button>
+  </div>`;
   chat.messages.forEach((m,i)=>{
     if(m.role==='system') return; // skip system messages in display
     if(m.role==='user') html+=`<div class="msg user"><div class="bubble">${renderMd(m.content)}</div></div>`;
