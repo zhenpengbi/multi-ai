@@ -1,0 +1,17 @@
+{
+  "name": "Multi AI Studio",
+  "short_name": "Multi AI",
+  "description": "多模型AI对话工具",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#4f6ef7",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><linearGradient id='g' x1='0%' y1='0%' x2='100%' y2='100%'><stop offset='0%' stop-color='%234f6ef7'/><stop offset='100%' stop-color='%238b5cf6'/></linearGradient></defs><rect width='100' height='100' rx='20' fill='url(%23g)'/><path d='M50 25L25 38v24l25 13 25-13V38L50 25z' fill='none' stroke='white' stroke-width='3'/><path d='M50 51l25-13M50 51v26M50 51L25 38' fill='none' stroke='white' stroke-width='2.5'/></svg>",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
