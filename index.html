@@ -1073,16 +1073,24 @@ function renderMultiMode(area,chat){
 // ===== MARKDOWN (marked.js + highlight.js) =====
 (function initMarked(){
   if(typeof marked!=='undefined'){
-    marked.setOptions({
-      highlight:function(code,lang){
-        if(typeof hljs!=='undefined'){
-          if(lang&&hljs.getLanguage(lang))return hljs.highlight(code,{language:lang}).value;
-          return hljs.highlightAuto(code).value;
+    const renderer=new marked.Renderer();
+    renderer.code=function(text,lang){
+      let highlighted=text;
+      if(typeof hljs!=='undefined'){
+        // marked v15: text may be {text,lang} object
+        const codeStr=typeof text==='object'?text.text:text;
+        const codeLang=typeof text==='object'?text.lang:lang;
+        if(codeLang&&hljs.getLanguage(codeLang)){
+          highlighted=hljs.highlight(codeStr,{language:codeLang}).value;
+        }else{
+          highlighted=hljs.highlightAuto(codeStr).value;
         }
-        return code;
-      },
-      breaks:true,gfm:true,headerIds:false,mangle:false
-    });
+        return `<pre><code class="hljs language-${codeLang||'plaintext'}">${highlighted}</code></pre>`;
+      }
+      const codeStr2=typeof text==='object'?text.text:text;
+      return `<pre><code>${codeStr2}</code></pre>`;
+    };
+    marked.setOptions({renderer,breaks:true,gfm:true});
   }
 })();
 function copyCode(btn){const pre=btn.parentElement.querySelector('pre');navigator.clipboard.writeText(pre.textContent);btn.textContent='已复制';setTimeout(()=>btn.textContent='复制',1500)}
