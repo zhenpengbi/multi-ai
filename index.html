@@ -460,6 +460,13 @@ function chatItemHTML(c) {
 }
 
 // ===== CHAT AREA =====
+let _renderPending = false;
+function scheduleRender() {
+  if (_renderPending) return;
+  _renderPending = true;
+  requestAnimationFrame(() => { _renderPending = false; renderChatArea(); });
+}
+
 function renderChatArea() {
   const area = document.getElementById('chatArea');
   const chat = getCurrentChat();
@@ -682,7 +689,8 @@ async function streamToModel(modelId, chat, history, retryCount = 0) {
     
     if (!res.ok) {
       const errText = await res.text().catch(()=>'');
-      throw new Error(`HTTP ${res.status}: ${errText.slice(0,100)}`);
+      if (res.status === 429) throw new Error('模型繁忙，请稍后再试（限流）');
+      throw new Error(`HTTP ${res.status}: ${errText.slice(0,150)}`);
     }
     
     const reader = res.body.getReader();
@@ -705,7 +713,7 @@ async function streamToModel(modelId, chat, history, retryCount = 0) {
           const delta = j.choices?.[0]?.delta?.content;
           if (delta) {
             state.streaming[modelId].text += delta;
-            renderChatArea();
+            scheduleRender();
           }
         } catch(e) {}
       }
@@ -730,6 +738,8 @@ async function streamToModel(modelId, chat, history, retryCount = 0) {
         return streamToModel(modelId, chat, history, retryCount + 1);
       }
       addError(chat, modelId, '请求超时（30s）');
+    } else if (err.message.includes('限流')) {
+      addError(chat, modelId, err.message);
     } else if (retryCount < MAX_RETRIES) {
       await sleep(RETRY_DELAY);
       return streamToModel(modelId, chat, history, retryCount + 1);
