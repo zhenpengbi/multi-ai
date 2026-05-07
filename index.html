@@ -2,877 +2,857 @@
 <html lang="zh-CN" data-theme="light">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
 <title>Multi AI Studio</title>
 <style>
-:root{--bg-main:#f8f9fa;--bg-sidebar:#ffffff;--bg-card:#ffffff;--bg-input:#ffffff;--text-primary:#1a1a2e;--text-secondary:#4a5568;--text-tertiary:#a0aec0;--border:#e2e8f0;--accent:#6366f1;--accent-light:#eef2ff;--accent-hover:#4f46e5;--shadow-card:0 1px 3px rgba(0,0,0,0.08);--shadow-elevated:0 4px 16px rgba(0,0,0,0.12);--focus-ring:0 0 0 3px rgba(99,102,241,0.1);--radius-sm:8px;--radius-md:12px;--radius-lg:16px;--msg-user-bg:#6366f1;--msg-user-text:#fff;--msg-ai-bg:#f1f3f5;--msg-ai-text:#1a1a2e;--error-color:#ef4444;--success-color:#10b981}
-[data-theme="dark"]{--bg-main:#0f0f1a;--bg-sidebar:#1a1a2e;--bg-card:#1a1a2e;--bg-input:#1e1e3f;--text-primary:#e8e8f0;--text-secondary:#a0a0c0;--text-tertiary:#6a6a8a;--border:#2d2d4a;--accent:#818cf8;--accent-light:#1e1e3f;--accent-hover:#6366f1;--shadow-card:0 1px 3px rgba(0,0,0,0.3);--shadow-elevated:0 4px 16px rgba(0,0,0,0.5);--focus-ring:0 0 0 3px rgba(129,140,248,0.15);--msg-user-bg:#6366f1;--msg-user-text:#fff;--msg-ai-bg:#1e1e3f;--msg-ai-text:#e8e8f0;--error-color:#f87171;--success-color:#34d399}
+:root{--bg-primary:#fff;--bg-secondary:#f7f8fa;--bg-tertiary:#f0f1f3;--text-primary:#1a1a1a;--text-secondary:#666;--text-tertiary:#999;--accent:#4f6ef7;--accent-light:#eef1fe;--border:#e8e8e8;--radius-sm:8px;--radius-md:12px;--radius-lg:16px;--shadow-sm:0 1px 3px rgba(0,0,0,.06);--shadow-md:0 4px 12px rgba(0,0,0,.08);--success:#52c41a;--warning:#faad14;--error:#ff4d4f}
+[data-theme="dark"]{--bg-primary:#1a1a1a;--bg-secondary:#242424;--bg-tertiary:#2d2d2d;--text-primary:#e8e8e8;--text-secondary:#aaa;--text-tertiary:#777;--accent:#6b8aff;--accent-light:#2a2f4a;--border:#3a3a3a;--shadow-sm:0 1px 3px rgba(0,0,0,.2);--shadow-md:0 4px 12px rgba(0,0,0,.3);--success:#52c41a;--warning:#faad14;--error:#ff4d4f}
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Noto Sans SC',sans-serif;font-size:14px;line-height:1.6;color:var(--text-primary);background:var(--bg-main);height:100vh;overflow:hidden;transition:background .3s,color .3s}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Noto Sans SC',sans-serif;font-size:15px;line-height:1.7;color:var(--text-primary);background:var(--bg-primary);height:100vh;overflow:hidden;transition:background .3s,color .3s}
+button{font-family:inherit;border:none;background:none;cursor:pointer;color:inherit}
 .app{display:flex;height:100vh}
-.sidebar{width:260px;min-width:260px;background:var(--bg-sidebar);border-right:1px solid var(--border);display:flex;flex-direction:column;transition:all .3s}
-.sb-head{padding:20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
-.brand{display:flex;align-items:center;gap:10px;font-size:16px;font-weight:600}
-.brand-icon{width:32px;height:32px;background:linear-gradient(135deg,#6366f1,#8b5cf6);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;color:#fff}
-.btn-new{width:36px;height:36px;border:none;background:var(--accent);color:#fff;border-radius:8px;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;transition:all .2s}
-.btn-new:hover{background:var(--accent-hover);transform:scale(1.05)}
-.sb-list{flex:1;overflow-y:auto;padding:12px}
+/* Sidebar */
+.sidebar{width:260px;min-width:260px;background:var(--bg-secondary);border-right:1px solid var(--border);display:flex;flex-direction:column;transition:width .3s,min-width .3s;overflow:hidden;z-index:100}
+.sidebar.collapsed{width:60px;min-width:60px}
+.sidebar.collapsed .hide-c{display:none}
+.sidebar.collapsed .show-c{display:flex!important}
+.show-c{display:none!important}
+.sb-head{padding:14px 16px;display:flex;align-items:center;gap:10px}
+.brand{display:flex;align-items:center;gap:10px;font-size:15px;font-weight:600;white-space:nowrap}
+.brand-icon{width:30px;height:30px;background:linear-gradient(135deg,var(--accent),#8b5cf6);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.brand-icon svg{width:16px;height:16px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.btn-new{display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--accent);color:#fff;border-radius:var(--radius-md);font-size:13px;font-weight:500;transition:all .2s;width:calc(100% - 28px);justify-content:center;margin:0 14px 10px}
+.btn-new:hover{background:#3d5ce5;box-shadow:var(--shadow-sm)}
+.btn-new svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.sidebar.collapsed .btn-new{width:36px;height:36px;padding:0;margin:0 auto 10px;border-radius:8px}
+.sidebar.collapsed .btn-new .btn-text{display:none}
+.sb-search{margin:0 14px 10px;position:relative}
+.sb-search input{width:100%;padding:8px 12px 8px 34px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg-primary);color:var(--text-primary);font-size:13px;outline:none;transition:border-color .2s}
+.sb-search input:focus{border-color:var(--accent)}
+.sb-search svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);width:14px;height:14px;stroke:var(--text-tertiary);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.sb-list{flex:1;overflow-y:auto;padding:4px 8px;scrollbar-width:thin}
 .sb-list::-webkit-scrollbar{width:4px}
 .sb-list::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
-.folder-hdr{display:flex;align-items:center;gap:6px;padding:8px 12px;border-radius:8px;cursor:pointer;font-size:12px;font-weight:500;color:var(--text-secondary);transition:background .2s;user-select:none}
-.folder-hdr:hover{background:var(--accent-light)}
-.folder-hdr .arrow{transition:transform .2s;font-size:10px}
-.folder-hdr.collapsed .arrow{transform:rotate(-90deg)}
-.folder-acts{margin-left:auto;display:none;gap:4px}
-.folder-hdr:hover .folder-acts{display:flex}
-.folder-acts button{background:none;border:none;cursor:pointer;font-size:12px;padding:2px;opacity:.6;transition:opacity .2s}
-.folder-acts button:hover{opacity:1}
-.folder-body{overflow:hidden;transition:max-height .3s}
-.folder-body.collapsed{max-height:0!important}
-.chat-item{display:flex;align-items:center;padding:10px 12px;border-radius:8px;cursor:pointer;transition:all .2s;margin-bottom:2px;position:relative}
-.chat-item:hover{background:var(--accent-light)}
-.chat-item.active{background:var(--accent-light);box-shadow:inset 3px 0 0 var(--accent)}
+.grp-title-row{display:flex;align-items:center;justify-content:space-between;padding:6px 10px;margin-top:8px}
+.grp-title-row span{font-size:11px;font-weight:600;color:var(--text-tertiary);letter-spacing:.5px;text-transform:uppercase}
+.grp-title-row button{padding:2px 6px;border-radius:4px;color:var(--text-tertiary);transition:all .2s;font-size:14px}
+.grp-title-row button:hover{color:var(--accent);background:var(--accent-light)}
+.grp-hdr{display:flex;align-items:center;gap:6px;padding:8px 10px;border-radius:var(--radius-sm);cursor:pointer;font-size:13px;font-weight:500;color:var(--text-secondary);transition:background .15s;user-select:none}
+.grp-hdr:hover{background:var(--bg-tertiary)}
+.grp-hdr svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:transform .2s}
+.grp-hdr.collapsed svg.arrow{transform:rotate(-90deg)}
+.grp-acts{margin-left:auto;display:none;gap:2px}
+.grp-hdr:hover .grp-acts{display:flex}
+.grp-acts button{padding:3px;border-radius:4px;color:var(--text-tertiary);transition:all .2s}
+.grp-acts button:hover{color:var(--accent);background:var(--accent-light)}
+.grp-acts button svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.grp-body{overflow:hidden;transition:max-height .3s;padding-left:8px}
+.grp-body.collapsed{max-height:0!important}
+.chat-item{display:flex;align-items:center;padding:9px 12px;border-radius:var(--radius-sm);cursor:pointer;transition:all .15s;margin-bottom:2px}
+.chat-item:hover{background:var(--bg-tertiary)}
+.chat-item.active{background:var(--accent-light);color:var(--accent)}
 .chat-title{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px}
-.chat-acts{display:none;gap:4px;margin-left:8px}
+.chat-acts{display:none;gap:2px;margin-left:6px}
 .chat-item:hover .chat-acts{display:flex}
-.chat-acts button{background:none;border:none;cursor:pointer;font-size:12px;padding:2px 4px;border-radius:4px;transition:background .2s}
-.chat-acts button:hover{background:var(--border)}
-.edit-input{flex:1;background:var(--bg-input);border:1px solid var(--accent);border-radius:6px;padding:4px 8px;font-size:13px;color:var(--text-primary);outline:none}
-.btn-add-folder{display:flex;align-items:center;gap:6px;padding:8px 12px;border:1px dashed var(--border);border-radius:8px;background:none;cursor:pointer;font-size:12px;color:var(--text-tertiary);width:100%;transition:all .2s;margin:8px 12px;width:calc(100% - 24px)}
-.btn-add-folder:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-light)}
-.sb-foot{padding:16px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:8px}
-.srow{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-radius:8px;cursor:pointer;transition:background .2s;font-size:13px;color:var(--text-secondary)}
-.srow:hover{background:var(--accent-light)}
-.theme-sel{display:flex;gap:2px;background:var(--bg-main);padding:3px;border-radius:8px}
-.theme-btn{padding:4px 8px;border:none;background:none;border-radius:6px;font-size:12px;cursor:pointer;color:var(--text-secondary);transition:all .2s}
-.theme-btn.active{background:var(--accent);color:#fff}
+.chat-acts button{padding:3px;border-radius:4px;color:var(--text-tertiary);transition:all .2s}
+.chat-acts button:hover{color:var(--error)}
+.chat-acts button svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.edit-input{flex:1;background:var(--bg-primary);border:1px solid var(--accent);border-radius:6px;padding:4px 8px;font-size:13px;color:var(--text-primary);outline:none}
+.sb-foot{padding:10px 8px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:2px}
+.sb-foot-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:var(--radius-sm);font-size:13px;color:var(--text-secondary);transition:background .15s;cursor:pointer}
+.sb-foot-item:hover{background:var(--bg-tertiary)}
+.sb-foot-item svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.sb-foot-item .lbl{flex:1;white-space:nowrap;overflow:hidden}
+.sidebar.collapsed .sb-foot-item .lbl,.sidebar.collapsed .sb-foot-item .kst{display:none}
+/* Main */
 .main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
-.model-bar{padding:16px 24px;border-bottom:1px solid var(--border);background:var(--bg-card)}
-.tier{margin-bottom:10px}.tier:last-child{margin-bottom:0}
-.tier-label{font-size:11px;font-weight:500;color:var(--text-tertiary);margin-bottom:6px;letter-spacing:.5px}
+.top-bar{padding:10px 20px;border-bottom:1px solid var(--border);background:var(--bg-primary);display:flex;align-items:center;gap:10px}
+.top-bar svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.btn-hamburger{display:none;padding:6px;border-radius:var(--radius-sm);color:var(--text-secondary)}
+.btn-hamburger:hover{background:var(--bg-tertiary)}
+.btn-sidebar-toggle{padding:6px;border-radius:var(--radius-sm);color:var(--text-tertiary);transition:all .2s}
+.btn-sidebar-toggle:hover{background:var(--bg-tertiary);color:var(--text-primary)}
+.top-title{flex:1;font-size:14px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.model-trigger{display:flex;align-items:center;gap:6px;padding:6px 14px;border:1px solid var(--border);border-radius:20px;font-size:13px;color:var(--text-secondary);cursor:pointer;transition:all .2s}
+.model-trigger:hover{border-color:var(--accent);color:var(--accent)}
+.model-trigger .cnt{background:var(--accent);color:#fff;font-size:11px;padding:1px 6px;border-radius:10px;font-weight:600}
+/* Model Panel */
+.model-panel{position:fixed;inset:0;z-index:300;display:none;align-items:flex-end;justify-content:center}
+.model-panel.show{display:flex}
+.model-panel-bg{position:absolute;inset:0;background:rgba(0,0,0,.35);backdrop-filter:blur(2px)}
+.model-panel-body{position:relative;background:var(--bg-primary);border-radius:var(--radius-lg) var(--radius-lg) 0 0;width:100%;max-width:640px;max-height:70vh;overflow-y:auto;padding:24px;box-shadow:var(--shadow-md);animation:slideUp .25s ease}
+@keyframes slideUp{from{transform:translateY(16px);opacity:0}to{transform:translateY(0);opacity:1}}
+.mp-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.mp-hdr h3{font-size:16px;font-weight:600}
+.mp-close{padding:6px;border-radius:var(--radius-sm);color:var(--text-tertiary);transition:all .2s}
+.mp-close:hover{background:var(--bg-tertiary);color:var(--text-primary)}
+.mp-close svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.tier{margin-bottom:14px}.tier:last-child{margin-bottom:0}
+.tier-label{font-size:12px;font-weight:600;color:var(--text-tertiary);margin-bottom:6px}
 .tier-chips{display:flex;flex-wrap:wrap;gap:8px}
-.chip{padding:6px 14px;border:1px solid var(--border);border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;transition:all .2s;color:var(--text-secondary);background:var(--bg-card);user-select:none;display:flex;align-items:center;gap:6px}
+.chip{padding:6px 14px;border:1px solid var(--border);border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;transition:all .2s;color:var(--text-secondary);background:var(--bg-primary);user-select:none;display:flex;align-items:center;gap:4px}
 .chip:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-light)}
 .chip.sel{border-color:var(--accent);background:var(--accent);color:#fff}
-.chip .ck{display:none;font-size:10px}.chip.sel .ck{display:inline}
-.chat-area{flex:1;overflow-y:auto;padding:24px;display:flex;flex-direction:column}
+.chip .prov{font-size:10px;opacity:.7}
+/* Chat Area */
+.chat-area{flex:1;overflow-y:auto;padding:24px;display:flex;flex-direction:column;align-items:center;scrollbar-width:thin}
 .chat-area::-webkit-scrollbar{width:6px}
 .chat-area::-webkit-scrollbar-thumb{background:var(--border);border-radius:6px}
-.msg{max-width:720px;margin-bottom:20px;animation:msgIn .3s ease}
-@keyframes msgIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-.msg.user{align-self:flex-end}
-.msg.ai{align-self:flex-start}
-.bubble{padding:12px 18px;border-radius:var(--radius-md);line-height:1.6;word-break:break-word}
-.msg.user .bubble{background:var(--msg-user-bg);color:var(--msg-user-text);border-bottom-right-radius:4px}
-.msg.ai .bubble{background:var(--msg-ai-bg);color:var(--msg-ai-text);border-bottom-left-radius:4px}
-.msg .mname{font-size:11px;color:var(--text-tertiary);margin-bottom:4px;font-weight:500}
-.bubble code{background:rgba(0,0,0,.08);padding:2px 6px;border-radius:4px;font-size:13px;font-family:'SF Mono','Fira Code',monospace}
-.bubble pre{background:rgba(0,0,0,.06);padding:12px 16px;border-radius:8px;overflow-x:auto;margin:8px 0;font-size:13px;font-family:'SF Mono','Fira Code',monospace}
-[data-theme="dark"] .bubble code{background:rgba(255,255,255,.1)}
-[data-theme="dark"] .bubble pre{background:rgba(255,255,255,.05)}
+.chat-wrap{width:100%;max-width:800px}
+.msg{margin-bottom:20px;animation:msgIn .3s ease}
+@keyframes msgIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.msg.user{display:flex;justify-content:flex-end}
+.msg.ai{display:flex;flex-direction:column;align-items:flex-start}
+.bubble{padding:12px 18px;border-radius:var(--radius-lg);line-height:1.7;word-break:break-word;max-width:min(720px,85vw)}
+.msg.user .bubble{background:var(--accent);color:#fff;border-bottom-right-radius:4px}
+.msg.ai .bubble{background:var(--bg-secondary);color:var(--text-primary);border-bottom-left-radius:4px;border:1px solid var(--border)}
+.msg .mname{font-size:12px;color:var(--text-tertiary);margin-bottom:4px;font-weight:500}
+.bubble code{background:rgba(0,0,0,.06);padding:2px 5px;border-radius:4px;font-size:13px;font-family:'SF Mono','Fira Code',monospace}
+.bubble pre{background:var(--bg-tertiary);padding:12px 14px;border-radius:var(--radius-sm);overflow-x:auto;margin:8px 0;font-size:13px;font-family:'SF Mono','Fira Code',monospace;border:1px solid var(--border)}
+[data-theme="dark"] .bubble code{background:rgba(255,255,255,.08)}
 .bubble ul,.bubble ol{padding-left:20px;margin:8px 0}
 .bubble strong{font-weight:600}
-.thinking-block{margin:0 0 10px 0;border:1px solid rgba(128,128,128,.2);border-radius:8px;padding:0;overflow:hidden}
-.thinking-block summary{cursor:pointer;padding:8px 12px;font-size:13px;color:var(--text-secondary);background:rgba(128,128,128,.05);user-select:none}
-.thinking-block summary:hover{background:rgba(128,128,128,.1)}
-.thinking-content{padding:8px 12px;font-size:13px;color:var(--text-secondary);max-height:300px;overflow-y:auto;border-top:1px solid rgba(128,128,128,.1)}
+/* Thinking */
+.thinking-block{margin:0 0 10px;border-radius:var(--radius-sm);overflow:hidden}
+.thinking-summary{display:flex;align-items:center;gap:6px;padding:8px 12px;font-size:13px;color:var(--text-secondary);cursor:pointer;border-radius:var(--radius-sm);transition:background .2s;user-select:none}
+.thinking-summary:hover{background:var(--bg-tertiary)}
+.thinking-summary svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.dot-anim{display:inline-flex;gap:3px;margin-left:4px}
+.dot-anim span{width:4px;height:4px;border-radius:50%;background:var(--accent);animation:dotP 1.4s infinite}
+.dot-anim span:nth-child(2){animation-delay:.2s}
+.dot-anim span:nth-child(3){animation-delay:.4s}
+@keyframes dotP{0%,80%,100%{opacity:.3;transform:scale(.8)}40%{opacity:1;transform:scale(1)}}
+.thinking-body{padding:10px 14px;font-size:13px;color:var(--text-secondary);max-height:200px;overflow-y:auto;background:var(--bg-tertiary);border-radius:var(--radius-sm);margin-top:4px;border:1px solid var(--border);opacity:.85}
+.thinking-done{font-size:12px;color:var(--text-tertiary);padding:4px 10px;background:var(--bg-tertiary);border-radius:14px;display:inline-flex;align-items:center;gap:4px;margin-bottom:8px}
 .cursor{display:inline-block;width:2px;height:16px;background:var(--accent);margin-left:2px;animation:blink 1s infinite;vertical-align:middle}
 @keyframes blink{0%,50%{opacity:1}51%,100%{opacity:0}}
-.cols{display:flex;gap:16px;flex:1;overflow-x:auto;padding:24px}
-.col{flex:1;min-width:300px;max-width:500px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);display:flex;flex-direction:column;box-shadow:var(--shadow-card)}
-.col-hdr{padding:14px 18px;border-bottom:1px solid var(--border);font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px}
-.col-msgs{flex:1;overflow-y:auto;padding:16px}
+/* Multi Column */
+.cols{display:flex;gap:16px;flex:1;overflow-x:auto;padding:20px;width:100%}
+.col{flex:1;min-width:300px;max-width:520px;background:var(--bg-primary);border:1px solid var(--border);border-radius:var(--radius-lg);display:flex;flex-direction:column;box-shadow:var(--shadow-sm)}
+.col-hdr{padding:12px 16px;border-bottom:1px solid var(--border);font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px}
+.col-hdr .dot{width:6px;height:6px;border-radius:50%;background:var(--success)}
+.col-msgs{flex:1;overflow-y:auto;padding:14px;scrollbar-width:thin}
 .col-msgs::-webkit-scrollbar{width:4px}
 .col-msgs::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
-.col-in{padding:12px;border-top:1px solid var(--border);display:flex;gap:8px}
-.col-input{flex:1;padding:8px 12px;border:1px solid var(--border);border-radius:8px;background:var(--bg-input);color:var(--text-primary);font-size:13px;outline:none;transition:border-color .2s,box-shadow .2s}
-.col-input:focus{border-color:var(--accent);box-shadow:var(--focus-ring)}
-.col-send{padding:8px 12px;background:var(--accent);color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:13px;transition:background .2s}
-.col-send:hover{background:var(--accent-hover)}
-.err{color:var(--error-color);font-size:12px;margin-top:4px}
-.input-area{padding:16px 24px 24px;background:var(--bg-card);border-top:1px solid var(--border)}
+.col-in{padding:10px;border-top:1px solid var(--border)}
+.col-input-wrap{display:flex;gap:8px;align-items:flex-end}
+.col-input{flex:1;padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg-secondary);color:var(--text-primary);font-size:13px;outline:none;transition:border-color .2s}
+.col-input:focus{border-color:var(--accent)}
+.col-send{width:28px;height:28px;background:var(--accent);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
+.col-send:hover{background:#3d5ce5}
+.col-send svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.col-tools{display:flex;gap:4px;margin-top:6px}
+.col-tbtn{padding:4px;border-radius:4px;color:var(--text-tertiary);transition:all .2s}
+.col-tbtn:hover{color:var(--accent);background:var(--accent-light)}
+.col-tbtn.active{color:var(--accent)}
+.col-tbtn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+/* Input Area */
+.input-area{padding:14px 24px 20px;background:var(--bg-primary);border-top:1px solid var(--border)}
 .input-wrap{max-width:800px;margin:0 auto;position:relative}
-.tool-badges{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap}
-.tbadge{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;background:var(--accent-light);border:1px solid var(--accent);border-radius:16px;font-size:11px;color:var(--accent);font-weight:500}
-.tbadge .rx{cursor:pointer;font-size:14px;line-height:1;opacity:.7;transition:opacity .2s}
-.tbadge .rx:hover{opacity:1}
-.input-row{display:flex;align-items:flex-end;gap:10px;background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius-md);padding:8px 12px;transition:border-color .2s,box-shadow .2s}
-.input-row:focus-within{border-color:var(--accent);box-shadow:var(--focus-ring)}
-.tool-trig{width:36px;height:36px;border:none;background:none;cursor:pointer;font-size:20px;border-radius:8px;display:flex;align-items:center;justify-content:center;transition:background .2s;flex-shrink:0}
-.tool-trig:hover{background:var(--accent-light)}
-#mainInput{flex:1;border:none;background:none;resize:none;font-size:14px;line-height:1.5;color:var(--text-primary);outline:none;min-height:24px;max-height:120px;font-family:inherit}
+.input-box{background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-lg);padding:12px 16px;transition:border-color .2s,box-shadow .2s}
+.input-box:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px rgba(79,110,247,.06)}
+#mainInput{width:100%;border:none;background:none;resize:none;font-size:15px;line-height:1.6;color:var(--text-primary);outline:none;min-height:26px;max-height:150px;font-family:inherit}
 #mainInput::placeholder{color:var(--text-tertiary)}
-.send-btn{width:36px;height:36px;border:none;background:var(--accent);color:#fff;border-radius:8px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
-.send-btn:hover{background:var(--accent-hover);transform:scale(1.05)}
-.send-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
-.tool-menu{position:absolute;bottom:calc(100% + 8px);left:0;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);box-shadow:var(--shadow-elevated);padding:8px;display:none;min-width:180px;z-index:200}
+.input-toolbar{display:flex;align-items:center;gap:6px;margin-top:10px;padding-top:8px;border-top:1px solid var(--border)}
+.itb-btn{display:flex;align-items:center;gap:5px;padding:5px 12px;border-radius:18px;font-size:13px;color:var(--text-secondary);transition:all .2s;user-select:none}
+.itb-btn:hover{background:var(--bg-tertiary);color:var(--text-primary)}
+.itb-btn.active{background:var(--accent-light);color:var(--accent);font-weight:500}
+.itb-btn svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.itb-right{margin-left:auto;display:flex;align-items:center;gap:6px}
+.send-btn{width:34px;height:34px;background:var(--bg-tertiary);color:var(--text-tertiary);border-radius:50%;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.send-btn.active{background:var(--accent);color:#fff}
+.send-btn.active:hover{background:#3d5ce5;transform:scale(1.05)}
+.send-btn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.tool-menu{position:absolute;bottom:100%;left:60px;background:var(--bg-primary);border:1px solid var(--border);border-radius:var(--radius-md);box-shadow:var(--shadow-md);padding:6px;display:none;min-width:160px;z-index:200;margin-bottom:8px}
 .tool-menu.show{display:block;animation:menuIn .15s ease}
-@keyframes menuIn{from{opacity:0;transform:translateY(4px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
-.tmenu-item{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;cursor:pointer;transition:background .15s;font-size:13px;color:var(--text-primary)}
-.tmenu-item:hover{background:var(--accent-light)}
-.ctx-menu{position:fixed;background:var(--bg-card);border:1px solid var(--border);border-radius:8px;box-shadow:var(--shadow-elevated);padding:6px;z-index:1000;min-width:160px;display:none}
+@keyframes menuIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+.tm-item{display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:var(--radius-sm);font-size:13px;transition:background .15s}
+.tm-item:hover{background:var(--accent-light)}
+.tm-item svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.tool-badges{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap}
+.tbadge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;background:var(--accent-light);border:1px solid var(--accent);border-radius:14px;font-size:12px;color:var(--accent);font-weight:500}
+.tbadge .rx{cursor:pointer;font-size:14px;line-height:1;opacity:.6}
+.tbadge .rx:hover{opacity:1}
+.err{color:var(--error);font-size:12px;margin-top:4px;padding:3px 8px;background:rgba(255,77,79,.05);border-radius:4px}
+/* Context Menu */
+.ctx-menu{position:fixed;background:var(--bg-primary);border:1px solid var(--border);border-radius:var(--radius-sm);box-shadow:var(--shadow-md);padding:4px;z-index:1000;min-width:150px;display:none}
 .ctx-menu.show{display:block;animation:menuIn .15s ease}
-.ctx-item{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:6px;cursor:pointer;font-size:13px;color:var(--text-primary);transition:background .15s}
+.ctx-item{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:6px;font-size:13px;transition:background .15s;cursor:pointer}
 .ctx-item:hover{background:var(--accent-light)}
-.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.4);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:500}
-.modal-bg.show{display:flex;animation:fadeIn .2s ease}
-@keyframes fadeIn{from{opacity:0}to{opacity:1}}
-.modal{background:var(--bg-card);border-radius:var(--radius-lg);padding:32px;width:420px;max-width:90vw;box-shadow:var(--shadow-elevated);animation:modalIn .25s ease}
-@keyframes modalIn{from{opacity:0;transform:scale(.95) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
-.modal h2{font-size:18px;font-weight:600;margin-bottom:8px}
-.modal p{font-size:13px;color:var(--text-secondary);margin-bottom:20px}
-.modal-input{width:100%;padding:12px 16px;border:1px solid var(--border);border-radius:8px;background:var(--bg-input);color:var(--text-primary);font-size:14px;outline:none;transition:border-color .2s,box-shadow .2s;font-family:'SF Mono','Fira Code',monospace}
-.modal-input:focus{border-color:var(--accent);box-shadow:var(--focus-ring)}
+/* Modal */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.35);backdrop-filter:blur(3px);display:none;align-items:center;justify-content:center;z-index:500}
+.modal-bg.show{display:flex}
+.modal{background:var(--bg-primary);border-radius:var(--radius-lg);padding:28px;width:420px;max-width:90vw;box-shadow:var(--shadow-md);animation:modalIn .25s ease}
+@keyframes modalIn{from{opacity:0;transform:scale(.96) translateY(8px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.modal h2{font-size:17px;font-weight:600;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.modal h2 svg{width:20px;height:20px;stroke:var(--accent);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.modal p{font-size:13px;color:var(--text-secondary);margin-bottom:18px}
+.mf{margin-bottom:12px}
+.mf label{font-size:12px;font-weight:500;color:var(--text-secondary);display:block;margin-bottom:5px}
+.modal-input{width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg-secondary);color:var(--text-primary);font-size:13px;outline:none;transition:border-color .2s;font-family:'SF Mono','Fira Code',monospace}
+.modal-input:focus{border-color:var(--accent)}
 .modal-acts{display:flex;justify-content:flex-end;gap:10px;margin-top:20px}
-.mbtn{padding:10px 20px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;transition:all .2s;border:none}
+.mbtn{padding:9px 18px;border-radius:var(--radius-sm);font-size:13px;font-weight:500;transition:all .2s}
 .mbtn.pri{background:var(--accent);color:#fff}
-.mbtn.pri:hover{background:var(--accent-hover)}
-.mbtn.sec{background:var(--bg-main);color:var(--text-secondary);border:1px solid var(--border)}
-.mbtn.sec:hover{background:var(--accent-light)}
-.empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--text-tertiary);gap:12px}
-.empty .ei{font-size:48px;opacity:.5}
-.empty .et{font-size:15px;font-weight:500}
+.mbtn.pri:hover{background:#3d5ce5}
+.mbtn.sec{background:var(--bg-secondary);color:var(--text-secondary);border:1px solid var(--border)}
+.mbtn.sec:hover{background:var(--bg-tertiary)}
+/* Empty */
+.empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--text-tertiary);gap:12px;padding:40px}
+.empty .ei{width:56px;height:56px;background:linear-gradient(135deg,var(--accent),#8b5cf6);border-radius:14px;display:flex;align-items:center;justify-content:center;opacity:.6}
+.empty .ei svg{width:28px;height:28px;stroke:#fff;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.empty .et{font-size:15px;font-weight:500;color:var(--text-secondary)}
 .empty .es{font-size:13px}
+/* Mobile */
+@media(max-width:768px){
+.sidebar{position:fixed;left:0;top:0;bottom:0;width:280px;min-width:280px;transform:translateX(-100%);z-index:200;box-shadow:var(--shadow-md)}
+.sidebar.mobile-open{transform:translateX(0)}
+.sidebar.collapsed{transform:translateX(-100%)}
+.sidebar-overlay{position:fixed;inset:0;background:rgba(0,0,0,.25);z-index:199;display:none}
+.sidebar-overlay.show{display:block}
+.btn-hamburger{display:flex}
+.btn-sidebar-toggle{display:none}
+.chat-area{padding:16px}
+.bubble{max-width:85vw}
+.input-area{padding:10px 14px 16px}
+.cols{flex-direction:column;padding:14px}
+.col{min-width:unset;max-width:unset}
+}
+@media(min-width:769px){.btn-hamburger{display:none}.sidebar-overlay{display:none!important}}
 </style>
 </head>
 <body>
 <div class="app">
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeMobileSidebar()"></div>
 <aside class="sidebar" id="sidebar">
   <div class="sb-head">
-    <div class="brand"><div class="brand-icon">✦</div><span>Multi AI</span></div>
-    <button class="btn-new" onclick="createNewChat()" title="新建对话">+</button>
+    <div class="brand hide-c"><div class="brand-icon"><svg viewBox="0 0 20 20"><path d="M10 3L3 7v6l7 4 7-4V7l-7-4z"/><path d="M10 11l7-4M10 11v8M10 11L3 7"/></svg></div><span>Multi AI</span></div>
   </div>
+  <button class="btn-new hide-c" onclick="createNewChat()"><svg viewBox="0 0 20 20"><path d="M10 4v12M4 10h12"/></svg><span class="btn-text">新建对话</span></button>
+  <button class="btn-new show-c" onclick="createNewChat()" title="新建对话"><svg viewBox="0 0 20 20"><path d="M10 4v12M4 10h12"/></svg></button>
+  <div class="sb-search hide-c"><svg viewBox="0 0 20 20"><circle cx="9" cy="9" r="5"/><path d="M14 14l3 3"/></svg><input placeholder="搜索对话..." oninput="filterChats(this.value)"></div>
   <div class="sb-list" id="sbList"></div>
-  <button class="btn-add-folder" onclick="createFolder()">📁 新建文件夹</button>
   <div class="sb-foot">
-    <div class="srow">
-      <span>🎨 主题</span>
-      <div class="theme-sel">
-        <button class="theme-btn" data-t="light" onclick="setTheme('light')">☀️</button>
-        <button class="theme-btn" data-t="dark" onclick="setTheme('dark')">🌙</button>
-        <button class="theme-btn" data-t="system" onclick="setTheme('system')">💻</button>
-      </div>
-    </div>
-    <div class="srow" onclick="showKeyModal()">
-      <span>🔑 API Key</span>
-      <span style="font-size:12px;color:var(--text-tertiary)" id="keyStatus">未设置</span>
-    </div>
+    <div class="sb-foot-item hide-c" onclick="toggleSidebar()"><svg viewBox="0 0 20 20"><path d="M13 4l-6 6 6 6"/><path d="M7 4l-6 6 6 6" opacity=".4"/></svg><span class="lbl">收起侧栏</span></div>
+    <div class="sb-foot-item show-c" onclick="toggleSidebar()" title="展开侧栏" style="justify-content:center"><svg viewBox="0 0 20 20"><path d="M7 4l6 6-6 6"/><path d="M13 4l6 6-6 6" opacity=".4"/></svg></div>
+    <div class="sb-foot-item" onclick="toggleTheme()"><svg id="themeIcon" viewBox="0 0 20 20"><circle cx="10" cy="10" r="4"/><path d="M10 2v2M10 16v2M2 10h2M16 10h2M4.93 4.93l1.41 1.41M13.66 13.66l1.41 1.41M4.93 15.07l1.41-1.41M13.66 6.34l1.41-1.41"/></svg><span class="lbl">切换主题</span></div>
+    <div class="sb-foot-item" onclick="showKeyModal()"><svg viewBox="0 0 20 20"><path d="M15 7a3 3 0 11-6 0 3 3 0 016 0z"/><path d="M9 10l-6 6v2h2l6-6"/></svg><span class="lbl">API Key</span><span class="kst" id="keyStatus" style="font-size:11px;color:var(--text-tertiary)">未设置</span></div>
   </div>
 </aside>
 <main class="main">
-  <div class="model-bar" id="modelBar"></div>
-  <div class="chat-area" id="chatArea">
-    <div class="empty"><div class="ei">✦</div><div class="et">选择模型，开始对话</div><div class="es">支持多模型并排对比</div></div>
+  <div class="top-bar">
+    <button class="btn-hamburger" onclick="openMobileSidebar()"><svg viewBox="0 0 20 20"><path d="M3 5h14M3 10h14M3 15h14"/></svg></button>
+    <button class="btn-sidebar-toggle" onclick="toggleSidebar()" title="切换侧栏"><svg viewBox="0 0 20 20" id="sidebarToggleIcon"><path d="M3 5h14M3 10h14M3 15h14"/></svg></button>
+    <span class="top-title" id="topTitle">Multi AI Studio</span>
+    <button class="model-trigger" onclick="openModelPanel()"><svg viewBox="0 0 20 20" style="width:14px;height:14px"><path d="M3 3h6v6H3zM11 3h6v6h-6zM3 11h6v6H3zM11 11h6v6h-6z"/></svg><span id="modelTriggerText">选择模型</span></button>
   </div>
+  <div class="chat-area" id="chatArea"><div class="empty"><div class="ei"><svg viewBox="0 0 24 24"><path d="M12 3L3 7v6l9 5 9-5V7l-9-4z"/><path d="M12 12l9-5M12 12v10M12 12L3 7"/></svg></div><div class="et">选择模型，开始对话</div><div class="es">支持多模型并排对比 · 深度思考</div></div></div>
   <div class="input-area">
     <div class="input-wrap">
       <div class="tool-badges" id="toolBadges"></div>
       <div class="tool-menu" id="toolMenu">
-        <div class="tmenu-item" onclick="toggleTool('联网搜索')"><span class="tool-emoji">🌐</span>联网搜索</div>
-        <div class="tmenu-item" onclick="toggleTool('写作')"><span class="tool-emoji">✍️</span>写作</div>
-        <div class="tmenu-item" onclick="toggleTool('编程')"><span class="tool-emoji">💻</span>编程</div>
-        <div class="tmenu-item" onclick="toggleTool('解题')"><span class="tool-emoji">🧩</span>解题</div>
+        <div class="tm-item" onclick="toggleTool('联网搜索')"><svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="7"/><path d="M3 10h14M10 3c-2 2.5-2 11 0 14M10 3c2 2.5 2 11 0 14"/></svg>联网搜索</div>
+        <div class="tm-item" onclick="toggleTool('写作')"><svg viewBox="0 0 20 20"><path d="M3 17h14M5 13l8-8 2 2-8 8H5v-2z"/></svg>写作</div>
+        <div class="tm-item" onclick="toggleTool('编程')"><svg viewBox="0 0 20 20"><path d="M6 7l-3 3 3 3M14 7l3 3-3 3M11 5l-2 10"/></svg>编程</div>
+        <div class="tm-item" onclick="toggleTool('解题')"><svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="7"/><path d="M8 8a2.5 2.5 0 013 2.5c0 1.5-1 2-1 3M10 15v.5"/></svg>解题</div>
       </div>
-      <div class="input-row">
-        <button class="tool-trig" onclick="toggleToolMenu(event)">⚡</button>
-        <textarea id="mainInput" placeholder="输入消息..." rows="1" onkeydown="handleInputKeyDown(event)" onkeyup="handleInputKeyUp(event)" oninput="autoResize(this)"></textarea>
-        <button class="send-btn" id="sendBtn" onclick="sendMessage()">↑</button>
+      <div class="input-box">
+        <textarea id="mainInput" placeholder="输入消息..." rows="1" onkeydown="handleInputKeyDown(event)" onkeyup="handleInputKeyUp(event)" oninput="autoResize(this);updateSendBtn()"></textarea>
+        <div class="input-toolbar">
+          <button class="itb-btn" id="deepThinkBtn" onclick="toggleDeepThink()"><svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="3"/><circle cx="10" cy="10" r="7" stroke-dasharray="3 3"/><path d="M10 3v2M10 15v2M3 10h2M15 10h2"/></svg><span class="hide-c">深度思考</span></button>
+          <button class="itb-btn" onclick="toggleToolMenu(event)"><svg viewBox="0 0 20 20"><path d="M5 3h10v2H5zM4 5h12v12a2 2 0 01-2 2H6a2 2 0 01-2-2V5z"/><path d="M8 9h4M8 12h4"/></svg><span class="hide-c">工具</span><svg viewBox="0 0 12 12" style="width:10px;height:10px;margin-left:2px"><path d="M3 5l3 3 3-3"/></svg></button>
+          <div class="itb-right"><button class="send-btn" id="sendBtn" onclick="sendMessage()"><svg viewBox="0 0 20 20"><path d="M10 16V4M10 4l-5 5M10 4l5 5"/></svg></button></div>
+        </div>
       </div>
     </div>
   </div>
 </main>
 </div>
+<!-- Model Panel -->
+<div class="model-panel" id="modelPanel"><div class="model-panel-bg" onclick="closeModelPanel()"></div><div class="model-panel-body" id="modelPanelBody"></div></div>
+<!-- Context Menu -->
 <div class="ctx-menu" id="ctxMenu"></div>
+<!-- Key Modal -->
 <div class="modal-bg" id="modalBg" onclick="hideModal(event)">
   <div class="modal" onclick="event.stopPropagation()">
-    <h2>🔑 API Key 配置</h2>
+    <h2><svg viewBox="0 0 20 20"><path d="M15 7a3 3 0 11-6 0 3 3 0 016 0z"/><path d="M9 10l-6 6v2h2l6-6"/></svg>API Key 配置</h2>
     <p>分别设置各平台的 API Key</p>
-    <div style="margin-bottom:14px">
-      <label style="font-size:12px;font-weight:500;color:var(--text-secondary);display:block;margin-bottom:6px">OpenRouter Key</label>
-      <input class="modal-input" id="keyInput" placeholder="sk-or-v1-..." />
-    </div>
-    <div style="margin-bottom:14px">
-      <label style="font-size:12px;font-weight:500;color:var(--text-secondary);display:block;margin-bottom:6px">智谱 AI Key</label>
-      <input class="modal-input" id="keyInputZhipu" placeholder="智谱 API Key..." />
-    </div>
-    <div style="margin-bottom:14px">
-      <label style="font-size:12px;font-weight:500;color:var(--text-secondary);display:block;margin-bottom:6px">Kimi / 月之暗面 Key</label>
-      <input class="modal-input" id="keyInputKimi" placeholder="Kimi API Key..." />
-    </div>
-    <div>
-      <label style="font-size:12px;font-weight:500;color:var(--text-secondary);display:block;margin-bottom:6px">硅基流动 Key</label>
-      <input class="modal-input" id="keyInputSilicon" placeholder="硅基流动 API Key..." />
-    </div>
-    <div class="modal-acts">
-      <button class="mbtn sec" onclick="hideModal()">取消</button>
-      <button class="mbtn pri" onclick="saveKey()">保存</button>
-    </div>
+    <div class="mf"><label>OpenRouter Key</label><input class="modal-input" id="keyInput" placeholder="sk-or-v1-..."></div>
+    <div class="mf"><label>智谱 AI Key</label><input class="modal-input" id="keyInputZhipu" placeholder="智谱 API Key..."></div>
+    <div class="mf"><label>Kimi / 月之暗面 Key</label><input class="modal-input" id="keyInputKimi" placeholder="Kimi API Key..."></div>
+    <div class="mf"><label>硅基流动 Key</label><input class="modal-input" id="keyInputSilicon" placeholder="硅基流动 API Key..."></div>
+    <div class="modal-acts"><button class="mbtn sec" onclick="hideModal()">取消</button><button class="mbtn pri" onclick="saveKey()">保存</button></div>
   </div>
 </div>
 <script>
-// ===== DATA & STATE =====
-const MODELS = [
-  {tier:'🥇 旗舰级',models:[
-    {id:'nvidia/nemotron-3-super-120b-a12b:free',name:'Nemotron 3 Super 120B'},
-    {id:'openai/gpt-oss-120b:free',name:'GPT-OSS 120B'},
-    {id:'nousresearch/hermes-3-llama-3.1-405b:free',name:'Hermes 3 405B'},
-    {id:'inclusionai/ling-2.6-1t:free',name:'Ling 2.6 1T'}
+// ===== MODEL DATA =====
+const MODELS=[
+  {tier:'🧠 推理能力强',models:[
+    {id:'silicon/DeepSeek-R1',name:'DeepSeek R1',provider:'硅基'},
+    {id:'silicon/Qwen3-32B',name:'Qwen3 32B',provider:'硅基'},
+    {id:'kimi/moonshot-v1-32k',name:'Kimi 32K',provider:'Kimi'}
   ]},
-  {tier:'🥈 主力级',models:[
-    {id:'minimax/minimax-m2.5:free',name:'MiniMax M2.5'},
-    {id:'tencent/hy3-preview:free',name:'HY3 Preview'},
-    {id:'z-ai/glm-4.5-air:free',name:'GLM 4.5 Air'}
+  {tier:'⚡ 速度快',models:[
+    {id:'silicon/DeepSeek-V4-Flash',name:'DeepSeek V4 Flash',provider:'硅基'},
+    {id:'silicon/DeepSeek-V3',name:'DeepSeek V3',provider:'硅基'},
+    {id:'silicon/Qwen3-30B-A3B',name:'Qwen3 30B-A3B',provider:'硅基'},
+    {id:'zhipu/glm-4-flash',name:'GLM-4 Flash',provider:'智谱'}
   ]},
-  {tier:'🥉 轻量级',models:[
-    {id:'nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free',name:'Nemotron Nano Reasoning'}
+  {tier:'📝 中文写作',models:[
+    {id:'silicon/DeepSeek-V3',name:'DeepSeek V3',provider:'硅基'},
+    {id:'silicon/Qwen3-32B',name:'Qwen3 32B',provider:'硅基'},
+    {id:'zhipu/glm-4-flash',name:'GLM-4 Flash',provider:'智谱'},
+    {id:'kimi/moonshot-v1-8k',name:'Kimi 8K',provider:'Kimi'}
   ]},
-  {tier:'🆓 智谱免费',models:[
-    {id:'zhipu/glm-4-flash',name:'GLM-4-Flash'},
-    {id:'zhipu/glm-4.7-flash',name:'GLM-4.7-Flash'}
+  {tier:'🌐 英文/代码',models:[
+    {id:'silicon/DeepSeek-V3',name:'DeepSeek V3',provider:'硅基'},
+    {id:'silicon/DeepSeek-R1',name:'DeepSeek R1',provider:'硅基'}
   ]},
-  {tier:'🆓 Kimi免费',models:[
-    {id:'kimi/moonshot-v1-8k',name:'Kimi 8K'},
-    {id:'kimi/moonshot-v1-32k',name:'Kimi 32K'}
-  ]},
-  {tier:'🆓 硅基流动',models:[
-    {id:'silicon/DeepSeek-V3',name:'DeepSeek V3'},
-    {id:'silicon/DeepSeek-R1',name:'DeepSeek R1（推理）'},
-    {id:'silicon/Qwen3-32B',name:'Qwen3 32B'},
-    {id:'silicon/Qwen3-30B-A3B',name:'Qwen3 30B-A3B'},
-    {id:'silicon/DeepSeek-V4-Flash',name:'DeepSeek V4 Flash'}
+  {tier:'🆓 完全免费',models:[
+    {id:'zhipu/glm-4-flash',name:'GLM-4 Flash',provider:'智谱'},
+    {id:'zhipu/glm-4.7-flash',name:'GLM-4.7 Flash',provider:'智谱'},
+    {id:'kimi/moonshot-v1-8k',name:'Kimi 8K',provider:'Kimi'},
+    {id:'kimi/moonshot-v1-32k',name:'Kimi 32K',provider:'Kimi'}
   ]}
 ];
 
-const MAX_RETRIES = 2;
-const RETRY_DELAY = 1500;
-const TIMEOUT_MS = 30000;
-const HISTORY_LIMIT = 10;
+// Deep think model mapping
+const DEEP_THINK_MAP={
+  'silicon/DeepSeek-V3':'silicon/DeepSeek-R1',
+  'silicon/DeepSeek-V4-Flash':'silicon/DeepSeek-R1',
+  'silicon/Qwen3-32B':'silicon/DeepSeek-R1',
+  'silicon/Qwen3-30B-A3B':'silicon/DeepSeek-R1',
+  'zhipu/glm-4-flash':'zhipu/glm-4-flash',
+  'zhipu/glm-4.7-flash':'zhipu/glm-4.7-flash',
+  'kimi/moonshot-v1-8k':'kimi/moonshot-v1-8k',
+  'kimi/moonshot-v1-32k':'kimi/moonshot-v1-32k'
+};
 
-let state = {
-  chats: JSON.parse(localStorage.getItem('multi_ai_chats') || '[]'),
-  folders: JSON.parse(localStorage.getItem('multi_ai_folders') || '[]'),
-  currentChatId: null,
-  selectedModels: [],
-  activeTools: [],
-  abortControllers: {},
-  streaming: {}
+const SILICON_MODEL_MAP={
+  'DeepSeek-V3':'deepseek-ai/DeepSeek-V3',
+  'DeepSeek-R1':'deepseek-ai/DeepSeek-R1',
+  'Qwen3-32B':'Qwen/Qwen3-32B',
+  'Qwen3-30B-A3B':'Qwen/Qwen3-30B-A3B-Instruct-2507',
+  'DeepSeek-V4-Flash':'deepseek-ai/DeepSeek-V4-Flash'
+};
+
+const MAX_RETRIES=2,RETRY_DELAY=1500,TIMEOUT_MS=30000,HISTORY_LIMIT=10;
+
+let state={
+  chats:JSON.parse(localStorage.getItem('multi_ai_chats')||'[]'),
+  folders:JSON.parse(localStorage.getItem('multi_ai_folders')||'[]'),
+  currentChatId:null,
+  selectedModels:[],
+  activeTools:[],
+  deepThink:false,
+  abortControllers:{},
+  streaming:{},
+  sidebarCollapsed:localStorage.getItem('multi_ai_sidebar_collapsed')==='true'
 };
 
 // ===== THEME =====
-function setTheme(t) {
-  localStorage.setItem('multi_ai_theme', t);
-  applyTheme(t);
-  document.querySelectorAll('.theme-btn').forEach(b => b.classList.toggle('active', b.dataset.t === t));
+function toggleTheme(){
+  const cur=document.documentElement.getAttribute('data-theme');
+  const next=cur==='dark'?'light':'dark';
+  document.documentElement.setAttribute('data-theme',next);
+  localStorage.setItem('multi_ai_theme',next);
+  updateThemeIcon(next);
+}
+function updateThemeIcon(t){
+  const icon=document.getElementById('themeIcon');
+  if(t==='dark') icon.innerHTML='<path d="M17 10a7 7 0 01-9.9 6.4A7 7 0 0110 3.6a5.5 5.5 0 007 6.4z"/>';
+  else icon.innerHTML='<circle cx="10" cy="10" r="4"/><path d="M10 2v2M10 16v2M2 10h2M16 10h2M4.93 4.93l1.41 1.41M13.66 13.66l1.41 1.41M4.93 15.07l1.41-1.41M13.66 6.34l1.41-1.41"/>';
+}
+function initTheme(){
+  const t=localStorage.getItem('multi_ai_theme')||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
+  document.documentElement.setAttribute('data-theme',t);
+  updateThemeIcon(t);
 }
 
-function applyTheme(t) {
-  if (t === 'system') {
-    const dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
-  } else {
-    document.documentElement.setAttribute('data-theme', t);
-  }
+// ===== SIDEBAR =====
+function toggleSidebar(){
+  state.sidebarCollapsed=!state.sidebarCollapsed;
+  localStorage.setItem('multi_ai_sidebar_collapsed',state.sidebarCollapsed);
+  document.getElementById('sidebar').classList.toggle('collapsed',state.sidebarCollapsed);
 }
-
-function initTheme() {
-  const t = localStorage.getItem('multi_ai_theme') || 'light';
-  applyTheme(t);
-  document.querySelectorAll('.theme-btn').forEach(b => b.classList.toggle('active', b.dataset.t === t));
-  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-    if (localStorage.getItem('multi_ai_theme') === 'system') applyTheme('system');
+function openMobileSidebar(){
+  document.getElementById('sidebar').classList.add('mobile-open');
+  document.getElementById('sidebarOverlay').classList.add('show');
+}
+function closeMobileSidebar(){
+  document.getElementById('sidebar').classList.remove('mobile-open');
+  document.getElementById('sidebarOverlay').classList.remove('show');
+}
+function filterChats(q){
+  const items=document.querySelectorAll('.chat-item');
+  items.forEach(el=>{
+    const title=el.querySelector('.chat-title');
+    if(title) el.style.display=title.textContent.toLowerCase().includes(q.toLowerCase())?'':'none';
   });
 }
 
 // ===== API KEY =====
-function showKeyModal() {
+function showKeyModal(){
   document.getElementById('modalBg').classList.add('show');
-  document.getElementById('keyInput').value = localStorage.getItem('multi_ai_key') || '';
-  document.getElementById('keyInputZhipu').value = localStorage.getItem('multi_ai_key_zhipu') || '';
-  document.getElementById('keyInputKimi').value = localStorage.getItem('multi_ai_key_kimi') || '';
-  document.getElementById('keyInputSilicon').value = localStorage.getItem('multi_ai_key_silicon') || '';
-  document.getElementById('keyInput').focus();
+  document.getElementById('keyInput').value=localStorage.getItem('multi_ai_key')||'';
+  document.getElementById('keyInputZhipu').value=localStorage.getItem('multi_ai_key_zhipu')||'';
+  document.getElementById('keyInputKimi').value=localStorage.getItem('multi_ai_key_kimi')||'';
+  document.getElementById('keyInputSilicon').value=localStorage.getItem('multi_ai_key_silicon')||'';
 }
-
-function hideModal(e) {
-  if (e && e.target !== document.getElementById('modalBg')) return;
+function hideModal(e){
+  if(e&&e.target!==document.getElementById('modalBg'))return;
   document.getElementById('modalBg').classList.remove('show');
 }
-
-function saveKey() {
-  let k = document.getElementById('keyInput').value.replace(/[^\x20-\x7E]/g, '').trim();
-  let kz = document.getElementById('keyInputZhipu').value.replace(/[^\x20-\x7E]/g, '').trim();
-  let kk = document.getElementById('keyInputKimi').value.replace(/[^\x20-\x7E]/g, '').trim();
-  let ks = document.getElementById('keyInputSilicon').value.replace(/[^\x20-\x7E]/g, '').trim();
-  localStorage.setItem('multi_ai_key', k);
-  localStorage.setItem('multi_ai_key_zhipu', kz);
-  localStorage.setItem('multi_ai_key_kimi', kk);
-  localStorage.setItem('multi_ai_key_silicon', ks);
-  updateKeyStatus();
-  hideModal();
+function saveKey(){
+  ['keyInput','keyInputZhipu','keyInputKimi','keyInputSilicon'].forEach((id,i)=>{
+    const keys=['multi_ai_key','multi_ai_key_zhipu','multi_ai_key_kimi','multi_ai_key_silicon'];
+    localStorage.setItem(keys[i],document.getElementById(id).value.replace(/[^\x20-\x7E]/g,'').trim());
+  });
+  updateKeyStatus();hideModal();
+}
+function updateKeyStatus(){
+  const parts=[];
+  if(localStorage.getItem('multi_ai_key'))parts.push('OR✓');
+  if(localStorage.getItem('multi_ai_key_zhipu'))parts.push('智谱✓');
+  if(localStorage.getItem('multi_ai_key_kimi'))parts.push('Kimi✓');
+  if(localStorage.getItem('multi_ai_key_silicon'))parts.push('硅基✓');
+  document.getElementById('keyStatus').textContent=parts.length?parts.join(' '):' 未设置';
 }
 
-function updateKeyStatus() {
-  const hasOR = !!localStorage.getItem('multi_ai_key');
-  const hasZP = !!localStorage.getItem('multi_ai_key_zhipu');
-  const hasKM = !!localStorage.getItem('multi_ai_key_kimi');
-  const hasSL = !!localStorage.getItem('multi_ai_key_silicon');
-  const parts = [];
-  if (hasOR) parts.push('OpenRouter ✓');
-  if (hasZP) parts.push('智谱 ✓');
-  if (hasKM) parts.push('Kimi ✓');
-  if (hasSL) parts.push('硅基 ✓');
-  document.getElementById('keyStatus').textContent = parts.length ? parts.join(' | ') : '未设置';
+// ===== MODEL PANEL =====
+function openModelPanel(){
+  const panel=document.getElementById('modelPanel');
+  const body=document.getElementById('modelPanelBody');
+  let html='<div class="mp-hdr"><h3>选择模型</h3><button class="mp-close" onclick="closeModelPanel()"><svg viewBox="0 0 20 20"><path d="M5 5l10 10M15 5L5 15"/></svg></button></div>';
+  MODELS.forEach(tier=>{
+    html+=`<div class="tier"><div class="tier-label">${tier.tier}</div><div class="tier-chips">`;
+    tier.models.forEach(m=>{
+      const sel=state.selectedModels.includes(m.id);
+      html+=`<div class="chip${sel?' sel':''}" onclick="toggleModel('${m.id}')">${sel?'✓ ':''}${m.name}<span class="prov">${m.provider}</span></div>`;
+    });
+    html+='</div></div>';
+  });
+  body.innerHTML=html;
+  panel.classList.add('show');
 }
-
-// ===== MODELS =====
-function renderModelBar() {
-  const bar = document.getElementById('modelBar');
-  bar.innerHTML = MODELS.map(tier => `
-    <div class="tier">
-      <div class="tier-label">${tier.tier}</div>
-      <div class="tier-chips">${tier.models.map(m => `
-        <div class="chip${state.selectedModels.includes(m.id)?' sel':''}" data-id="${m.id}" onclick="toggleModel('${m.id}')">
-          <span class="ck">✓</span>${m.name}
-        </div>`).join('')}
-      </div>
-    </div>`).join('');
-}
-
-function toggleModel(id) {
-  const idx = state.selectedModels.indexOf(id);
-  if (idx >= 0) {
-    state.selectedModels.splice(idx, 1);
-  } else {
-    state.selectedModels.push(id);
-  }
-  renderModelBar();
+function closeModelPanel(){document.getElementById('modelPanel').classList.remove('show')}
+function toggleModel(id){
+  const idx=state.selectedModels.indexOf(id);
+  if(idx>=0)state.selectedModels.splice(idx,1);else state.selectedModels.push(id);
+  openModelPanel();// refresh
+  updateModelTrigger();
   renderChatArea();
 }
+function updateModelTrigger(){
+  const el=document.getElementById('modelTriggerText');
+  if(!state.selectedModels.length){el.innerHTML='选择模型';return;}
+  const names=state.selectedModels.map(getModelName);
+  if(names.length===1)el.innerHTML=names[0];
+  else el.innerHTML=`${names[0]} <span class="cnt">+${names.length-1}</span>`;
+}
+function getModelName(id){
+  for(const t of MODELS)for(const m of t.models)if(m.id===id)return m.name;
+  return id.split('/').pop();
+}
 
-function getModelName(id) {
-  for (const t of MODELS) for (const m of t.models) if (m.id === id) return m.name;
-  return id;
+// ===== DEEP THINK =====
+function toggleDeepThink(){
+  state.deepThink=!state.deepThink;
+  document.getElementById('deepThinkBtn').classList.toggle('active',state.deepThink);
+}
+function getEffectiveModelId(modelId){
+  if(!state.deepThink)return modelId;
+  return DEEP_THINK_MAP[modelId]||modelId;
 }
 
 // ===== CHATS =====
-function saveChats() {
-  localStorage.setItem('multi_ai_chats', JSON.stringify(state.chats));
+function saveChats(){localStorage.setItem('multi_ai_chats',JSON.stringify(state.chats))}
+function saveFolders(){localStorage.setItem('multi_ai_folders',JSON.stringify(state.folders))}
+function createNewChat(){
+  const chat={id:Date.now().toString(),title:'新对话',messages:[],folderId:null};
+  state.chats.unshift(chat);state.currentChatId=chat.id;
+  saveChats();renderSidebar();renderChatArea();updateTopTitle();
+  closeMobileSidebar();
 }
-
-function saveFolders() {
-  localStorage.setItem('multi_ai_folders', JSON.stringify(state.folders));
+function selectChat(id){
+  state.currentChatId=id;renderSidebar();renderChatArea();updateTopTitle();
+  closeMobileSidebar();
 }
-
-function createNewChat() {
-  const chat = {id: Date.now().toString(), title: '新对话', messages: [], folderId: null};
-  state.chats.unshift(chat);
-  state.currentChatId = chat.id;
-  saveChats();
-  renderSidebar();
-  renderChatArea();
+function getCurrentChat(){return state.chats.find(c=>c.id===state.currentChatId)}
+function deleteChat(id,e){
+  e&&e.stopPropagation();if(!confirm('确认删除？'))return;
+  state.chats=state.chats.filter(c=>c.id!==id);
+  if(state.currentChatId===id)state.currentChatId=state.chats[0]?.id||null;
+  saveChats();renderSidebar();renderChatArea();updateTopTitle();
 }
-
-function selectChat(id) {
-  state.currentChatId = id;
-  renderSidebar();
-  renderChatArea();
-}
-
-function getCurrentChat() {
-  return state.chats.find(c => c.id === state.currentChatId);
-}
-
-function deleteChat(id, e) {
-  e && e.stopPropagation();
-  if (!confirm('确认删除此对话？')) return;
-  state.chats = state.chats.filter(c => c.id !== id);
-  if (state.currentChatId === id) state.currentChatId = state.chats[0]?.id || null;
-  saveChats();
-  renderSidebar();
-  renderChatArea();
-}
-
-function startEditChat(id, e) {
-  e && e.stopPropagation();
-  const item = document.querySelector(`.chat-item[data-id="${id}"]`);
-  const titleEl = item.querySelector('.chat-title');
-  const current = titleEl.textContent;
-  titleEl.outerHTML = `<input class="edit-input" value="${current}" onblur="finishEditChat('${id}',this)" onkeydown="if(event.key==='Enter')this.blur()">`;
+function startEditChat(id,e){
+  e&&e.stopPropagation();
+  const item=document.querySelector(`.chat-item[data-id="${id}"]`);
+  const tEl=item.querySelector('.chat-title');
+  const cur=tEl.textContent;
+  tEl.outerHTML=`<input class="edit-input" value="${cur}" onblur="finishEditChat('${id}',this)" onkeydown="if(event.key==='Enter')this.blur()">`;
   item.querySelector('.edit-input').focus();
 }
-
-function finishEditChat(id, input) {
-  const chat = state.chats.find(c => c.id === id);
-  if (chat && input.value.trim()) chat.title = input.value.trim();
-  saveChats();
-  renderSidebar();
+function finishEditChat(id,input){
+  const chat=state.chats.find(c=>c.id===id);
+  if(chat&&input.value.trim())chat.title=input.value.trim();
+  saveChats();renderSidebar();updateTopTitle();
+}
+function updateTopTitle(){
+  const chat=getCurrentChat();
+  document.getElementById('topTitle').textContent=chat?chat.title:'Multi AI Studio';
 }
 
-// ===== FOLDERS =====
-function createFolder() {
-  const name = prompt('文件夹名称：');
-  if (!name) return;
-  state.folders.push({id: Date.now().toString(), name, collapsed: false});
-  saveFolders();
-  renderSidebar();
+// ===== FOLDERS / GROUPS =====
+function createFolder(){
+  const name=prompt('分组名称：');if(!name)return;
+  state.folders.push({id:Date.now().toString(),name,collapsed:false});
+  saveFolders();renderSidebar();
 }
-
-function renameFolder(id) {
-  const f = state.folders.find(x => x.id === id);
-  const name = prompt('重命名文件夹：', f.name);
-  if (name) { f.name = name; saveFolders(); renderSidebar(); }
+function renameFolder(id){
+  const f=state.folders.find(x=>x.id===id);
+  const name=prompt('重命名分组：',f.name);
+  if(name){f.name=name;saveFolders();renderSidebar();}
 }
-
-function deleteFolder(id) {
-  if (!confirm('删除文件夹？（对话会移到根目录）')) return;
-  state.chats.forEach(c => { if (c.folderId === id) c.folderId = null; });
-  state.folders = state.folders.filter(f => f.id !== id);
-  saveFolders(); saveChats(); renderSidebar();
+function deleteFolder(id){
+  if(!confirm('删除分组？（对话会移出）'))return;
+  state.chats.forEach(c=>{if(c.folderId===id)c.folderId=null});
+  state.folders=state.folders.filter(f=>f.id!==id);
+  saveFolders();saveChats();renderSidebar();
 }
-
-function toggleFolder(id) {
-  const f = state.folders.find(x => x.id === id);
-  f.collapsed = !f.collapsed;
-  saveFolders();
-  renderSidebar();
+function toggleFolderCollapse(id){
+  const f=state.folders.find(x=>x.id===id);f.collapsed=!f.collapsed;
+  saveFolders();renderSidebar();
 }
 
 // ===== CONTEXT MENU =====
-function showCtxMenu(e, chatId) {
-  e.preventDefault();
-  const menu = document.getElementById('ctxMenu');
-  const folders = state.folders.map(f => `<div class="ctx-item" onclick="moveChatToFolder('${chatId}','${f.id}')">📂 ${f.name}</div>`).join('');
-  menu.innerHTML = `
-    <div class="ctx-item" onclick="moveChatToFolder('${chatId}',null)">📄 移到根目录</div>
-    ${folders}`;
-  menu.style.left = e.clientX + 'px';
-  menu.style.top = e.clientY + 'px';
-  menu.classList.add('show');
-  setTimeout(() => document.addEventListener('click', hideCtx, {once: true}), 0);
+function showCtxMenu(e,chatId){
+  e.preventDefault();const menu=document.getElementById('ctxMenu');
+  const folders=state.folders.map(f=>`<div class="ctx-item" onclick="moveChatToFolder('${chatId}','${f.id}')">📁 ${f.name}</div>`).join('');
+  menu.innerHTML=`<div class="ctx-item" onclick="moveChatToFolder('${chatId}',null)">移到根目录</div>${folders}`;
+  menu.style.left=e.clientX+'px';menu.style.top=e.clientY+'px';menu.classList.add('show');
+  setTimeout(()=>document.addEventListener('click',hideCtx,{once:true}),0);
 }
-
-function hideCtx() { document.getElementById('ctxMenu').classList.remove('show'); }
-
-function moveChatToFolder(chatId, folderId) {
-  const chat = state.chats.find(c => c.id === chatId);
-  if (chat) chat.folderId = folderId;
-  saveChats(); renderSidebar(); hideCtx();
+function hideCtx(){document.getElementById('ctxMenu').classList.remove('show')}
+function moveChatToFolder(chatId,folderId){
+  const chat=state.chats.find(c=>c.id===chatId);if(chat)chat.folderId=folderId;
+  saveChats();renderSidebar();hideCtx();
 }
 
 // ===== SIDEBAR RENDER =====
-function renderSidebar() {
-  const list = document.getElementById('sbList');
-  let html = '';
-  // Folders
-  state.folders.forEach(f => {
-    const chats = state.chats.filter(c => c.folderId === f.id);
-    html += `<div class="folder-hdr${f.collapsed?' collapsed':''}" onclick="toggleFolder('${f.id}')">
-      <span class="arrow">▼</span> 📁 ${f.name} <span style="font-size:11px;color:var(--text-tertiary)">(${chats.length})</span>
-      <div class="folder-acts" onclick="event.stopPropagation()">
-        <button onclick="renameFolder('${f.id}')" title="重命名">✏️</button>
-        <button onclick="deleteFolder('${f.id}')" title="删除">🗑️</button>
-      </div>
-    </div>`;
-    html += `<div class="folder-body${f.collapsed?' collapsed':''}" style="max-height:${chats.length*50}px">`;
-    chats.forEach(c => { html += chatItemHTML(c); });
-    html += '</div>';
+function renderSidebar(){
+  const list=document.getElementById('sbList');let html='';
+  // Groups section header
+  if(state.folders.length||true){
+    html+='<div class="grp-title-row hide-c"><span>分组</span><button onclick="createFolder()" title="新建分组">+</button></div>';
+  }
+  state.folders.forEach(f=>{
+    const chats=state.chats.filter(c=>c.folderId===f.id);
+    html+=`<div class="grp-hdr${f.collapsed?' collapsed':''}" onclick="toggleFolderCollapse('${f.id}')">
+      <svg class="arrow" viewBox="0 0 12 12"><path d="M3 2l4 4-4 4"/></svg>
+      <svg viewBox="0 0 16 16"><path d="M2 4h12v9a1 1 0 01-1 1H3a1 1 0 01-1-1V4z"/><path d="M2 4l2-2h4l2 2"/></svg>
+      ${f.name} <span style="font-size:11px;color:var(--text-tertiary)">(${chats.length})</span>
+      <div class="grp-acts" onclick="event.stopPropagation()">
+        <button onclick="renameFolder('${f.id}')" title="重命名"><svg viewBox="0 0 12 12"><path d="M2 10l6-6 2 2-6 6H2v-2z"/></svg></button>
+        <button onclick="deleteFolder('${f.id}')" title="删除"><svg viewBox="0 0 12 12"><path d="M3 3l6 6M9 3l-6 6"/></svg></button>
+      </div></div>`;
+    html+=`<div class="grp-body${f.collapsed?' collapsed':''}" style="max-height:${chats.length*46}px">`;
+    chats.forEach(c=>{html+=chatItemHTML(c)});
+    html+='</div>';
   });
-  // Root chats
-  state.chats.filter(c => !c.folderId).forEach(c => { html += chatItemHTML(c); });
-  list.innerHTML = html;
+  // Ungrouped
+  const ungrouped=state.chats.filter(c=>!c.folderId);
+  if(ungrouped.length){
+    html+='<div class="grp-title-row hide-c"><span>聊天</span></div>';
+    ungrouped.forEach(c=>{html+=chatItemHTML(c)});
+  }
+  list.innerHTML=html;
 }
-
-function chatItemHTML(c) {
+function chatItemHTML(c){
   return `<div class="chat-item${c.id===state.currentChatId?' active':''}" data-id="${c.id}" onclick="selectChat('${c.id}')" oncontextmenu="showCtxMenu(event,'${c.id}')">
     <span class="chat-title">${c.title}</span>
     <div class="chat-acts">
-      <button onclick="startEditChat('${c.id}',event)" title="编辑">✏️</button>
-      <button onclick="deleteChat('${c.id}',event)" title="删除">🗑️</button>
-    </div>
-  </div>`;
+      <button onclick="startEditChat('${c.id}',event)" title="编辑"><svg viewBox="0 0 12 12"><path d="M2 10l6-6 2 2-6 6H2v-2z"/></svg></button>
+      <button onclick="deleteChat('${c.id}',event)" title="删除"><svg viewBox="0 0 12 12"><path d="M3 3l6 6M9 3l-6 6"/></svg></button>
+    </div></div>`;
 }
 
 // ===== CHAT AREA =====
-let _renderPending = false;
-let _streamingModelId = null;
+let _renderPending=false,_streamingModelId=null;
 
-function renderReasoning(reasoning, isStreaming) {
-  if (!reasoning) return '';
-  const cursor = isStreaming ? '<span class="cursor"></span>' : '';
-  return `<details class="thinking-block"${isStreaming?' open':''}><summary>💭 思考过程</summary><div class="thinking-content">${renderMd(reasoning)}${cursor}</div></details>`;
+function renderReasoning(reasoning,isStreaming,startTime){
+  if(!reasoning)return'';
+  if(!isStreaming){
+    const sec=startTime?Math.round((Date.now()-startTime)/1000):'';
+    return `<div class="thinking-done"><svg viewBox="0 0 14 14" style="width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2"><circle cx="7" cy="7" r="3"/><circle cx="7" cy="7" r="6" stroke-dasharray="2 2"/></svg> 已深度思考${sec?` ${sec}秒`:''}</div>`;
+  }
+  return `<div class="thinking-block"><div class="thinking-summary"><svg viewBox="0 0 14 14" style="width:14px;height:14px;stroke:var(--accent);fill:none;stroke-width:2"><circle cx="7" cy="7" r="3"/><circle cx="7" cy="7" r="6" stroke-dasharray="2 2"/></svg>思考中<div class="dot-anim"><span></span><span></span><span></span></div></div><div class="thinking-body">${renderMd(reasoning)}<span class="cursor"></span></div></div>`;
 }
 
-function updateStreamingBubble(modelId) {
-  const safeId = 'stream-' + modelId.replace(/[^a-z0-9]/gi, '_');
-  const el = document.getElementById(safeId);
-  if (el && state.streaming[modelId]) {
-    const s = state.streaming[modelId];
-    el.innerHTML = renderReasoning(s.reasoning, true) + renderMd(s.text) + (s.text ? '' : (!s.reasoning ? '' : '')) + '<span class="cursor"></span>';
-    const parent = el.closest('.col-msgs') || el.closest('.chat-area');
-    if (parent) parent.scrollTop = parent.scrollHeight;
+function updateStreamingBubble(modelId){
+  const safeId='stream-'+modelId.replace(/[^a-z0-9]/gi,'_');
+  const el=document.getElementById(safeId);
+  if(el&&state.streaming[modelId]){
+    const s=state.streaming[modelId];
+    el.innerHTML=renderReasoning(s.reasoning,true,s.startTime)+renderMd(s.text)+(s.text||s.reasoning?'':'')+'<span class="cursor"></span>';
+    const parent=el.closest('.col-msgs')||el.closest('.chat-area');
+    if(parent)parent.scrollTop=parent.scrollHeight;
     return true;
   }
   return false;
 }
-
-function scheduleRender(modelId) {
-  if (_renderPending) return;
-  _renderPending = true;
-  _streamingModelId = modelId;
-  requestAnimationFrame(() => {
-    _renderPending = false;
-    if (_streamingModelId && updateStreamingBubble(_streamingModelId)) return;
+function scheduleRender(modelId){
+  if(_renderPending)return;_renderPending=true;_streamingModelId=modelId;
+  requestAnimationFrame(()=>{_renderPending=false;
+    if(_streamingModelId&&updateStreamingBubble(_streamingModelId))return;
     renderChatArea();
   });
 }
 
-function renderChatArea() {
-  const area = document.getElementById('chatArea');
-  const chat = getCurrentChat();
-  if (!chat || !state.selectedModels.length) {
-    area.innerHTML = '<div class="empty"><div class="ei">✦</div><div class="et">选择模型，开始对话</div><div class="es">支持多模型并排对比</div></div>';
-    area.className = 'chat-area';
-    return;
+function renderChatArea(){
+  const area=document.getElementById('chatArea');
+  const chat=getCurrentChat();
+  if(!chat||!state.selectedModels.length){
+    area.innerHTML='<div class="empty"><div class="ei"><svg viewBox="0 0 24 24"><path d="M12 3L3 7v6l9 5 9-5V7l-9-4z"/><path d="M12 12l9-5M12 12v10M12 12L3 7"/></svg></div><div class="et">选择模型，开始对话</div><div class="es">支持多模型并排对比 · 深度思考</div></div>';
+    area.style.padding='24px';return;
   }
-  if (state.selectedModels.length === 1) {
-    area.className = 'chat-area';
-    renderSingleMode(area, chat);
-  } else {
-    area.className = 'chat-area';
-    area.innerHTML = '';
-    renderMultiMode(area, chat);
-  }
+  if(state.selectedModels.length===1){area.style.padding='24px';renderSingleMode(area,chat)}
+  else{area.style.padding='0';renderMultiMode(area,chat)}
 }
 
-function renderSingleMode(area, chat) {
-  const modelId = state.selectedModels[0];
-  let html = '';
-  chat.messages.forEach(m => {
-    if (m.role === 'user') {
-      html += `<div class="msg user"><div class="bubble">${renderMd(m.content)}</div></div>`;
-    } else if (m.modelId === modelId || !m.modelId) {
-      const reasonHtml = m.reasoning ? renderReasoning(m.reasoning, false) : '';
-      html += `<div class="msg ai"><div class="mname">${getModelName(m.modelId||modelId)}</div><div class="bubble">${reasonHtml}${renderMd(m.content)}${m.streaming?'<span class="cursor"></span>':''}</div>${m.error?`<div class="err">${m.error}</div>`:''}</div>`;
+function renderSingleMode(area,chat){
+  const modelId=state.selectedModels[0];
+  let html='<div class="chat-wrap">';
+  chat.messages.forEach(m=>{
+    if(m.role==='user') html+=`<div class="msg user"><div class="bubble">${renderMd(m.content)}</div></div>`;
+    else if(m.modelId===modelId||!m.modelId){
+      const rHtml=m.reasoning?renderReasoning(m.reasoning,false,m.thinkStart):'';
+      html+=`<div class="msg ai"><div class="mname">${getModelName(m.modelId||modelId)}</div><div class="bubble">${rHtml}${renderMd(m.content)}</div>${m.error?`<div class="err">${m.error}</div>`:''}</div>`;
     }
   });
-  // Check if streaming
-  if (state.streaming[modelId]) {
-    const safeId = 'stream-' + modelId.replace(/[^a-z0-9]/gi, '_');
-    const s = state.streaming[modelId];
-    html += `<div class="msg ai"><div class="mname">${getModelName(modelId)}</div><div class="bubble" id="${safeId}">${renderReasoning(s.reasoning, true)}${renderMd(s.text)}<span class="cursor"></span></div></div>`;
+  if(state.streaming[modelId]){
+    const safeId='stream-'+modelId.replace(/[^a-z0-9]/gi,'_');
+    const s=state.streaming[modelId];
+    html+=`<div class="msg ai"><div class="mname">${getModelName(modelId)}</div><div class="bubble" id="${safeId}">${renderReasoning(s.reasoning,true,s.startTime)}${renderMd(s.text)}<span class="cursor"></span></div></div>`;
   }
-  area.innerHTML = html;
-  area.scrollTop = area.scrollHeight;
+  html+='</div>';area.innerHTML=html;area.scrollTop=area.scrollHeight;
 }
 
-function renderMultiMode(area, chat) {
-  area.style.padding = '0';
-  let colsHtml = '<div class="cols">';
-  state.selectedModels.forEach(modelId => {
-    const msgs = chat.messages.filter(m => {
-      if (m.role === 'user') return !m.targetModelId || m.targetModelId === modelId;
-      return m.modelId === modelId;
+function renderMultiMode(area,chat){
+  let html='<div class="cols">';
+  state.selectedModels.forEach(modelId=>{
+    const msgs=chat.messages.filter(m=>{
+      if(m.role==='user')return!m.targetModelId||m.targetModelId===modelId;
+      return m.modelId===modelId;
     });
-    let msgsHtml = '';
-    msgs.forEach(m => {
-      if (m.role==='user') {
-        msgsHtml += `<div class="msg user"><div class="bubble">${renderMd(m.content)}</div></div>`;
-      } else {
-        const reasonHtml = m.reasoning ? renderReasoning(m.reasoning, false) : '';
-        msgsHtml += `<div class="msg ai"><div class="bubble">${reasonHtml}${renderMd(m.content)}${m.streaming?'<span class="cursor"></span>':''}</div>${m.error?`<div class="err">${m.error}</div>`:''}</div>`;
+    let msgsHtml='';
+    msgs.forEach(m=>{
+      if(m.role==='user') msgsHtml+=`<div class="msg user"><div class="bubble">${renderMd(m.content)}</div></div>`;
+      else{
+        const rHtml=m.reasoning?renderReasoning(m.reasoning,false,m.thinkStart):'';
+        msgsHtml+=`<div class="msg ai"><div class="bubble">${rHtml}${renderMd(m.content)}</div>${m.error?`<div class="err">${m.error}</div>`:''}</div>`;
       }
     });
-    if (state.streaming[modelId]) {
-      const safeId = 'stream-' + modelId.replace(/[^a-z0-9]/gi, '_');
-      const s = state.streaming[modelId];
-      msgsHtml += `<div class="msg ai"><div class="bubble" id="${safeId}">${renderReasoning(s.reasoning, true)}${renderMd(s.text)}<span class="cursor"></span></div></div>`;
+    if(state.streaming[modelId]){
+      const safeId='stream-'+modelId.replace(/[^a-z0-9]/gi,'_');
+      const s=state.streaming[modelId];
+      msgsHtml+=`<div class="msg ai"><div class="bubble" id="${safeId}">${renderReasoning(s.reasoning,true,s.startTime)}${renderMd(s.text)}<span class="cursor"></span></div></div>`;
     }
-    colsHtml += `<div class="col">
-      <div class="col-hdr"><span style="width:6px;height:6px;border-radius:50%;background:var(--success-color)"></span>${getModelName(modelId)}</div>
-      <div class="col-msgs" id="col-${modelId.replace(/[^a-z0-9]/gi,'_')}">${msgsHtml}</div>
-      <div class="col-in">
+    const colId='col-'+modelId.replace(/[^a-z0-9]/gi,'_');
+    html+=`<div class="col"><div class="col-hdr"><span class="dot"></span>${getModelName(modelId)}</div>
+      <div class="col-msgs" id="${colId}">${msgsHtml}</div>
+      <div class="col-in"><div class="col-input-wrap">
         <input class="col-input" placeholder="追问..." onkeydown="if(event.isComposing||event.keyCode===229){_imeActive=true;return}if(event.key==='Enter'&&!_imeActive){colSend('${modelId}',this);event.preventDefault()}" onkeyup="if(event.key==='Enter')_imeActive=false">
-        <button class="col-send" onclick="colSend('${modelId}',this.previousElementSibling)">↑</button>
+        <button class="col-send" onclick="colSend('${modelId}',this.closest('.col-input-wrap').querySelector('input'))"><svg viewBox="0 0 14 14"><path d="M7 11V3M7 3L4 6M7 3l3 3"/></svg></button>
       </div>
-    </div>`;
+      <div class="col-tools">
+        <button class="col-tbtn${state.deepThink?' active':''}" onclick="toggleDeepThink()" title="深度思考"><svg viewBox="0 0 14 14"><circle cx="7" cy="7" r="2.5"/><circle cx="7" cy="7" r="5" stroke-dasharray="2 2"/></svg></button>
+      </div></div></div>`;
   });
-  colsHtml += '</div>';
-  area.innerHTML = colsHtml;
-  // Scroll all columns
-  state.selectedModels.forEach(id => {
-    const el = document.getElementById('col-' + id.replace(/[^a-z0-9]/gi,'_'));
-    if (el) el.scrollTop = el.scrollHeight;
+  html+='</div>';area.innerHTML=html;
+  state.selectedModels.forEach(id=>{
+    const el=document.getElementById('col-'+id.replace(/[^a-z0-9]/gi,'_'));
+    if(el)el.scrollTop=el.scrollHeight;
   });
 }
 
-// ===== MARKDOWN SIMPLE =====
-function renderMd(text) {
-  if (!text) return '';
-  let h = text
-    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-    .replace(/```([\s\S]*?)```/g, (_, c) => `<pre><code>${c.trim()}</code></pre>`)
-    .replace(/`([^`]+)`/g, '<code>$1</code>')
-    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-    .replace(/^\* (.+)$/gm, '<li>$1</li>')
-    .replace(/^\d+\. (.+)$/gm, '<li>$1</li>')
-    .replace(/\n/g, '<br>');
-  // Wrap consecutive <li> in <ul>
-  h = h.replace(/(<li>.*?<\/li>(<br>)?)+/g, m => '<ul>'+m.replace(/<br>/g,'')+'</ul>');
-  return h;
+// ===== MARKDOWN =====
+function renderMd(text){
+  if(!text)return'';
+  return text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/```([\s\S]*?)```/g,(_,c)=>`<pre><code>${c.trim()}</code></pre>`)
+    .replace(/`([^`]+)`/g,'<code>$1</code>')
+    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+    .replace(/^\* (.+)$/gm,'<li>$1</li>')
+    .replace(/^\d+\. (.+)$/gm,'<li>$1</li>')
+    .replace(/\n/g,'<br>')
+    .replace(/(<li>.*?<\/li>(<br>)?)+/g,m=>'<ul>'+m.replace(/<br>/g,'')+'</ul>');
 }
 
 // ===== TOOLS =====
-function toggleToolMenu(e) {
-  e.stopPropagation();
-  const menu = document.getElementById('toolMenu');
+function toggleToolMenu(e){
+  e.stopPropagation();const menu=document.getElementById('toolMenu');
   menu.classList.toggle('show');
-  if (menu.classList.contains('show')) {
-    setTimeout(() => document.addEventListener('click', () => menu.classList.remove('show'), {once:true}), 0);
-  }
+  if(menu.classList.contains('show'))setTimeout(()=>document.addEventListener('click',()=>menu.classList.remove('show'),{once:true}),0);
 }
-
-function toggleTool(name) {
-  const idx = state.activeTools.indexOf(name);
-  if (idx >= 0) state.activeTools.splice(idx,1);
-  else state.activeTools.push(name);
+function toggleTool(name){
+  const idx=state.activeTools.indexOf(name);
+  if(idx>=0)state.activeTools.splice(idx,1);else state.activeTools.push(name);
   renderToolBadges();
 }
-
-function renderToolBadges() {
-  const el = document.getElementById('toolBadges');
-  el.innerHTML = state.activeTools.map(t => `<div class="tbadge">${t}<span class="rx" onclick="removeTool('${t}')">×</span></div>`).join('');
+function renderToolBadges(){
+  document.getElementById('toolBadges').innerHTML=state.activeTools.map(t=>`<div class="tbadge">${t}<span class="rx" onclick="removeTool('${t}')">×</span></div>`).join('');
 }
-
-function removeTool(name) {
-  state.activeTools = state.activeTools.filter(t=>t!==name);
-  renderToolBadges();
-}
+function removeTool(name){state.activeTools=state.activeTools.filter(t=>t!==name);renderToolBadges()}
 
 // ===== INPUT =====
-function autoResize(el) {
-  el.style.height = 'auto';
-  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+function autoResize(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,150)+'px'}
+function updateSendBtn(){
+  const has=document.getElementById('mainInput').value.trim().length>0;
+  document.getElementById('sendBtn').classList.toggle('active',has);
 }
+let _imeActive=false;
+function handleInputKeyDown(e){
+  if(e.isComposing||e.keyCode===229){_imeActive=true;return}
+  if(e.key==='Enter'&&!e.shiftKey&&!_imeActive){e.preventDefault();sendMessage()}
+}
+function handleInputKeyUp(e){if(e.key==='Enter')_imeActive=false}
 
-let _imeActive = false;
-function handleInputKeyDown(e) {
-  if (e.isComposing || e.keyCode === 229) { _imeActive = true; return; }
-  if (e.key === 'Enter' && !e.shiftKey && !_imeActive) { e.preventDefault(); sendMessage(); }
-}
-function handleInputKeyUp(e) {
-  if (e.key === 'Enter') { _imeActive = false; }
-}
-
-// ===== SEND MESSAGE =====
-function sendMessage() {
-  const input = document.getElementById('mainInput');
-  let text = input.value.trim();
-  if (!text || !state.selectedModels.length) return;
-  
-  // Prepend tool prefix
-  if (state.activeTools.length) {
-    text = `[${state.activeTools.join(',')}] ${text}`;
-  }
-  
-  let chat = getCurrentChat();
-  if (!chat) { createNewChat(); chat = getCurrentChat(); }
-  
-  // Auto-title
-  if (chat.title === '新对话' && text.length > 0) {
-    chat.title = text.slice(0, 20) + (text.length > 20 ? '...' : '');
-  }
-  
-  chat.messages.push({role:'user', content: text, ts: Date.now()});
-  saveChats();
-  renderSidebar();
-  
-  input.value = '';
-  autoResize(input);
-  state.activeTools = [];
-  renderToolBadges();
-  
-  // Send to selected models
-  if (state.selectedModels.length === 1) {
-    streamToModel(state.selectedModels[0], chat, getHistory(chat, state.selectedModels[0]));
-  } else {
-    state.selectedModels.forEach(id => {
-      streamToModel(id, chat, getHistory(chat, id));
-    });
-  }
+// ===== SEND =====
+function sendMessage(){
+  const input=document.getElementById('mainInput');
+  let text=input.value.trim();
+  if(!text||!state.selectedModels.length)return;
+  if(state.activeTools.length)text=`[${state.activeTools.join(',')}] ${text}`;
+  let chat=getCurrentChat();
+  if(!chat){createNewChat();chat=getCurrentChat()}
+  if(chat.title==='新对话'&&text.length>0)chat.title=text.slice(0,20)+(text.length>20?'...':'');
+  chat.messages.push({role:'user',content:text,ts:Date.now()});
+  saveChats();renderSidebar();
+  input.value='';autoResize(input);updateSendBtn();
+  state.activeTools=[];renderToolBadges();
+  if(state.selectedModels.length===1) streamToModel(state.selectedModels[0],chat,getHistory(chat,state.selectedModels[0]));
+  else state.selectedModels.forEach(id=>streamToModel(id,chat,getHistory(chat,id)));
   renderChatArea();
 }
-
-function colSend(modelId, inputEl) {
-  const text = inputEl.value.trim();
-  if (!text) return;
-  inputEl.value = '';
-  
-  const chat = getCurrentChat();
-  if (!chat) return;
-  
-  chat.messages.push({role:'user', content: text, ts: Date.now(), targetModelId: modelId});
+function colSend(modelId,inputEl){
+  const text=inputEl.value.trim();if(!text)return;inputEl.value='';
+  const chat=getCurrentChat();if(!chat)return;
+  chat.messages.push({role:'user',content:text,ts:Date.now(),targetModelId:modelId});
   saveChats();
-  
-  streamToModel(modelId, chat, getHistory(chat, modelId));
+  streamToModel(modelId,chat,getHistory(chat,modelId));
   renderChatArea();
 }
-
-function getHistory(chat, modelId) {
-  const relevant = chat.messages.filter(m => {
-    if (m.role === 'user') return !m.targetModelId || m.targetModelId === modelId;
-    return m.modelId === modelId;
+function getHistory(chat,modelId){
+  const relevant=chat.messages.filter(m=>{
+    if(m.role==='user')return!m.targetModelId||m.targetModelId===modelId;
+    return m.modelId===modelId;
   });
-  const recent = relevant.slice(-HISTORY_LIMIT * 2);
-  return recent.map(m => ({role: m.role === 'user' ? 'user' : 'assistant', content: m.content}));
+  return relevant.slice(-HISTORY_LIMIT*2).map(m=>({role:m.role==='user'?'user':'assistant',content:m.content}));
 }
 
 // ===== STREAMING =====
-const SILICON_MODEL_MAP = {
-  'DeepSeek-V3': 'deepseek-ai/DeepSeek-V3',
-  'DeepSeek-R1': 'deepseek-ai/DeepSeek-R1',
-  'Qwen3-32B': 'Qwen/Qwen3-32B',
-  'Qwen3-30B-A3B': 'Qwen/Qwen3-30B-A3B-Instruct-2507',
-  'DeepSeek-V4-Flash': 'deepseek-ai/DeepSeek-V4-Flash'
-};
+async function streamToModel(modelId,chat,history,retryCount=0){
+  const effectiveId=getEffectiveModelId(modelId);
+  const isZhipu=effectiveId.startsWith('zhipu/');
+  const isKimi=effectiveId.startsWith('kimi/');
+  const isSilicon=effectiveId.startsWith('silicon/');
+  let key,endpoint,headers,bodyModel;
 
-async function streamToModel(modelId, chat, history, retryCount = 0) {
-  const isZhipu = modelId.startsWith('zhipu/');
-  const isKimi = modelId.startsWith('kimi/');
-  const isSilicon = modelId.startsWith('silicon/');
-  let key, endpoint, headers, bodyModel;
-  
-  if (isSilicon) {
-    key = localStorage.getItem('multi_ai_key_silicon');
-    if (!key) { addError(chat, modelId, '请先设置硅基流动的 API Key'); renderChatArea(); return; }
-    endpoint = 'https://api.siliconflow.cn/v1/chat/completions';
-    headers = {'Content-Type':'application/json','Authorization':`Bearer ${key}`};
-    const shortName = modelId.replace('silicon/', '');
-    bodyModel = SILICON_MODEL_MAP[shortName] || shortName;
-  } else if (isKimi) {
-    key = localStorage.getItem('multi_ai_key_kimi');
-    if (!key) { addError(chat, modelId, '请先设置 Kimi 的 API Key'); renderChatArea(); return; }
-    endpoint = 'https://api.moonshot.cn/v1/chat/completions';
-    headers = {'Content-Type':'application/json','Authorization':`Bearer ${key}`};
-    bodyModel = modelId.replace('kimi/', '');
-  } else if (isZhipu) {
-    key = localStorage.getItem('multi_ai_key_zhipu');
-    if (!key) { addError(chat, modelId, '请先设置智谱 AI 的 API Key'); renderChatArea(); return; }
-    endpoint = 'https://open.bigmodel.cn/api/paas/v4/chat/completions';
-    headers = {'Content-Type':'application/json','Authorization':`Bearer ${key}`};
-    bodyModel = modelId.replace('zhipu/', '');
-  } else {
-    key = localStorage.getItem('multi_ai_key');
-    if (!key) { addError(chat, modelId, '请先设置 OpenRouter 的 API Key'); renderChatArea(); return; }
-    endpoint = 'https://openrouter.ai/api/v1/chat/completions';
-    headers = {'Content-Type':'application/json','Authorization':`Bearer ${key}`,'HTTP-Referer':location.href};
-    bodyModel = modelId;
+  if(isSilicon){
+    key=localStorage.getItem('multi_ai_key_silicon');
+    if(!key){addError(chat,modelId,'请先设置硅基流动 API Key');renderChatArea();return}
+    endpoint='https://api.siliconflow.cn/v1/chat/completions';
+    headers={'Content-Type':'application/json','Authorization':`Bearer ${key}`};
+    const short=effectiveId.replace('silicon/','');
+    bodyModel=SILICON_MODEL_MAP[short]||short;
+  }else if(isKimi){
+    key=localStorage.getItem('multi_ai_key_kimi');
+    if(!key){addError(chat,modelId,'请先设置 Kimi API Key');renderChatArea();return}
+    endpoint='https://api.moonshot.cn/v1/chat/completions';
+    headers={'Content-Type':'application/json','Authorization':`Bearer ${key}`};
+    bodyModel=effectiveId.replace('kimi/','');
+  }else if(isZhipu){
+    key=localStorage.getItem('multi_ai_key_zhipu');
+    if(!key){addError(chat,modelId,'请先设置智谱 API Key');renderChatArea();return}
+    endpoint='https://open.bigmodel.cn/api/paas/v4/chat/completions';
+    headers={'Content-Type':'application/json','Authorization':`Bearer ${key}`};
+    bodyModel=effectiveId.replace('zhipu/','');
+  }else{
+    key=localStorage.getItem('multi_ai_key');
+    if(!key){addError(chat,modelId,'请先设置 OpenRouter API Key');renderChatArea();return}
+    endpoint='https://openrouter.ai/api/v1/chat/completions';
+    headers={'Content-Type':'application/json','Authorization':`Bearer ${key}`,'HTTP-Referer':location.href};
+    bodyModel=effectiveId;
   }
-  
-  const controller = new AbortController();
-  state.abortControllers[modelId] = controller;
-  state.streaming[modelId] = {text: '', done: false};
-  
-  const timeoutId = setTimeout(() => controller.abort(), TIMEOUT_MS);
-  
-  try {
-    const res = await fetch(endpoint, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify({model: bodyModel, messages: history, stream: true}),
-      signal: controller.signal
+
+  const controller=new AbortController();
+  state.abortControllers[modelId]=controller;
+  state.streaming[modelId]={text:'',reasoning:'',done:false,startTime:Date.now()};
+  const timeoutId=setTimeout(()=>controller.abort(),TIMEOUT_MS);
+
+  try{
+    const res=await fetch(endpoint,{
+      method:'POST',headers,
+      body:JSON.stringify({model:bodyModel,messages:history,stream:true}),
+      signal:controller.signal
     });
-    
     clearTimeout(timeoutId);
-    
-    if (!res.ok) {
-      const errText = await res.text().catch(()=>'');
-      if (res.status === 429) throw new Error('模型繁忙，请稍后再试（限流）');
+    if(!res.ok){
+      const errText=await res.text().catch(()=>'');
+      if(res.status===429)throw new Error('模型繁忙，请稍后再试');
       throw new Error(`HTTP ${res.status}: ${errText.slice(0,150)}`);
     }
-    
-    const reader = res.body.getReader();
-    const decoder = new TextDecoder();
-    let buffer = '';
-    
-    while (true) {
-      const {done, value} = await reader.read();
-      if (done) break;
-      buffer += decoder.decode(value, {stream: true});
-      const lines = buffer.split('\n');
-      buffer = lines.pop() || '';
-      
-      for (const line of lines) {
-        if (!line.startsWith('data: ')) continue;
-        const data = line.slice(6).trim();
-        if (data === '[DONE]') break;
-        try {
-          const j = JSON.parse(data);
-          const delta = j.choices?.[0]?.delta;
-          if (delta?.reasoning_content) {
-            if (!state.streaming[modelId].reasoning) state.streaming[modelId].reasoning = '';
-            state.streaming[modelId].reasoning += delta.reasoning_content;
+    const reader=res.body.getReader();const decoder=new TextDecoder();let buffer='';
+    while(true){
+      const{done,value}=await reader.read();if(done)break;
+      buffer+=decoder.decode(value,{stream:true});
+      const lines=buffer.split('\n');buffer=lines.pop()||'';
+      for(const line of lines){
+        if(!line.startsWith('data: '))continue;
+        const data=line.slice(6).trim();if(data==='[DONE]')break;
+        try{
+          const j=JSON.parse(data);const delta=j.choices?.[0]?.delta;
+          if(delta?.reasoning_content){
+            state.streaming[modelId].reasoning+=delta.reasoning_content;
             scheduleRender(modelId);
           }
-          if (delta?.content) {
-            state.streaming[modelId].text += delta.content;
+          if(delta?.content){
+            state.streaming[modelId].text+=delta.content;
             scheduleRender(modelId);
           }
-        } catch(e) {}
+        }catch(e){}
       }
     }
-    
-    // Finalize
-    const finalText = state.streaming[modelId].text;
-    const finalReasoning = state.streaming[modelId].reasoning || '';
-    delete state.streaming[modelId];
-    delete state.abortControllers[modelId];
-    const msg = {role:'assistant', modelId, content: finalText, ts: Date.now()};
-    if (finalReasoning) msg.reasoning = finalReasoning;
-    chat.messages.push(msg);
-    saveChats();
-    renderChatArea();
-    
-  } catch(err) {
-    clearTimeout(timeoutId);
-    delete state.streaming[modelId];
-    delete state.abortControllers[modelId];
-    
-    if (err.name === 'AbortError') {
-      if (retryCount < MAX_RETRIES) {
-        await sleep(RETRY_DELAY);
-        return streamToModel(modelId, chat, history, retryCount + 1);
-      }
-      addError(chat, modelId, '请求超时（30s）');
-    } else if (err.message.includes('限流')) {
-      addError(chat, modelId, err.message);
-    } else if (retryCount < MAX_RETRIES) {
-      await sleep(RETRY_DELAY);
-      return streamToModel(modelId, chat, history, retryCount + 1);
-    } else {
-      addError(chat, modelId, err.message || '请求失败');
-    }
+    const finalText=state.streaming[modelId].text;
+    const finalReasoning=state.streaming[modelId].reasoning;
+    const startTime=state.streaming[modelId].startTime;
+    delete state.streaming[modelId];delete state.abortControllers[modelId];
+    const msg={role:'assistant',modelId,content:finalText,ts:Date.now()};
+    if(finalReasoning){msg.reasoning=finalReasoning;msg.thinkStart=startTime}
+    chat.messages.push(msg);saveChats();renderChatArea();
+  }catch(err){
+    clearTimeout(timeoutId);delete state.streaming[modelId];delete state.abortControllers[modelId];
+    if(err.name==='AbortError'){
+      if(retryCount<MAX_RETRIES){await sleep(RETRY_DELAY);return streamToModel(modelId,chat,history,retryCount+1)}
+      addError(chat,modelId,'请求超时（30s）');
+    }else if(retryCount<MAX_RETRIES&&!err.message.includes('繁忙')){
+      await sleep(RETRY_DELAY);return streamToModel(modelId,chat,history,retryCount+1);
+    }else{addError(chat,modelId,err.message||'请求失败')}
     renderChatArea();
   }
 }
-
-function addError(chat, modelId, errMsg) {
-  chat.messages.push({role:'assistant', modelId, content:'', error: errMsg, ts: Date.now()});
-  saveChats();
-}
-
-function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+function addError(chat,modelId,errMsg){chat.messages.push({role:'assistant',modelId,content:'',error:errMsg,ts:Date.now()});saveChats()}
+function sleep(ms){return new Promise(r=>setTimeout(r,ms))}
 
 // ===== INIT =====
-function init() {
-  initTheme();
-  updateKeyStatus();
-  renderModelBar();
-  renderSidebar();
-  if (state.chats.length === 0) createNewChat();
-  else { state.currentChatId = state.chats[0].id; renderSidebar(); }
-  renderChatArea();
+function init(){
+  initTheme();updateKeyStatus();renderSidebar();
+  if(state.sidebarCollapsed)document.getElementById('sidebar').classList.add('collapsed');
+  if(state.chats.length===0)createNewChat();
+  else{state.currentChatId=state.chats[0].id;renderSidebar()}
+  renderChatArea();updateModelTrigger();updateTopTitle();updateSendBtn();
 }
-
 init();
 </script>
 </body>
