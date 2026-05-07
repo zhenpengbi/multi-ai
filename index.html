@@ -868,6 +868,9 @@ function renderChatArea(){
   }
   if(state.selectedModels.length===1){area.style.padding='24px';renderSingleMode(area,chat)}
   else{area.style.padding='0';renderMultiMode(area,chat)}
+  // Hide global input area in multi-column mode (each column has its own input)
+  const inputArea=document.querySelector('.input-area');
+  if(inputArea)inputArea.style.display=state.selectedModels.length>1?'none':'';
 }
 
 function msgActionsHTML(msgIdx){
