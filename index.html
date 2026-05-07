@@ -39,6 +39,7 @@ button{font-family:inherit;border:none;background:none;cursor:pointer;color:inhe
 .grp-title-row button:hover{color:var(--accent);background:var(--accent-light)}
 .grp-hdr{display:flex;align-items:center;gap:6px;padding:8px 10px;border-radius:var(--radius-sm);cursor:pointer;font-size:13px;font-weight:500;color:var(--text-secondary);transition:background .15s;user-select:none}
 .grp-hdr:hover{background:var(--bg-tertiary)}
+.grp-hdr.active{background:var(--accent-light);color:var(--accent)}
 .grp-hdr svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:transform .2s}
 .grp-hdr.collapsed svg.arrow{transform:rotate(-90deg)}
 .grp-acts{margin-left:auto;display:none;gap:2px}
@@ -195,6 +196,61 @@ button{font-family:inherit;border:none;background:none;cursor:pointer;color:inhe
 .tbadge .rx{cursor:pointer;font-size:14px;line-height:1;opacity:.6}
 .tbadge .rx:hover{opacity:1}
 .err{color:var(--error);font-size:12px;margin-top:4px;padding:3px 8px;background:rgba(255,77,79,.05);border-radius:4px}
+/* Chat Dropdown (3-dot menu) */
+.chat-dots{display:none;padding:3px 6px;border-radius:4px;color:var(--text-tertiary);transition:all .2s;font-size:16px;line-height:1;letter-spacing:-1px}
+.chat-item:hover .chat-dots{display:flex}
+.chat-dots:hover{color:var(--text-primary);background:var(--bg-tertiary)}
+.chat-dropdown{position:absolute;right:8px;top:100%;background:var(--bg-primary);border:1px solid var(--border);border-radius:var(--radius-sm);box-shadow:var(--shadow-md);padding:4px;z-index:1000;min-width:140px;display:none}
+.chat-dropdown.show{display:block;animation:menuIn .15s ease}
+.cd-item{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:6px;font-size:13px;transition:background .15s;cursor:pointer;position:relative}
+.cd-item:hover{background:var(--accent-light)}
+.cd-item.danger{color:var(--error)}
+.cd-item.danger:hover{background:rgba(255,77,79,.08)}
+.cd-sub{position:absolute;left:100%;top:0;background:var(--bg-primary);border:1px solid var(--border);border-radius:var(--radius-sm);box-shadow:var(--shadow-md);padding:4px;min-width:120px;display:none}
+.cd-item:hover .cd-sub{display:block}
+.cd-sub .cd-item{padding:6px 10px}
+/* Folder detail page */
+.folder-detail{flex:1;display:flex;flex-direction:column;overflow-y:auto;padding:32px 24px;align-items:center}
+.fd-wrap{width:100%;max-width:800px}
+.fd-header{display:flex;align-items:center;gap:12px;margin-bottom:24px}
+.fd-header svg{width:28px;height:28px;stroke:var(--accent);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.fd-header h2{font-size:20px;font-weight:600}
+.fd-cards{display:flex;gap:14px;margin-bottom:28px}
+.fd-card{flex:1;padding:16px;border:1px solid var(--border);border-radius:var(--radius-md);cursor:pointer;transition:all .2s;display:flex;flex-direction:column;gap:6px}
+.fd-card:hover{border-color:var(--accent);background:var(--accent-light)}
+.fd-card .fc-icon{width:32px;height:32px;background:var(--bg-tertiary);border-radius:8px;display:flex;align-items:center;justify-content:center}
+.fd-card .fc-icon svg{width:16px;height:16px;stroke:var(--accent);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.fd-card .fc-title{font-size:14px;font-weight:500}
+.fd-card .fc-desc{font-size:12px;color:var(--text-tertiary)}
+.fd-chats-title{font-size:14px;font-weight:600;margin-bottom:12px;color:var(--text-secondary)}
+.fd-chat-item{display:flex;align-items:center;padding:10px 14px;border-radius:var(--radius-sm);cursor:pointer;transition:background .15s;margin-bottom:4px}
+.fd-chat-item:hover{background:var(--bg-tertiary)}
+.fd-chat-item .fdc-title{flex:1;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fd-chat-item .fdc-time{font-size:11px;color:var(--text-tertiary)}
+.fd-input-area{padding:14px 0;margin-top:auto}
+/* Sidebar top icons row */
+.sb-top-icons{display:flex;align-items:center;gap:4px;padding:10px 14px 6px}
+.sb-top-icon{padding:6px;border-radius:var(--radius-sm);color:var(--text-secondary);transition:all .2s}
+.sb-top-icon:hover{background:var(--bg-tertiary);color:var(--text-primary)}
+.sb-top-icon svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+/* Brand entry */
+.sb-brand-entry{display:flex;align-items:center;gap:10px;padding:8px 14px;margin:4px 8px;border-radius:var(--radius-sm);cursor:pointer;transition:background .15s}
+.sb-brand-entry:hover{background:var(--bg-tertiary)}
+.sb-brand-entry .bre-icon{width:28px;height:28px;background:linear-gradient(135deg,var(--accent),#8b5cf6);border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sb-brand-entry .bre-icon svg{width:14px;height:14px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.sb-brand-entry span{font-size:14px;font-weight:600}
+/* Collapse groups btn */
+.collapse-grp-btn{display:flex;align-items:center;gap:6px;padding:6px 10px;margin:4px 8px;border-radius:var(--radius-sm);font-size:12px;color:var(--text-tertiary);cursor:pointer;transition:all .15s}
+.collapse-grp-btn:hover{background:var(--bg-tertiary);color:var(--text-secondary)}
+.collapse-grp-btn svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+/* System prompt modal */
+.sp-modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.35);backdrop-filter:blur(3px);display:none;align-items:center;justify-content:center;z-index:500}
+.sp-modal-bg.show{display:flex}
+.sp-modal{background:var(--bg-primary);border-radius:var(--radius-lg);padding:24px;width:480px;max-width:90vw;box-shadow:var(--shadow-md);animation:modalIn .25s ease}
+.sp-modal h3{font-size:16px;font-weight:600;margin-bottom:12px}
+.sp-modal textarea{width:100%;height:160px;padding:12px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg-secondary);color:var(--text-primary);font-size:13px;font-family:inherit;outline:none;resize:vertical;transition:border-color .2s}
+.sp-modal textarea:focus{border-color:var(--accent)}
+.sp-modal .sp-acts{display:flex;justify-content:flex-end;gap:10px;margin-top:16px}
 /* Context Menu */
 .ctx-menu{position:fixed;background:var(--bg-primary);border:1px solid var(--border);border-radius:var(--radius-sm);box-shadow:var(--shadow-md);padding:4px;z-index:1000;min-width:150px;display:none}
 .ctx-menu.show{display:block;animation:menuIn .15s ease}
@@ -247,18 +303,22 @@ button{font-family:inherit;border:none;background:none;cursor:pointer;color:inhe
 <div class="app">
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeMobileSidebar()"></div>
 <aside class="sidebar" id="sidebar">
-  <div class="sb-head">
-    <div class="brand hide-c"><div class="brand-icon"><svg viewBox="0 0 20 20"><path d="M10 3L3 7v6l7 4 7-4V7l-7-4z"/><path d="M10 11l7-4M10 11v8M10 11L3 7"/></svg></div><span>Multi AI</span></div>
+  <div class="sb-top-icons hide-c">
+    <button class="sb-top-icon" onclick="toggleSidebar()" title="收起侧栏"><svg viewBox="0 0 16 16"><path d="M2 3h12M2 8h12M2 13h12"/></svg></button>
+    <button class="sb-top-icon" onclick="createNewChat()" title="新建对话"><svg viewBox="0 0 16 16"><path d="M8 3v10M3 8h10"/></svg></button>
+    <button class="sb-top-icon" onclick="showKeyModal()" title="设置"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="3"/><path d="M8 2v1.5M8 12.5V14M2 8h1.5M12.5 8H14M4.1 4.1l1.1 1.1M10.8 10.8l1.1 1.1M4.1 11.9l1.1-1.1M10.8 5.2l1.1-1.1"/></svg></button>
   </div>
-  <button class="btn-new hide-c" onclick="createNewChat()"><svg viewBox="0 0 20 20"><path d="M10 4v12M4 10h12"/></svg><span class="btn-text">新建对话</span></button>
   <button class="btn-new show-c" onclick="createNewChat()" title="新建对话"><svg viewBox="0 0 20 20"><path d="M10 4v12M4 10h12"/></svg></button>
   <div class="sb-search hide-c"><svg viewBox="0 0 20 20"><circle cx="9" cy="9" r="5"/><path d="M14 14l3 3"/></svg><input placeholder="搜索对话..." oninput="filterChats(this.value)"></div>
+  <div class="sb-brand-entry hide-c" onclick="showHome()">
+    <div class="bre-icon"><svg viewBox="0 0 20 20"><path d="M10 3L3 7v6l7 4 7-4V7l-7-4z"/><path d="M10 11l7-4M10 11v8M10 11L3 7"/></svg></div>
+    <span>Multi AI</span>
+  </div>
   <div class="sb-list" id="sbList"></div>
   <div class="sb-foot">
-    <div class="sb-foot-item hide-c" onclick="toggleSidebar()"><svg viewBox="0 0 20 20"><path d="M13 4l-6 6 6 6"/><path d="M7 4l-6 6 6 6" opacity=".4"/></svg><span class="lbl">收起侧栏</span></div>
     <div class="sb-foot-item show-c" onclick="toggleSidebar()" title="展开侧栏" style="justify-content:center"><svg viewBox="0 0 20 20"><path d="M7 4l6 6-6 6"/><path d="M13 4l6 6-6 6" opacity=".4"/></svg></div>
     <div class="sb-foot-item" onclick="toggleTheme()"><svg id="themeIcon" viewBox="0 0 20 20"><circle cx="10" cy="10" r="4"/><path d="M10 2v2M10 16v2M2 10h2M16 10h2M4.93 4.93l1.41 1.41M13.66 13.66l1.41 1.41M4.93 15.07l1.41-1.41M13.66 6.34l1.41-1.41"/></svg><span class="lbl">切换主题</span></div>
-    <div class="sb-foot-item" onclick="showKeyModal()"><svg viewBox="0 0 20 20"><path d="M15 7a3 3 0 11-6 0 3 3 0 016 0z"/><path d="M9 10l-6 6v2h2l6-6"/></svg><span class="lbl">API Key</span><span class="kst" id="keyStatus" style="font-size:11px;color:var(--text-tertiary)">未设置</span></div>
+    <div class="sb-foot-item hide-c" onclick="showKeyModal()"><svg viewBox="0 0 20 20"><path d="M15 7a3 3 0 11-6 0 3 3 0 016 0z"/><path d="M9 10l-6 6v2h2l6-6"/></svg><span class="lbl">API Key</span><span class="kst" id="keyStatus" style="font-size:11px;color:var(--text-tertiary)">未设置</span></div>
   </div>
 </aside>
 <main class="main">
@@ -305,6 +365,14 @@ button{font-family:inherit;border:none;background:none;cursor:pointer;color:inhe
     <div class="mf"><label>Kimi / 月之暗面 Key</label><input class="modal-input" id="keyInputKimi" placeholder="Kimi API Key..."></div>
     <div class="mf"><label>硅基流动 Key</label><input class="modal-input" id="keyInputSilicon" placeholder="硅基流动 API Key..."></div>
     <div class="modal-acts"><button class="mbtn sec" onclick="hideModal()">取消</button><button class="mbtn pri" onclick="saveKey()">保存</button></div>
+  </div>
+</div>
+<!-- System Prompt Modal -->
+<div class="sp-modal-bg" id="spModalBg" onclick="hideSpModal(event)">
+  <div class="sp-modal" onclick="event.stopPropagation()">
+    <h3>添加指令（System Prompt）</h3>
+    <textarea id="spTextarea" placeholder="设定该分组下对话的系统指令..."></textarea>
+    <div class="sp-acts"><button class="mbtn sec" onclick="hideSpModal()">取消</button><button class="mbtn pri" onclick="saveSystemPrompt()">保存</button></div>
   </div>
 </div>
 <script>
@@ -365,13 +433,17 @@ let state={
   chats:JSON.parse(localStorage.getItem('multi_ai_chats')||'[]'),
   folders:JSON.parse(localStorage.getItem('multi_ai_folders')||'[]'),
   currentChatId:null,
+  currentFolderId:null,
   selectedModels:[],
   activeTools:[],
   deepThink:false,
   abortControllers:{},
   streaming:{},
-  sidebarCollapsed:localStorage.getItem('multi_ai_sidebar_collapsed')==='true'
+  sidebarCollapsed:localStorage.getItem('multi_ai_sidebar_collapsed')==='true',
+  groupsCollapsed:false
 };
+// Ensure folders have systemPrompt field
+state.folders.forEach(f=>{if(f.systemPrompt===undefined)f.systemPrompt=''});
 
 // ===== THEME =====
 function toggleTheme(){
@@ -521,19 +593,23 @@ function dislikeMsg(idx,btn){btn.classList.toggle('disliked');btn.closest('.msg-
 // ===== CHATS =====
 function saveChats(){localStorage.setItem('multi_ai_chats',JSON.stringify(state.chats))}
 function saveFolders(){localStorage.setItem('multi_ai_folders',JSON.stringify(state.folders))}
-function createNewChat(){
-  const chat={id:Date.now().toString(),title:'新对话',messages:[],folderId:null};
-  state.chats.unshift(chat);state.currentChatId=chat.id;
+function createNewChat(folderId){
+  const fid=folderId||null;
+  const chat={id:Date.now().toString(),title:'新对话',messages:[],folderId:fid};
+  // Add system prompt if folder has one
+  if(fid){const folder=state.folders.find(f=>f.id===fid);if(folder&&folder.systemPrompt)chat.messages.push({role:'system',content:folder.systemPrompt,ts:Date.now()})}
+  state.chats.unshift(chat);state.currentChatId=chat.id;state.currentFolderId=null;
   saveChats();renderSidebar();renderChatArea();updateTopTitle();
   closeMobileSidebar();
 }
 function selectChat(id){
-  state.currentChatId=id;renderSidebar();renderChatArea();updateTopTitle();
+  state.currentChatId=id;state.currentFolderId=null;
+  renderSidebar();renderChatArea();updateTopTitle();
   closeMobileSidebar();
 }
 function getCurrentChat(){return state.chats.find(c=>c.id===state.currentChatId)}
 function deleteChat(id,e){
-  e&&e.stopPropagation();if(!confirm('确认删除？'))return;
+  e&&e.stopPropagation();if(!confirm('确认删除该对话？'))return;
   state.chats=state.chats.filter(c=>c.id!==id);
   if(state.currentChatId===id)state.currentChatId=state.chats[0]?.id||null;
   saveChats();renderSidebar();renderChatArea();updateTopTitle();
@@ -541,7 +617,9 @@ function deleteChat(id,e){
 function startEditChat(id,e){
   e&&e.stopPropagation();
   const item=document.querySelector(`.chat-item[data-id="${id}"]`);
+  if(!item)return;
   const tEl=item.querySelector('.chat-title');
+  if(!tEl)return;
   const cur=tEl.textContent;
   tEl.outerHTML=`<input class="edit-input" value="${cur}" onblur="finishEditChat('${id}',this)" onkeydown="if(event.key==='Enter')this.blur()">`;
   item.querySelector('.edit-input').focus();
@@ -552,6 +630,10 @@ function finishEditChat(id,input){
   saveChats();renderSidebar();updateTopTitle();
 }
 function updateTopTitle(){
+  if(state.currentFolderId&&!state.currentChatId){
+    const f=state.folders.find(x=>x.id===state.currentFolderId);
+    document.getElementById('topTitle').textContent=f?f.name:'Multi AI Studio';return;
+  }
   const chat=getCurrentChat();
   document.getElementById('topTitle').textContent=chat?chat.title:'Multi AI Studio';
 }
@@ -592,42 +674,144 @@ function moveChatToFolder(chatId,folderId){
   saveChats();renderSidebar();hideCtx();
 }
 
+// ===== FOLDER DETAIL (Requirement 3) =====
+function openFolderDetail(folderId){
+  state.currentFolderId=folderId;
+  state.currentChatId=null;
+  renderSidebar();renderChatArea();updateTopTitle();
+  closeMobileSidebar();
+}
+function showHome(){
+  state.currentFolderId=null;
+  state.currentChatId=state.chats[0]?.id||null;
+  renderSidebar();renderChatArea();updateTopTitle();
+}
+function renderFolderDetail(area){
+  const folder=state.folders.find(f=>f.id===state.currentFolderId);
+  if(!folder){renderChatArea();return}
+  const chats=state.chats.filter(c=>c.folderId===folder.id);
+  let html=`<div class="folder-detail"><div class="fd-wrap">`;
+  html+=`<div class="fd-header"><svg viewBox="0 0 24 24"><path d="M3 6h18v13a2 2 0 01-2 2H5a2 2 0 01-2-2V6z"/><path d="M3 6l3-3h6l3 3"/></svg><h2>${folder.name}</h2></div>`;
+  // Cards
+  html+=`<div class="fd-cards">`;
+  html+=`<div class="fd-card" onclick="showSpModal('${folder.id}')"><div class="fc-icon"><svg viewBox="0 0 16 16"><path d="M3 2h10v12H3zM6 5h4M6 8h4M6 11h2"/></svg></div><div class="fc-title">添加指令</div><div class="fc-desc">${folder.systemPrompt?'已设置':'点击编辑 System Prompt'}</div></div>`;
+  html+=`<div class="fd-card"><div class="fc-icon"><svg viewBox="0 0 16 16"><path d="M2 3h12v10H2zM5 7h6M5 9h4"/></svg></div><div class="fc-title">资料库</div><div class="fc-desc">即将上线</div></div>`;
+  html+=`</div>`;
+  // Chat list
+  html+=`<div class="fd-chats-title">组内对话 · ${chats.length}</div>`;
+  chats.forEach(c=>{
+    html+=`<div class="fd-chat-item" onclick="selectChat('${c.id}')"><span class="fdc-title">${c.title}</span></div>`;
+  });
+  // Input area for new chat in this folder
+  html+=`<div class="fd-input-area"><div class="input-wrap"><div class="input-box"><textarea id="folderInput" placeholder="在此分组中新建对话..." rows="1" onkeydown="handleFolderInputKeyDown(event)" oninput="autoResize(this)"></textarea></div></div></div>`;
+  html+=`</div></div>`;
+  area.innerHTML=html;area.style.padding='0';
+}
+function handleFolderInputKeyDown(e){
+  if(e.isComposing||e.keyCode===229)return;
+  if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendFolderMessage()}
+}
+function sendFolderMessage(){
+  const input=document.getElementById('folderInput');
+  const text=input.value.trim();if(!text)return;
+  const folder=state.folders.find(f=>f.id===state.currentFolderId);if(!folder)return;
+  const chat={id:Date.now().toString(),title:text.slice(0,20)+(text.length>20?'...':''),messages:[],folderId:folder.id};
+  // Add system prompt if set
+  if(folder.systemPrompt){
+    chat.messages.push({role:'system',content:folder.systemPrompt,ts:Date.now()});
+  }
+  chat.messages.push({role:'user',content:text,ts:Date.now()});
+  state.chats.unshift(chat);state.currentChatId=chat.id;state.currentFolderId=null;
+  saveChats();renderSidebar();
+  if(state.selectedModels.length){
+    if(state.selectedModels.length===1)streamToModel(state.selectedModels[0],chat,getHistory(chat,state.selectedModels[0]));
+    else state.selectedModels.forEach(id=>streamToModel(id,chat,getHistory(chat,id)));
+  }
+  renderChatArea();updateTopTitle();
+}
+// System Prompt Modal
+let _spFolderId=null;
+function showSpModal(folderId){
+  _spFolderId=folderId;
+  const folder=state.folders.find(f=>f.id===folderId);
+  document.getElementById('spTextarea').value=folder?.systemPrompt||'';
+  document.getElementById('spModalBg').classList.add('show');
+}
+function hideSpModal(e){
+  if(e&&e.target!==document.getElementById('spModalBg'))return;
+  document.getElementById('spModalBg').classList.remove('show');_spFolderId=null;
+}
+function saveSystemPrompt(){
+  if(!_spFolderId)return;
+  const folder=state.folders.find(f=>f.id===_spFolderId);
+  if(folder){folder.systemPrompt=document.getElementById('spTextarea').value;saveFolders()}
+  hideSpModal();renderChatArea();
+}
+
 // ===== SIDEBAR RENDER =====
 function renderSidebar(){
   const list=document.getElementById('sbList');let html='';
   // Groups section header
-  if(state.folders.length||true){
-    html+='<div class="grp-title-row hide-c"><span>分组</span><button onclick="createFolder()" title="新建分组">+</button></div>';
+  html+='<div class="grp-title-row hide-c"><span>分组</span><button onclick="createFolder()" title="新建分组">+</button></div>';
+  if(!state.groupsCollapsed){
+    state.folders.forEach(f=>{
+      const chats=state.chats.filter(c=>c.folderId===f.id);
+      const isActive=state.currentFolderId===f.id&&!state.currentChatId;
+      html+=`<div class="grp-hdr${isActive?' active':''}" onclick="openFolderDetail('${f.id}')">
+        <svg viewBox="0 0 16 16"><path d="M2 4h12v9a1 1 0 01-1 1H3a1 1 0 01-1-1V4z"/><path d="M2 4l2-2h4l2 2"/></svg>
+        ${f.name} <span style="font-size:11px;color:var(--text-tertiary)">(${chats.length})</span>
+        <div class="grp-acts" onclick="event.stopPropagation()">
+          <button onclick="renameFolder('${f.id}')" title="重命名"><svg viewBox="0 0 12 12"><path d="M2 10l6-6 2 2-6 6H2v-2z"/></svg></button>
+          <button onclick="deleteFolder('${f.id}')" title="删除"><svg viewBox="0 0 12 12"><path d="M3 3l6 6M9 3l-6 6"/></svg></button>
+        </div></div>`;
+    });
+    if(state.folders.length) html+='<div class="collapse-grp-btn hide-c" onclick="toggleGroupsCollapse()"><svg viewBox="0 0 12 12"><path d="M6 2v8M3 7l3 3 3-3"/></svg>收起分组</div>';
+  }else{
+    html+='<div class="collapse-grp-btn hide-c" onclick="toggleGroupsCollapse()"><svg viewBox="0 0 12 12"><path d="M6 10V2M3 5l3-3 3 3"/></svg>展开分组</div>';
   }
-  state.folders.forEach(f=>{
-    const chats=state.chats.filter(c=>c.folderId===f.id);
-    html+=`<div class="grp-hdr${f.collapsed?' collapsed':''}" onclick="toggleFolderCollapse('${f.id}')">
-      <svg class="arrow" viewBox="0 0 12 12"><path d="M3 2l4 4-4 4"/></svg>
-      <svg viewBox="0 0 16 16"><path d="M2 4h12v9a1 1 0 01-1 1H3a1 1 0 01-1-1V4z"/><path d="M2 4l2-2h4l2 2"/></svg>
-      ${f.name} <span style="font-size:11px;color:var(--text-tertiary)">(${chats.length})</span>
-      <div class="grp-acts" onclick="event.stopPropagation()">
-        <button onclick="renameFolder('${f.id}')" title="重命名"><svg viewBox="0 0 12 12"><path d="M2 10l6-6 2 2-6 6H2v-2z"/></svg></button>
-        <button onclick="deleteFolder('${f.id}')" title="删除"><svg viewBox="0 0 12 12"><path d="M3 3l6 6M9 3l-6 6"/></svg></button>
-      </div></div>`;
-    html+=`<div class="grp-body${f.collapsed?' collapsed':''}" style="max-height:${chats.length*46}px">`;
-    chats.forEach(c=>{html+=chatItemHTML(c)});
-    html+='</div>';
-  });
-  // Ungrouped
+  // Ungrouped chats
   const ungrouped=state.chats.filter(c=>!c.folderId);
-  if(ungrouped.length){
+  if(ungrouped.length||true){
     html+='<div class="grp-title-row hide-c"><span>聊天</span></div>';
     ungrouped.forEach(c=>{html+=chatItemHTML(c)});
   }
   list.innerHTML=html;
 }
+function toggleGroupsCollapse(){state.groupsCollapsed=!state.groupsCollapsed;renderSidebar()}
 function chatItemHTML(c){
-  return `<div class="chat-item${c.id===state.currentChatId?' active':''}" data-id="${c.id}" onclick="selectChat('${c.id}')" oncontextmenu="showCtxMenu(event,'${c.id}')">
+  return `<div class="chat-item${c.id===state.currentChatId?' active':''}" data-id="${c.id}" onclick="selectChat('${c.id}')" oncontextmenu="showCtxMenu(event,'${c.id}')" style="position:relative">
     <span class="chat-title">${c.title}</span>
-    <div class="chat-acts">
-      <button onclick="startEditChat('${c.id}',event)" title="编辑"><svg viewBox="0 0 12 12"><path d="M2 10l6-6 2 2-6 6H2v-2z"/></svg></button>
-      <button onclick="deleteChat('${c.id}',event)" title="删除"><svg viewBox="0 0 12 12"><path d="M3 3l6 6M9 3l-6 6"/></svg></button>
-    </div></div>`;
+    <button class="chat-dots" onclick="event.stopPropagation();showChatDropdown(event,'${c.id}')">⋯</button>
+  </div>`;
+}
+// ===== CHAT 3-DOT DROPDOWN =====
+let _activeDropdown=null;
+function showChatDropdown(e,chatId){
+  e.stopPropagation();closeChatDropdown();
+  const btn=e.currentTarget;
+  const item=btn.closest('.chat-item');
+  const rect=btn.getBoundingClientRect();
+  // Build submenu for folders
+  let folderSub='';
+  state.folders.forEach(f=>{
+    folderSub+=`<div class="cd-item" onclick="event.stopPropagation();moveChatToFolder('${chatId}','${f.id}');closeChatDropdown()">📁 ${f.name}</div>`;
+  });
+  folderSub+=`<div class="cd-item" onclick="event.stopPropagation();moveChatToFolder('${chatId}',null);closeChatDropdown()">取消分组</div>`;
+  const dd=document.createElement('div');
+  dd.className='chat-dropdown show';
+  dd.style.position='fixed';
+  dd.style.left=(rect.right-140)+'px';
+  dd.style.top=(rect.bottom+4)+'px';
+  dd.innerHTML=`
+    <div class="cd-item" onclick="event.stopPropagation();closeChatDropdown();startEditChat('${chatId}')">✏️ 重命名</div>
+    <div class="cd-item" style="position:relative">📁 移到分组<svg viewBox="0 0 10 10" style="width:10px;height:10px;margin-left:auto;stroke:currentColor;fill:none;stroke-width:2"><path d="M4 2l4 3-4 3"/></svg><div class="cd-sub">${folderSub}</div></div>
+    <div class="cd-item danger" onclick="event.stopPropagation();closeChatDropdown();deleteChat('${chatId}')">🗑️ 删除</div>`;
+  document.body.appendChild(dd);
+  _activeDropdown=dd;
+  setTimeout(()=>document.addEventListener('click',closeChatDropdown,{once:true}),0);
+}
+function closeChatDropdown(){
+  if(_activeDropdown){_activeDropdown.remove();_activeDropdown=null}
 }
 
 // ===== CHAT AREA =====
@@ -664,6 +848,10 @@ function scheduleRender(modelId){
 
 function renderChatArea(){
   const area=document.getElementById('chatArea');
+  // Folder detail view
+  if(state.currentFolderId&&!state.currentChatId){
+    renderFolderDetail(area);return;
+  }
   const chat=getCurrentChat();
   if(!chat||!state.selectedModels.length){
     area.innerHTML='<div class="empty"><div class="ei"><svg viewBox="0 0 24 24"><path d="M12 3L3 7v6l9 5 9-5V7l-9-4z"/><path d="M12 12l9-5M12 12v10M12 12L3 7"/></svg></div><div class="et">选择模型，开始对话</div><div class="es">支持多模型并排对比 · 深度思考</div></div>';
@@ -686,6 +874,7 @@ function renderSingleMode(area,chat){
   const modelId=state.selectedModels[0];
   let html='<div class="chat-wrap">';
   chat.messages.forEach((m,i)=>{
+    if(m.role==='system') return; // skip system messages in display
     if(m.role==='user') html+=`<div class="msg user"><div class="bubble">${renderMd(m.content)}</div></div>`;
     else if(m.modelId===modelId||!m.modelId){
       const rHtml=m.reasoning?renderReasoning(m.reasoning,false,m.thinkStart):'';
@@ -704,11 +893,13 @@ function renderMultiMode(area,chat){
   let html='<div class="cols">';
   state.selectedModels.forEach(modelId=>{
     const msgs=chat.messages.filter(m=>{
+      if(m.role==='system')return false;
       if(m.role==='user')return!m.targetModelId||m.targetModelId===modelId;
       return m.modelId===modelId;
     });
     let msgsHtml='';
     msgs.forEach((m,idx)=>{
+      if(m.role==='system') return; // skip system messages
       const origIdx=chat.messages.indexOf(m);
       if(m.role==='user') msgsHtml+=`<div class="msg user"><div class="bubble">${renderMd(m.content)}</div></div>`;
       else{
@@ -817,10 +1008,14 @@ function colSend(modelId,inputEl){
 }
 function getHistory(chat,modelId){
   const relevant=chat.messages.filter(m=>{
+    if(m.role==='system')return true;
     if(m.role==='user')return!m.targetModelId||m.targetModelId===modelId;
     return m.modelId===modelId;
   });
-  return relevant.slice(-HISTORY_LIMIT*2).map(m=>({role:m.role==='user'?'user':'assistant',content:m.content}));
+  // Keep system messages + last N exchanges
+  const sys=relevant.filter(m=>m.role==='system');
+  const rest=relevant.filter(m=>m.role!=='system').slice(-HISTORY_LIMIT*2);
+  return [...sys,...rest].map(m=>({role:m.role==='user'?'user':(m.role==='system'?'system':'assistant'),content:m.content}));
 }
 
 // ===== STREAMING =====
