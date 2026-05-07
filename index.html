@@ -171,7 +171,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Noto
       </div>
       <div class="input-row">
         <button class="tool-trig" onclick="toggleToolMenu(event)">⚡</button>
-        <textarea id="mainInput" placeholder="输入消息..." rows="1" onkeydown="handleInputKey(event)" oninput="autoResize(this)" oncompositionstart="_isComposing=true" oncompositionend="_isComposing=false"></textarea>
+        <textarea id="mainInput" placeholder="输入消息..." rows="1" onkeydown="handleInputKey(event)" oninput="autoResize(this)"></textarea>
         <button class="send-btn" id="sendBtn" onclick="sendMessage()">↑</button>
       </div>
     </div>
@@ -187,9 +187,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Noto
       <label style="font-size:12px;font-weight:500;color:var(--text-secondary);display:block;margin-bottom:6px">OpenRouter Key</label>
       <input class="modal-input" id="keyInput" placeholder="sk-or-v1-..." />
     </div>
-    <div>
+    <div style="margin-bottom:14px">
       <label style="font-size:12px;font-weight:500;color:var(--text-secondary);display:block;margin-bottom:6px">智谱 AI Key</label>
       <input class="modal-input" id="keyInputZhipu" placeholder="智谱 API Key..." />
+    </div>
+    <div>
+      <label style="font-size:12px;font-weight:500;color:var(--text-secondary);display:block;margin-bottom:6px">Kimi / 月之暗面 Key</label>
+      <input class="modal-input" id="keyInputKimi" placeholder="Kimi API Key..." />
     </div>
     <div class="modal-acts">
       <button class="mbtn sec" onclick="hideModal()">取消</button>
@@ -217,6 +221,10 @@ const MODELS = [
   {tier:'🆓 智谱免费',models:[
     {id:'zhipu/glm-4-flash',name:'GLM-4-Flash'},
     {id:'zhipu/glm-4.7-flash',name:'GLM-4.7-Flash'}
+  ]},
+  {tier:'🆓 Kimi免费',models:[
+    {id:'kimi/moonshot-v1-8k',name:'Kimi 8K'},
+    {id:'kimi/moonshot-v1-32k',name:'Kimi 32K'}
   ]}
 ];
 
@@ -265,6 +273,7 @@ function showKeyModal() {
   document.getElementById('modalBg').classList.add('show');
   document.getElementById('keyInput').value = localStorage.getItem('multi_ai_key') || '';
   document.getElementById('keyInputZhipu').value = localStorage.getItem('multi_ai_key_zhipu') || '';
+  document.getElementById('keyInputKimi').value = localStorage.getItem('multi_ai_key_kimi') || '';
   document.getElementById('keyInput').focus();
 }
 
@@ -276,8 +285,10 @@ function hideModal(e) {
 function saveKey() {
   let k = document.getElementById('keyInput').value.replace(/[^\x20-\x7E]/g, '').trim();
   let kz = document.getElementById('keyInputZhipu').value.replace(/[^\x20-\x7E]/g, '').trim();
+  let kk = document.getElementById('keyInputKimi').value.replace(/[^\x20-\x7E]/g, '').trim();
   localStorage.setItem('multi_ai_key', k);
   localStorage.setItem('multi_ai_key_zhipu', kz);
+  localStorage.setItem('multi_ai_key_kimi', kk);
   updateKeyStatus();
   hideModal();
 }
@@ -285,9 +296,11 @@ function saveKey() {
 function updateKeyStatus() {
   const hasOR = !!localStorage.getItem('multi_ai_key');
   const hasZP = !!localStorage.getItem('multi_ai_key_zhipu');
+  const hasKM = !!localStorage.getItem('multi_ai_key_kimi');
   const parts = [];
   if (hasOR) parts.push('OpenRouter ✓');
   if (hasZP) parts.push('智谱 ✓');
+  if (hasKM) parts.push('Kimi ✓');
   document.getElementById('keyStatus').textContent = parts.length ? parts.join(' | ') : '未设置';
 }
 
@@ -461,10 +474,29 @@ function chatItemHTML(c) {
 
 // ===== CHAT AREA =====
 let _renderPending = false;
-function scheduleRender() {
+let _streamingModelId = null;
+
+function updateStreamingBubble(modelId) {
+  const safeId = 'stream-' + modelId.replace(/[^a-z0-9]/gi, '_');
+  const el = document.getElementById(safeId);
+  if (el && state.streaming[modelId]) {
+    el.innerHTML = renderMd(state.streaming[modelId].text) + '<span class="cursor"></span>';
+    const parent = el.closest('.col-msgs') || el.closest('.chat-area');
+    if (parent) parent.scrollTop = parent.scrollHeight;
+    return true;
+  }
+  return false;
+}
+
+function scheduleRender(modelId) {
   if (_renderPending) return;
   _renderPending = true;
-  requestAnimationFrame(() => { _renderPending = false; renderChatArea(); });
+  _streamingModelId = modelId;
+  requestAnimationFrame(() => {
+    _renderPending = false;
+    if (_streamingModelId && updateStreamingBubble(_streamingModelId)) return;
+    renderChatArea();
+  });
 }
 
 function renderChatArea() {
@@ -497,8 +529,9 @@ function renderSingleMode(area, chat) {
   });
   // Check if streaming
   if (state.streaming[modelId]) {
+    const safeId = 'stream-' + modelId.replace(/[^a-z0-9]/gi, '_');
     const s = state.streaming[modelId];
-    html += `<div class="msg ai"><div class="mname">${getModelName(modelId)}</div><div class="bubble">${renderMd(s.text)}<span class="cursor"></span></div></div>`;
+    html += `<div class="msg ai"><div class="mname">${getModelName(modelId)}</div><div class="bubble" id="${safeId}">${renderMd(s.text)}<span class="cursor"></span></div></div>`;
   }
   area.innerHTML = html;
   area.scrollTop = area.scrollHeight;
@@ -518,14 +551,15 @@ function renderMultiMode(area, chat) {
       }
     });
     if (state.streaming[modelId]) {
+      const safeId = 'stream-' + modelId.replace(/[^a-z0-9]/gi, '_');
       const s = state.streaming[modelId];
-      msgsHtml += `<div class="msg ai"><div class="bubble">${renderMd(s.text)}<span class="cursor"></span></div></div>`;
+      msgsHtml += `<div class="msg ai"><div class="bubble" id="${safeId}">${renderMd(s.text)}<span class="cursor"></span></div></div>`;
     }
     colsHtml += `<div class="col">
       <div class="col-hdr"><span style="width:6px;height:6px;border-radius:50%;background:var(--success-color)"></span>${getModelName(modelId)}</div>
       <div class="col-msgs" id="col-${modelId.replace(/[^a-z0-9]/gi,'_')}">${msgsHtml}</div>
       <div class="col-in">
-        <input class="col-input" placeholder="追问..." oncompositionstart="_isComposing=true" oncompositionend="_isComposing=false" onkeydown="if(!_isComposing&&event.key==='Enter'){colSend('${modelId}',this);event.preventDefault()}">
+        <input class="col-input" placeholder="追问..." onkeydown="if(event.isComposing||event.keyCode===229)return;if(event.key==='Enter'){colSend('${modelId}',this);event.preventDefault()}">
         <button class="col-send" onclick="colSend('${modelId}',this.previousElementSibling)">↑</button>
       </div>
     </div>`;
@@ -588,9 +622,8 @@ function autoResize(el) {
   el.style.height = Math.min(el.scrollHeight, 120) + 'px';
 }
 
-let _isComposing = false;
 function handleInputKey(e) {
-  if (_isComposing) return;
+  if (e.isComposing || e.keyCode === 229) return;
   if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
 }
 
@@ -657,9 +690,16 @@ function getHistory(chat, modelId) {
 // ===== STREAMING =====
 async function streamToModel(modelId, chat, history, retryCount = 0) {
   const isZhipu = modelId.startsWith('zhipu/');
+  const isKimi = modelId.startsWith('kimi/');
   let key, endpoint, headers, bodyModel;
   
-  if (isZhipu) {
+  if (isKimi) {
+    key = localStorage.getItem('multi_ai_key_kimi');
+    if (!key) { addError(chat, modelId, '请先设置 Kimi 的 API Key'); renderChatArea(); return; }
+    endpoint = 'https://api.moonshot.cn/v1/chat/completions';
+    headers = {'Content-Type':'application/json','Authorization':`Bearer ${key}`};
+    bodyModel = modelId.replace('kimi/', '');
+  } else if (isZhipu) {
     key = localStorage.getItem('multi_ai_key_zhipu');
     if (!key) { addError(chat, modelId, '请先设置智谱 AI 的 API Key'); renderChatArea(); return; }
     endpoint = 'https://open.bigmodel.cn/api/paas/v4/chat/completions';
@@ -715,7 +755,7 @@ async function streamToModel(modelId, chat, history, retryCount = 0) {
           const delta = j.choices?.[0]?.delta?.content;
           if (delta) {
             state.streaming[modelId].text += delta;
-            scheduleRender();
+            scheduleRender(modelId);
           }
         } catch(e) {}
       }
