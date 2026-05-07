@@ -171,7 +171,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Noto
       </div>
       <div class="input-row">
         <button class="tool-trig" onclick="toggleToolMenu(event)">⚡</button>
-        <textarea id="mainInput" placeholder="输入消息..." rows="1" onkeydown="handleInputKey(event)" oninput="autoResize(this)"></textarea>
+        <textarea id="mainInput" placeholder="输入消息..." rows="1" onkeydown="handleInputKey(event)" oninput="autoResize(this)" oncompositionstart="_isComposing=true" oncompositionend="_isComposing=false"></textarea>
         <button class="send-btn" id="sendBtn" onclick="sendMessage()">↑</button>
       </div>
     </div>
@@ -525,7 +525,7 @@ function renderMultiMode(area, chat) {
       <div class="col-hdr"><span style="width:6px;height:6px;border-radius:50%;background:var(--success-color)"></span>${getModelName(modelId)}</div>
       <div class="col-msgs" id="col-${modelId.replace(/[^a-z0-9]/gi,'_')}">${msgsHtml}</div>
       <div class="col-in">
-        <input class="col-input" placeholder="追问..." onkeydown="if(event.key==='Enter'){colSend('${modelId}',this);event.preventDefault()}">
+        <input class="col-input" placeholder="追问..." oncompositionstart="_isComposing=true" oncompositionend="_isComposing=false" onkeydown="if(!_isComposing&&event.key==='Enter'){colSend('${modelId}',this);event.preventDefault()}">
         <button class="col-send" onclick="colSend('${modelId}',this.previousElementSibling)">↑</button>
       </div>
     </div>`;
@@ -588,7 +588,9 @@ function autoResize(el) {
   el.style.height = Math.min(el.scrollHeight, 120) + 'px';
 }
 
+let _isComposing = false;
 function handleInputKey(e) {
+  if (_isComposing) return;
   if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
 }
 
