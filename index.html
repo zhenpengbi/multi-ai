@@ -306,6 +306,9 @@ button{font-family:inherit;border:none;background:none;cursor:pointer;color:inhe
 .code-wrap{position:relative}.code-copy{position:absolute;top:6px;right:6px;padding:3px 8px;border-radius:4px;font-size:11px;color:var(--text-tertiary);background:var(--bg-primary);border:1px solid var(--border);cursor:pointer;opacity:0;transition:opacity .2s}.code-wrap:hover .code-copy{opacity:1}.code-copy:hover{color:var(--accent);border-color:var(--accent)}
 .date-sep{padding:8px 12px 4px;font-size:11px;color:var(--text-tertiary);font-weight:500}
 .no-result{text-align:center;padding:20px;color:var(--text-tertiary);font-size:13px}
+.typing-indicator{display:flex;gap:4px;padding:8px 0}.typing-indicator span{width:6px;height:6px;border-radius:50%;background:var(--text-tertiary);animation:typing 1.4s infinite}.typing-indicator span:nth-child(2){animation-delay:.2s}.typing-indicator span:nth-child(3){animation-delay:.4s}@keyframes typing{0%,80%,100%{opacity:.3;transform:translateY(0)}40%{opacity:1;transform:translateY(-4px)}}
+.ctx-warn{padding:6px 14px;background:var(--warning);color:#333;font-size:12px;text-align:center;border-radius:var(--radius-sm);margin:0 24px 8px}
+.img-preview{display:flex;align-items:center;gap:8px;padding:8px;border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:8px}.img-preview img{height:60px;border-radius:4px}.img-preview button{padding:2px 6px;border-radius:50%;background:var(--bg-tertiary);color:var(--text-secondary);font-size:14px}
 </style>
 </head>
 <body>
@@ -336,10 +339,12 @@ button{font-family:inherit;border:none;background:none;cursor:pointer;color:inhe
     <button class="btn-sidebar-toggle" onclick="toggleSidebar()" title="切换侧栏"><svg viewBox="0 0 20 20" id="sidebarToggleIcon"><path d="M4 4h5v5H4zM11 4h5v5h-5zM4 11h5v5H4z"/><path d="M11 11h5v5h-5z" stroke-dasharray="2 1"/></svg></button>
     <button class="btn-topbar" onclick="createNewChat()" title="新建对话"><svg viewBox="0 0 20 20"><path d="M10 4v12M4 10h12"/></svg></button>
     <span class="top-title" id="topTitle">Multi AI Studio</span>
+    <button class="btn-topbar" onclick="exportChat()" title="导出"><svg viewBox="0 0 20 20"><path d="M10 3v10M10 13l-4-4M10 13l4-4"/><path d="M4 17h12"/></svg></button>
     <button class="model-trigger" onclick="openModelPanel()"><svg viewBox="0 0 20 20" style="width:14px;height:14px"><path d="M3 3h6v6H3zM11 3h6v6h-6zM3 11h6v6H3zM11 11h6v6h-6z"/></svg><span id="modelTriggerText">选择模型</span></button>
   </div>
   <div class="chat-area" id="chatArea"><div class="empty"><div class="ei"><svg viewBox="0 0 24 24"><path d="M12 3L3 7v6l9 5 9-5V7l-9-4z"/><path d="M12 12l9-5M12 12v10M12 12L3 7"/></svg></div><div class="et">选择模型，开始对话</div><div class="es">支持多模型并排对比 · 深度思考</div></div></div>
   <div class="input-area">
+    <div id="ctxWarnContainer"></div>
     <div class="input-wrap">
       <div class="tool-badges" id="toolBadges"></div>
       <div class="tool-menu" id="toolMenu">
@@ -348,9 +353,12 @@ button{font-family:inherit;border:none;background:none;cursor:pointer;color:inhe
         <div class="tm-item" onclick="toggleTool('编程')"><svg viewBox="0 0 20 20"><path d="M6 7l-3 3 3 3M14 7l3 3-3 3M11 5l-2 10"/></svg>编程</div>
         <div class="tm-item" onclick="toggleTool('解题')"><svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="7"/><path d="M8 8a2.5 2.5 0 013 2.5c0 1.5-1 2-1 3M10 15v.5"/></svg>解题</div>
       </div>
+      <div class="img-preview" id="imgPreview" style="display:none"></div>
       <div class="input-box">
-        <textarea id="mainInput" placeholder="输入消息..." rows="1" onkeydown="handleInputKeyDown(event)" onkeyup="handleInputKeyUp(event)" oninput="autoResize(this);updateSendBtn()"></textarea>
+        <textarea id="mainInput" placeholder="输入消息..." rows="1" onkeydown="handleInputKeyDown(event)" onkeyup="handleInputKeyUp(event)" oninput="autoResize(this);updateSendBtn()" onpaste="handlePaste(event)"></textarea>
         <div class="input-toolbar">
+          <button class="itb-btn" onclick="document.getElementById('imgUpload').click()"><svg viewBox="0 0 20 20"><rect x="3" y="4" width="14" height="12" rx="2"/><circle cx="8" cy="9" r="1.5"/><path d="M4 14l4-4 3 3 2-2 4 4"/></svg><span class="hide-c">图片</span></button>
+          <input type="file" id="imgUpload" accept="image/*" hidden onchange="handleImgUpload(event)">
           <button class="itb-btn" id="deepThinkBtn" onclick="toggleDeepThink()"><svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="3"/><circle cx="10" cy="10" r="7" stroke-dasharray="3 3"/><path d="M10 3v2M10 15v2M3 10h2M15 10h2"/></svg><span class="hide-c">深度思考</span></button>
           <button class="itb-btn" onclick="toggleToolMenu(event)"><svg viewBox="0 0 20 20"><path d="M5 3h10v2H5zM4 5h12v12a2 2 0 01-2 2H6a2 2 0 01-2-2V5z"/><path d="M8 9h4M8 12h4"/></svg><span class="hide-c">工具</span><svg viewBox="0 0 12 12" style="width:10px;height:10px;margin-left:2px"><path d="M3 5l3 3 3-3"/></svg></button>
           <div class="itb-right"><button class="send-btn" id="sendBtn" onclick="sendMessage()"><svg viewBox="0 0 20 20"><path d="M10 16V4M10 4l-5 5M10 4l5 5"/></svg></button></div>
@@ -426,6 +434,18 @@ const DEEP_THINK_MAP={
   'zhipu/glm-4.7-flash':'zhipu/glm-4.7-flash',
   'kimi/moonshot-v1-8k':'kimi/moonshot-v1-8k',
   'kimi/moonshot-v1-32k':'kimi/moonshot-v1-32k'
+};
+
+const FALLBACK_MAP={
+  'silicon/DeepSeek-V3':'silicon/DeepSeek-V4-Flash',
+  'silicon/DeepSeek-R1':'silicon/Qwen3-32B',
+  'silicon/Qwen3-32B':'silicon/DeepSeek-V3',
+  'silicon/Qwen3-30B-A3B':'silicon/DeepSeek-V4-Flash',
+  'silicon/DeepSeek-V4-Flash':'silicon/DeepSeek-V3',
+  'zhipu/glm-4-flash':'zhipu/glm-4.7-flash',
+  'zhipu/glm-4.7-flash':'zhipu/glm-4-flash',
+  'kimi/moonshot-v1-8k':'kimi/moonshot-v1-32k',
+  'kimi/moonshot-v1-32k':'kimi/moonshot-v1-8k'
 };
 
 const SILICON_MODEL_MAP={
@@ -866,7 +886,11 @@ function updateStreamingBubble(modelId){
   const el=document.getElementById(safeId);
   if(el&&state.streaming[modelId]){
     const s=state.streaming[modelId];
-    el.innerHTML=renderReasoning(s.reasoning,true,s.startTime)+renderMd(s.text)+(s.text||s.reasoning?'':'')+'<span class="cursor"></span>';
+    if(s.waiting){
+      el.innerHTML='<div class="typing-indicator"><span></span><span></span><span></span></div>';
+    }else{
+      el.innerHTML=renderReasoning(s.reasoning,true,s.startTime)+renderMd(s.text)+(s.text||s.reasoning?'':'')+'<span class="cursor"></span>';
+    }
     const parent=el.closest('.col-msgs')||el.closest('.chat-area');
     if(parent)parent.scrollTop=parent.scrollHeight;
     return true;
@@ -883,6 +907,16 @@ function scheduleRender(modelId){
 
 function renderChatArea(){
   const area=document.getElementById('chatArea');
+  // Context length warning
+  const warnEl=document.getElementById('ctxWarnContainer');
+  if(warnEl){
+    const chat0=getCurrentChat();
+    if(chat0&&chat0.messages.length){
+      const chars=chat0.messages.reduce((s,m)=>s+(m.content?m.content.length:0),0);
+      if(chars>CTX_WARN_CHARS){warnEl.innerHTML=`<div class="ctx-warn">⚠️ 对话已较长（约${Math.round(chars/3000)}k tokens），部分上下文可能被截断</div>`}
+      else{warnEl.innerHTML=''}
+    }else{warnEl.innerHTML=''}
+  }
   // Folder detail view
   if(state.currentFolderId&&!state.currentChatId){
     renderFolderDetail(area);return;
@@ -928,7 +962,8 @@ function renderSingleMode(area,chat){
   if(state.streaming[modelId]){
     const safeId='stream-'+modelId.replace(/[^a-z0-9]/gi,'_');
     const s=state.streaming[modelId];
-    html+=`<div class="msg ai"><div class="mname">${getModelName(modelId)}</div><div class="bubble" id="${safeId}">${renderReasoning(s.reasoning,true,s.startTime)}${renderMd(s.text)}<span class="cursor"></span></div></div>`;
+    const streamContent=s.waiting?'<div class="typing-indicator"><span></span><span></span><span></span></div>':(renderReasoning(s.reasoning,true,s.startTime)+renderMd(s.text)+'<span class="cursor"></span>');
+    html+=`<div class="msg ai"><div class="mname">${getModelName(modelId)}</div><div class="bubble" id="${safeId}">${streamContent}</div></div>`;
   }
   html+='</div>';area.innerHTML=html;area.scrollTop=area.scrollHeight;
 }
@@ -954,7 +989,8 @@ function renderMultiMode(area,chat){
     if(state.streaming[modelId]){
       const safeId='stream-'+modelId.replace(/[^a-z0-9]/gi,'_');
       const s=state.streaming[modelId];
-      msgsHtml+=`<div class="msg ai"><div class="bubble" id="${safeId}">${renderReasoning(s.reasoning,true,s.startTime)}${renderMd(s.text)}<span class="cursor"></span></div></div>`;
+      const streamContent=s.waiting?'<div class="typing-indicator"><span></span><span></span><span></span></div>':(renderReasoning(s.reasoning,true,s.startTime)+renderMd(s.text)+'<span class="cursor"></span>');
+      msgsHtml+=`<div class="msg ai"><div class="bubble" id="${safeId}">${streamContent}</div></div>`;
     }
     const colId='col-'+modelId.replace(/[^a-z0-9]/gi,'_');
     const colDeepActive=state.colDeepThink&&state.colDeepThink[modelId];
@@ -1041,6 +1077,44 @@ function renderToolBadges(){
 }
 function removeTool(name){state.activeTools=state.activeTools.filter(t=>t!==name);renderToolBadges()}
 
+// ===== IMAGE UPLOAD =====
+function handleImgUpload(event){
+  const file=event.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=function(e){
+    state.pendingImage=e.target.result;
+    showImagePreview(state.pendingImage);
+  };
+  reader.readAsDataURL(file);
+  event.target.value='';
+}
+function handlePaste(event){
+  const items=event.clipboardData?.items;if(!items)return;
+  for(const item of items){
+    if(item.type.startsWith('image/')){
+      event.preventDefault();
+      const file=item.getAsFile();if(!file)return;
+      const reader=new FileReader();
+      reader.onload=function(e){
+        state.pendingImage=e.target.result;
+        showImagePreview(state.pendingImage);
+      };
+      reader.readAsDataURL(file);
+      return;
+    }
+  }
+}
+function showImagePreview(dataUrl){
+  const el=document.getElementById('imgPreview');
+  el.innerHTML=`<img src="${dataUrl}"><button onclick="clearImage()">×</button>`;
+  el.style.display='flex';
+}
+function clearImage(){
+  state.pendingImage=null;
+  const el=document.getElementById('imgPreview');
+  el.innerHTML='';el.style.display='none';
+}
+
 // ===== INPUT =====
 function autoResize(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,150)+'px'}
 function updateSendBtn(){
@@ -1066,10 +1140,13 @@ function sendMessage(){
   let chat=getCurrentChat();
   if(!chat){createNewChat();chat=getCurrentChat()}
   if(chat.title==='新对话'&&text.length>0)chat.title=text.slice(0,20)+(text.length>20?'...':'');
-  chat.messages.push({role:'user',content:text,ts:Date.now()});
+  const hasImage=!!state.pendingImage;
+  const msgContent=hasImage?text:text;
+  chat.messages.push({role:'user',content:text,ts:Date.now(),image:hasImage?state.pendingImage:undefined});
   saveChats();renderSidebar();
   input.value='';autoResize(input);updateSendBtn();
   state.activeTools=[];renderToolBadges();
+  if(hasImage){state.pendingImage=null;clearImage()}
   if(state.selectedModels.length===1){
     streamToModel(state.selectedModels[0],chat,getHistory(chat,state.selectedModels[0]));
   } else {
@@ -1108,11 +1185,17 @@ function getHistory(chat,modelId){
   // Keep system messages + last N exchanges
   const sys=relevant.filter(m=>m.role==='system');
   const rest=relevant.filter(m=>m.role!=='system').slice(-HISTORY_LIMIT*2);
-  return [...sys,...rest].map(m=>({role:m.role==='user'?'user':(m.role==='system'?'system':'assistant'),content:m.content}));
+  return [...sys,...rest].map(m=>{
+    const role=m.role==='user'?'user':(m.role==='system'?'system':'assistant');
+    if(m.image&&role==='user'){
+      return {role,content:[{type:'text',text:m.content},{type:'image_url',image_url:{url:m.image}}]};
+    }
+    return {role,content:m.content};
+  });
 }
 
 // ===== STREAMING =====
-async function streamToModel(modelId,chat,history,retryCount=0){
+async function streamToModel(modelId,chat,history,retryCount=0,hasFallback=false){
   const effectiveId=getEffectiveModelId(modelId);
   const isZhipu=effectiveId.startsWith('zhipu/');
   const isKimi=effectiveId.startsWith('kimi/');
@@ -1148,7 +1231,7 @@ async function streamToModel(modelId,chat,history,retryCount=0){
 
   const controller=new AbortController();
   state.abortControllers[modelId]=controller;
-  state.streaming[modelId]={text:'',reasoning:'',done:false,startTime:Date.now()};
+  state.streaming[modelId]={text:'',reasoning:'',done:false,startTime:Date.now(),waiting:true};
   const timeoutId=setTimeout(()=>controller.abort(),TIMEOUT_MS);
 
   try{
@@ -1174,10 +1257,12 @@ async function streamToModel(modelId,chat,history,retryCount=0){
         try{
           const j=JSON.parse(data);const delta=j.choices?.[0]?.delta;
           if(delta?.reasoning_content){
+            state.streaming[modelId].waiting=false;
             state.streaming[modelId].reasoning+=delta.reasoning_content;
             scheduleRender(modelId);
           }
           if(delta?.content){
+            state.streaming[modelId].waiting=false;
             state.streaming[modelId].text+=delta.content;
             scheduleRender(modelId);
           }
@@ -1194,16 +1279,54 @@ async function streamToModel(modelId,chat,history,retryCount=0){
   }catch(err){
     clearTimeout(timeoutId);delete state.streaming[modelId];delete state.abortControllers[modelId];
     if(err.name==='AbortError'){
-      if(retryCount<MAX_RETRIES){await sleep(RETRY_DELAY);return streamToModel(modelId,chat,history,retryCount+1)}
+      if(retryCount<MAX_RETRIES){await sleep(RETRY_DELAY);return streamToModel(modelId,chat,history,retryCount+1,hasFallback)}
+      // Retry exhausted, try fallback
+      if(!hasFallback&&FALLBACK_MAP[modelId]){
+        const fb=FALLBACK_MAP[modelId];
+        addError(chat,modelId,`请求超时，模型降级为 ${getModelName(fb)}`);
+        renderChatArea();
+        return streamToModel(fb,chat,history,0,true);
+      }
       addError(chat,modelId,'请求超时（30s）');
     }else if(retryCount<MAX_RETRIES&&!err.message.includes('繁忙')){
-      await sleep(RETRY_DELAY);return streamToModel(modelId,chat,history,retryCount+1);
-    }else{addError(chat,modelId,err.message||'请求失败')}
+      await sleep(RETRY_DELAY);return streamToModel(modelId,chat,history,retryCount+1,hasFallback);
+    }else{
+      // Retry exhausted, try fallback
+      if(!hasFallback&&FALLBACK_MAP[modelId]){
+        const fb=FALLBACK_MAP[modelId];
+        addError(chat,modelId,`${err.message||'请求失败'}，模型降级为 ${getModelName(fb)}`);
+        renderChatArea();
+        return streamToModel(fb,chat,history,0,true);
+      }
+      addError(chat,modelId,err.message||'请求失败');
+    }
     renderChatArea();
   }
 }
 function addError(chat,modelId,errMsg){chat.messages.push({role:'assistant',modelId,content:'',error:errMsg,ts:Date.now()});saveChats()}
 function sleep(ms){return new Promise(r=>setTimeout(r,ms))}
+
+// ===== EXPORT =====
+function exportChat(){
+  const chat=getCurrentChat();if(!chat||!chat.messages.length)return;
+  let md='# '+chat.title+'\n\n';
+  chat.messages.forEach(m=>{
+    if(m.role==='system')return;
+    const time=m.ts?new Date(m.ts).toLocaleString('zh-CN'):'';
+    if(m.role==='user'){md+=`## 用户\n_${time}_\n\n${m.content}\n\n`}
+    else{const name=getModelName(m.modelId||'');md+=`## ${name}\n_${time}_\n\n${m.content}\n\n`}
+  });
+  const blob=new Blob([md],{type:'text/markdown;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  const date=new Date().toISOString().slice(0,10);
+  a.href=url;a.download=`${chat.title}_${date}.md`;
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// ===== CONTEXT WARNING =====
+const CTX_WARN_CHARS=24000;
 
 // ===== INIT =====
 function init(){
