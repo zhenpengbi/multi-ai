@@ -191,9 +191,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Noto
       <label style="font-size:12px;font-weight:500;color:var(--text-secondary);display:block;margin-bottom:6px">智谱 AI Key</label>
       <input class="modal-input" id="keyInputZhipu" placeholder="智谱 API Key..." />
     </div>
-    <div>
+    <div style="margin-bottom:14px">
       <label style="font-size:12px;font-weight:500;color:var(--text-secondary);display:block;margin-bottom:6px">Kimi / 月之暗面 Key</label>
       <input class="modal-input" id="keyInputKimi" placeholder="Kimi API Key..." />
+    </div>
+    <div>
+      <label style="font-size:12px;font-weight:500;color:var(--text-secondary);display:block;margin-bottom:6px">硅基流动 Key</label>
+      <input class="modal-input" id="keyInputSilicon" placeholder="硅基流动 API Key..." />
     </div>
     <div class="modal-acts">
       <button class="mbtn sec" onclick="hideModal()">取消</button>
@@ -225,6 +229,13 @@ const MODELS = [
   {tier:'🆓 Kimi免费',models:[
     {id:'kimi/moonshot-v1-8k',name:'Kimi 8K'},
     {id:'kimi/moonshot-v1-32k',name:'Kimi 32K'}
+  ]},
+  {tier:'🆓 硅基流动',models:[
+    {id:'silicon/DeepSeek-V3',name:'DeepSeek V3'},
+    {id:'silicon/DeepSeek-R1',name:'DeepSeek R1（推理）'},
+    {id:'silicon/Qwen3-32B',name:'Qwen3 32B'},
+    {id:'silicon/Qwen3-30B-A3B',name:'Qwen3 30B-A3B'},
+    {id:'silicon/DeepSeek-V4-Flash',name:'DeepSeek V4 Flash'}
   ]}
 ];
 
@@ -274,6 +285,7 @@ function showKeyModal() {
   document.getElementById('keyInput').value = localStorage.getItem('multi_ai_key') || '';
   document.getElementById('keyInputZhipu').value = localStorage.getItem('multi_ai_key_zhipu') || '';
   document.getElementById('keyInputKimi').value = localStorage.getItem('multi_ai_key_kimi') || '';
+  document.getElementById('keyInputSilicon').value = localStorage.getItem('multi_ai_key_silicon') || '';
   document.getElementById('keyInput').focus();
 }
 
@@ -286,9 +298,11 @@ function saveKey() {
   let k = document.getElementById('keyInput').value.replace(/[^\x20-\x7E]/g, '').trim();
   let kz = document.getElementById('keyInputZhipu').value.replace(/[^\x20-\x7E]/g, '').trim();
   let kk = document.getElementById('keyInputKimi').value.replace(/[^\x20-\x7E]/g, '').trim();
+  let ks = document.getElementById('keyInputSilicon').value.replace(/[^\x20-\x7E]/g, '').trim();
   localStorage.setItem('multi_ai_key', k);
   localStorage.setItem('multi_ai_key_zhipu', kz);
   localStorage.setItem('multi_ai_key_kimi', kk);
+  localStorage.setItem('multi_ai_key_silicon', ks);
   updateKeyStatus();
   hideModal();
 }
@@ -297,10 +311,12 @@ function updateKeyStatus() {
   const hasOR = !!localStorage.getItem('multi_ai_key');
   const hasZP = !!localStorage.getItem('multi_ai_key_zhipu');
   const hasKM = !!localStorage.getItem('multi_ai_key_kimi');
+  const hasSL = !!localStorage.getItem('multi_ai_key_silicon');
   const parts = [];
   if (hasOR) parts.push('OpenRouter ✓');
   if (hasZP) parts.push('智谱 ✓');
   if (hasKM) parts.push('Kimi ✓');
+  if (hasSL) parts.push('硅基 ✓');
   document.getElementById('keyStatus').textContent = parts.length ? parts.join(' | ') : '未设置';
 }
 
@@ -692,12 +708,28 @@ function getHistory(chat, modelId) {
 }
 
 // ===== STREAMING =====
+const SILICON_MODEL_MAP = {
+  'DeepSeek-V3': 'deepseek-ai/DeepSeek-V3',
+  'DeepSeek-R1': 'deepseek-ai/DeepSeek-R1',
+  'Qwen3-32B': 'Qwen/Qwen3-32B',
+  'Qwen3-30B-A3B': 'Qwen/Qwen3-30B-A3B-Instruct-2507',
+  'DeepSeek-V4-Flash': 'deepseek-ai/DeepSeek-V4-Flash'
+};
+
 async function streamToModel(modelId, chat, history, retryCount = 0) {
   const isZhipu = modelId.startsWith('zhipu/');
   const isKimi = modelId.startsWith('kimi/');
+  const isSilicon = modelId.startsWith('silicon/');
   let key, endpoint, headers, bodyModel;
   
-  if (isKimi) {
+  if (isSilicon) {
+    key = localStorage.getItem('multi_ai_key_silicon');
+    if (!key) { addError(chat, modelId, '请先设置硅基流动的 API Key'); renderChatArea(); return; }
+    endpoint = 'https://api.siliconflow.cn/v1/chat/completions';
+    headers = {'Content-Type':'application/json','Authorization':`Bearer ${key}`};
+    const shortName = modelId.replace('silicon/', '');
+    bodyModel = SILICON_MODEL_MAP[shortName] || shortName;
+  } else if (isKimi) {
     key = localStorage.getItem('multi_ai_key_kimi');
     if (!key) { addError(chat, modelId, '请先设置 Kimi 的 API Key'); renderChatArea(); return; }
     endpoint = 'https://api.moonshot.cn/v1/chat/completions';
