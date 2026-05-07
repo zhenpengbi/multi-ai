@@ -302,6 +302,10 @@ button{font-family:inherit;border:none;background:none;cursor:pointer;color:inhe
 .msg-actions{opacity:1}
 }
 @media(min-width:769px){.btn-hamburger{display:none}.sidebar-overlay{display:none!important}}
+.msg-time{font-size:11px;color:var(--text-tertiary);margin-left:auto}
+.code-wrap{position:relative}.code-copy{position:absolute;top:6px;right:6px;padding:3px 8px;border-radius:4px;font-size:11px;color:var(--text-tertiary);background:var(--bg-primary);border:1px solid var(--border);cursor:pointer;opacity:0;transition:opacity .2s}.code-wrap:hover .code-copy{opacity:1}.code-copy:hover{color:var(--accent);border-color:var(--accent)}
+.date-sep{padding:8px 12px 4px;font-size:11px;color:var(--text-tertiary);font-weight:500}
+.no-result{text-align:center;padding:20px;color:var(--text-tertiary);font-size:13px}
 </style>
 </head>
 <body>
@@ -486,10 +490,17 @@ function closeMobileSidebar(){
 }
 function filterChats(q){
   const items=document.querySelectorAll('.chat-item');
+  let anyVisible=false;
   items.forEach(el=>{
     const title=el.querySelector('.chat-title');
-    if(title) el.style.display=title.textContent.toLowerCase().includes(q.toLowerCase())?'':'none';
+    const show=title&&title.textContent.toLowerCase().includes(q.toLowerCase());
+    el.style.display=show?'':'none';
+    if(show)anyVisible=true;
   });
+  let noRes=document.getElementById('noResult');
+  if(!anyVisible&&q){
+    if(!noRes){noRes=document.createElement('div');noRes.className='no-result';noRes.id='noResult';noRes.textContent='无匹配对话';document.getElementById('sbList').appendChild(noRes)}
+  }else{if(noRes)noRes.remove()}
 }
 
 // ===== API KEY =====
@@ -788,7 +799,16 @@ function renderSidebar(){
   const ungrouped=state.chats.filter(c=>!c.folderId);
   if(ungrouped.length||true){
     html+='<div class="grp-title-row hide-c"><span>聊天</span></div>';
-    ungrouped.forEach(c=>{html+=chatItemHTML(c)});
+    const now=new Date();const todayStart=new Date(now.getFullYear(),now.getMonth(),now.getDate()).getTime();
+    const yesterdayStart=todayStart-86400000;
+    let shownToday=false,shownYesterday=false,shownEarlier=false;
+    ungrouped.forEach(c=>{
+      const msgs=c.messages||[];const lastTs=c.ts||(msgs.length?msgs[msgs.length-1].ts:0)||0;
+      if(lastTs>=todayStart){if(!shownToday){html+='<div class="date-sep">今天</div>';shownToday=true}}
+      else if(lastTs>=yesterdayStart){if(!shownYesterday){html+='<div class="date-sep">昨天</div>';shownYesterday=true}}
+      else{if(!shownEarlier){html+='<div class="date-sep">更早</div>';shownEarlier=true}}
+      html+=chatItemHTML(c);
+    });
   }
   list.innerHTML=html;
 }
@@ -876,12 +896,15 @@ function renderChatArea(){
   else{area.style.padding='0';renderMultiMode(area,chat)}
 }
 
-function msgActionsHTML(msgIdx){
+function formatMsgTime(ts){if(!ts)return'';const d=new Date(ts);return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')}
+function msgActionsHTML(msgIdx,ts){
+  const timeHtml=ts?`<span class="msg-time">${formatMsgTime(ts)}</span>`:'';
   return `<div class="msg-actions">
     <button class="msg-act" onclick="copyMsg(${msgIdx})" title="复制"><svg viewBox="0 0 16 16"><rect x="5" y="5" width="8" height="8" rx="1"/><path d="M3 11V3h8"/></svg></button>
     <button class="msg-act" onclick="regenMsg(${msgIdx})" title="重新生成"><svg viewBox="0 0 16 16"><path d="M2 8a6 6 0 0111.5-2M14 8a6 6 0 01-11.5 2"/><path d="M13 3v3h-3M3 13v-3h3"/></svg></button>
     <button class="msg-act" onclick="likeMsg(${msgIdx},this)" title="喜欢"><svg viewBox="0 0 16 16"><path d="M4 7v7h2V7H4zM7 7l1-4a1 1 0 011-1h1l1 2v3h3l-1 7H7V7z"/></svg></button>
     <button class="msg-act" onclick="dislikeMsg(${msgIdx},this)" title="不喜欢"><svg viewBox="0 0 16 16"><path d="M12 9V2h-2v7h2zM9 9l-1 4a1 1 0 01-1 1H6l-1-2V9H2l1-7h7v7z"/></svg></button>
+    ${timeHtml}
   </div>`;
 }
 
@@ -899,7 +922,7 @@ function renderSingleMode(area,chat){
     if(m.role==='user') html+=`<div class="msg user"><div class="bubble">${renderMd(m.content)}</div></div>`;
     else if(m.modelId===modelId||!m.modelId){
       const rHtml=m.reasoning?renderReasoning(m.reasoning,false,m.thinkStart):'';
-      html+=`<div class="msg ai"><div class="mname">${getModelName(m.modelId||modelId)}</div><div class="bubble">${rHtml}${renderMd(m.content)}</div>${m.error?`<div class="err">${m.error}</div>`:''}${m.content?msgActionsHTML(i):''}</div>`;
+      html+=`<div class="msg ai"><div class="mname">${getModelName(m.modelId||modelId)}</div><div class="bubble">${rHtml}${renderMd(m.content)}</div>${m.error?`<div class="err">${m.error}</div>`:''}${m.content?msgActionsHTML(i,m.ts):''}</div>`;
     }
   });
   if(state.streaming[modelId]){
@@ -925,7 +948,7 @@ function renderMultiMode(area,chat){
       if(m.role==='user') msgsHtml+=`<div class="msg user"><div class="bubble">${renderMd(m.content)}</div></div>`;
       else{
         const rHtml=m.reasoning?renderReasoning(m.reasoning,false,m.thinkStart):'';
-        msgsHtml+=`<div class="msg ai"><div class="bubble">${rHtml}${renderMd(m.content)}</div>${m.error?`<div class="err">${m.error}</div>`:''}${m.content?msgActionsHTML(origIdx):''}</div>`;
+        msgsHtml+=`<div class="msg ai"><div class="bubble">${rHtml}${renderMd(m.content)}</div>${m.error?`<div class="err">${m.error}</div>`:''}${m.content?msgActionsHTML(origIdx,m.ts):''}</div>`;
       }
     });
     if(state.streaming[modelId]){
@@ -955,10 +978,11 @@ function renderMultiMode(area,chat){
 }
 
 // ===== MARKDOWN =====
+function copyCode(btn){const pre=btn.parentElement.querySelector('pre');navigator.clipboard.writeText(pre.textContent);btn.textContent='已复制';setTimeout(()=>btn.textContent='复制',1500)}
 function renderMd(text){
   if(!text)return'';
   return text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-    .replace(/```([\s\S]*?)```/g,(_,c)=>`<pre><code>${c.trim()}</code></pre>`)
+    .replace(/```([\s\S]*?)```/g,(_,c)=>`<div class="code-wrap"><button class="code-copy" onclick="copyCode(this)">复制</button><pre><code>${c.trim()}</code></pre></div>`)
     .replace(/`([^`]+)`/g,'<code>$1</code>')
     .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
     .replace(/\*(.+?)\*/g,'<em>$1</em>')
@@ -1035,7 +1059,10 @@ function sendMessage(){
   const input=document.getElementById('mainInput');
   let text=input.value.trim();
   if(!text||!state.selectedModels.length)return;
-  if(state.activeTools.length)text=`[${state.activeTools.join(',')}] ${text}`;
+  // Global tools for single model; per-column tools respected in multi-mode
+  if(state.selectedModels.length===1){
+    if(state.activeTools.length)text=`[${state.activeTools.join(',')}] ${text}`;
+  }
   let chat=getCurrentChat();
   if(!chat){createNewChat();chat=getCurrentChat()}
   if(chat.title==='新对话'&&text.length>0)chat.title=text.slice(0,20)+(text.length>20?'...':'');
@@ -1043,8 +1070,20 @@ function sendMessage(){
   saveChats();renderSidebar();
   input.value='';autoResize(input);updateSendBtn();
   state.activeTools=[];renderToolBadges();
-  if(state.selectedModels.length===1) streamToModel(state.selectedModels[0],chat,getHistory(chat,state.selectedModels[0]));
-  else state.selectedModels.forEach(id=>streamToModel(id,chat,getHistory(chat,id)));
+  if(state.selectedModels.length===1){
+    streamToModel(state.selectedModels[0],chat,getHistory(chat,state.selectedModels[0]));
+  } else {
+    state.selectedModels.forEach(id=>{
+      // Per-column tools take priority, fallback to global activeTools
+      let sendText=text;
+      const ct=state.colTools[id];
+      if(ct&&ct.length){sendText=`[${ct.join(',')}] ${text}`;state.colTools[id]=[];}
+      // Override the last user message content for this model's history
+      const hist=getHistory(chat,id);
+      if(hist.length&&hist[hist.length-1].role==='user')hist[hist.length-1]={role:'user',content:sendText};
+      streamToModel(id,chat,hist);
+    });
+  }
   renderChatArea();
 }
 function colSend(modelId,inputEl){
