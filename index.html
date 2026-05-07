@@ -200,7 +200,7 @@ button{font-family:inherit;border:none;background:none;cursor:pointer;color:inhe
 .chat-dots{display:none;padding:3px 6px;border-radius:4px;color:var(--text-tertiary);transition:all .2s;font-size:16px;line-height:1;letter-spacing:-1px}
 .chat-item:hover .chat-dots{display:flex}
 .chat-dots:hover{color:var(--text-primary);background:var(--bg-tertiary)}
-.chat-dropdown{position:absolute;right:8px;top:100%;background:var(--bg-primary);border:1px solid var(--border);border-radius:var(--radius-sm);box-shadow:var(--shadow-md);padding:4px;z-index:1000;min-width:100px;display:none}
+.chat-dropdown{position:absolute;right:8px;top:100%;background:var(--bg-primary);border:1px solid var(--border);border-radius:var(--radius-sm);box-shadow:var(--shadow-md);padding:4px;z-index:1000;width:fit-content;min-width:0;display:none}
 .chat-dropdown.show{display:block;animation:menuIn .15s ease}
 .cd-item{display:flex;align-items:center;gap:6px;padding:7px 10px;border-radius:6px;font-size:13px;transition:background .15s;cursor:pointer;position:relative;white-space:nowrap}
 .cd-item:hover{background:var(--accent-light)}
@@ -804,7 +804,7 @@ function showChatDropdown(e,chatId){
   dd.style.top=(rect.bottom+4)+'px';
   dd.innerHTML=`
     <div class="cd-item" onclick="event.stopPropagation();closeChatDropdown();startEditChat('${chatId}')">重命名</div>
-    <div class="cd-item" style="position:relative">移到分组<svg viewBox="0 0 10 10" style="width:10px;height:10px;margin-left:auto;stroke:currentColor;fill:none;stroke-width:2"><path d="M4 2l4 3-4 3"/></svg><div class="cd-sub">${folderSub}</div></div>
+    <div class="cd-item" style="position:relative">移到分组 ›<div class="cd-sub">${folderSub}</div></div>
     <div class="cd-item danger" onclick="event.stopPropagation();closeChatDropdown();deleteChat('${chatId}')">删除</div>`;
   document.body.appendChild(dd);
   _activeDropdown=dd;
