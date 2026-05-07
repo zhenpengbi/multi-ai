@@ -72,6 +72,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Noto
 [data-theme="dark"] .bubble pre{background:rgba(255,255,255,.05)}
 .bubble ul,.bubble ol{padding-left:20px;margin:8px 0}
 .bubble strong{font-weight:600}
+.thinking-block{margin:0 0 10px 0;border:1px solid rgba(128,128,128,.2);border-radius:8px;padding:0;overflow:hidden}
+.thinking-block summary{cursor:pointer;padding:8px 12px;font-size:13px;color:var(--text-secondary);background:rgba(128,128,128,.05);user-select:none}
+.thinking-block summary:hover{background:rgba(128,128,128,.1)}
+.thinking-content{padding:8px 12px;font-size:13px;color:var(--text-secondary);max-height:300px;overflow-y:auto;border-top:1px solid rgba(128,128,128,.1)}
 .cursor{display:inline-block;width:2px;height:16px;background:var(--accent);margin-left:2px;animation:blink 1s infinite;vertical-align:middle}
 @keyframes blink{0%,50%{opacity:1}51%,100%{opacity:0}}
 .cols{display:flex;gap:16px;flex:1;overflow-x:auto;padding:24px}
@@ -492,11 +496,18 @@ function chatItemHTML(c) {
 let _renderPending = false;
 let _streamingModelId = null;
 
+function renderReasoning(reasoning, isStreaming) {
+  if (!reasoning) return '';
+  const cursor = isStreaming ? '<span class="cursor"></span>' : '';
+  return `<details class="thinking-block"${isStreaming?' open':''}><summary>💭 思考过程</summary><div class="thinking-content">${renderMd(reasoning)}${cursor}</div></details>`;
+}
+
 function updateStreamingBubble(modelId) {
   const safeId = 'stream-' + modelId.replace(/[^a-z0-9]/gi, '_');
   const el = document.getElementById(safeId);
   if (el && state.streaming[modelId]) {
-    el.innerHTML = renderMd(state.streaming[modelId].text) + '<span class="cursor"></span>';
+    const s = state.streaming[modelId];
+    el.innerHTML = renderReasoning(s.reasoning, true) + renderMd(s.text) + (s.text ? '' : (!s.reasoning ? '' : '')) + '<span class="cursor"></span>';
     const parent = el.closest('.col-msgs') || el.closest('.chat-area');
     if (parent) parent.scrollTop = parent.scrollHeight;
     return true;
@@ -540,14 +551,15 @@ function renderSingleMode(area, chat) {
     if (m.role === 'user') {
       html += `<div class="msg user"><div class="bubble">${renderMd(m.content)}</div></div>`;
     } else if (m.modelId === modelId || !m.modelId) {
-      html += `<div class="msg ai"><div class="mname">${getModelName(m.modelId||modelId)}</div><div class="bubble">${renderMd(m.content)}${m.streaming?'<span class="cursor"></span>':''}</div>${m.error?`<div class="err">${m.error}</div>`:''}</div>`;
+      const reasonHtml = m.reasoning ? renderReasoning(m.reasoning, false) : '';
+      html += `<div class="msg ai"><div class="mname">${getModelName(m.modelId||modelId)}</div><div class="bubble">${reasonHtml}${renderMd(m.content)}${m.streaming?'<span class="cursor"></span>':''}</div>${m.error?`<div class="err">${m.error}</div>`:''}</div>`;
     }
   });
   // Check if streaming
   if (state.streaming[modelId]) {
     const safeId = 'stream-' + modelId.replace(/[^a-z0-9]/gi, '_');
     const s = state.streaming[modelId];
-    html += `<div class="msg ai"><div class="mname">${getModelName(modelId)}</div><div class="bubble" id="${safeId}">${renderMd(s.text)}<span class="cursor"></span></div></div>`;
+    html += `<div class="msg ai"><div class="mname">${getModelName(modelId)}</div><div class="bubble" id="${safeId}">${renderReasoning(s.reasoning, true)}${renderMd(s.text)}<span class="cursor"></span></div></div>`;
   }
   area.innerHTML = html;
   area.scrollTop = area.scrollHeight;
@@ -563,13 +575,14 @@ function renderMultiMode(area, chat) {
       if (m.role==='user') {
         msgsHtml += `<div class="msg user"><div class="bubble">${renderMd(m.content)}</div></div>`;
       } else {
-        msgsHtml += `<div class="msg ai"><div class="bubble">${renderMd(m.content)}${m.streaming?'<span class="cursor"></span>':''}</div>${m.error?`<div class="err">${m.error}</div>`:''}</div>`;
+        const reasonHtml = m.reasoning ? renderReasoning(m.reasoning, false) : '';
+        msgsHtml += `<div class="msg ai"><div class="bubble">${reasonHtml}${renderMd(m.content)}${m.streaming?'<span class="cursor"></span>':''}</div>${m.error?`<div class="err">${m.error}</div>`:''}</div>`;
       }
     });
     if (state.streaming[modelId]) {
       const safeId = 'stream-' + modelId.replace(/[^a-z0-9]/gi, '_');
       const s = state.streaming[modelId];
-      msgsHtml += `<div class="msg ai"><div class="bubble" id="${safeId}">${renderMd(s.text)}<span class="cursor"></span></div></div>`;
+      msgsHtml += `<div class="msg ai"><div class="bubble" id="${safeId}">${renderReasoning(s.reasoning, true)}${renderMd(s.text)}<span class="cursor"></span></div></div>`;
     }
     colsHtml += `<div class="col">
       <div class="col-hdr"><span style="width:6px;height:6px;border-radius:50%;background:var(--success-color)"></span>${getModelName(modelId)}</div>
@@ -788,9 +801,14 @@ async function streamToModel(modelId, chat, history, retryCount = 0) {
         if (data === '[DONE]') break;
         try {
           const j = JSON.parse(data);
-          const delta = j.choices?.[0]?.delta?.content;
-          if (delta) {
-            state.streaming[modelId].text += delta;
+          const delta = j.choices?.[0]?.delta;
+          if (delta?.reasoning_content) {
+            if (!state.streaming[modelId].reasoning) state.streaming[modelId].reasoning = '';
+            state.streaming[modelId].reasoning += delta.reasoning_content;
+            scheduleRender(modelId);
+          }
+          if (delta?.content) {
+            state.streaming[modelId].text += delta.content;
             scheduleRender(modelId);
           }
         } catch(e) {}
@@ -799,9 +817,12 @@ async function streamToModel(modelId, chat, history, retryCount = 0) {
     
     // Finalize
     const finalText = state.streaming[modelId].text;
+    const finalReasoning = state.streaming[modelId].reasoning || '';
     delete state.streaming[modelId];
     delete state.abortControllers[modelId];
-    chat.messages.push({role:'assistant', modelId, content: finalText, ts: Date.now()});
+    const msg = {role:'assistant', modelId, content: finalText, ts: Date.now()};
+    if (finalReasoning) msg.reasoning = finalReasoning;
+    chat.messages.push(msg);
     saveChats();
     renderChatArea();
     
