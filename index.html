@@ -569,7 +569,10 @@ function renderMultiMode(area, chat) {
   area.style.padding = '0';
   let colsHtml = '<div class="cols">';
   state.selectedModels.forEach(modelId => {
-    const msgs = chat.messages.filter(m => m.role==='user' || m.modelId===modelId);
+    const msgs = chat.messages.filter(m => {
+      if (m.role === 'user') return !m.targetModelId || m.targetModelId === modelId;
+      return m.modelId === modelId;
+    });
     let msgsHtml = '';
     msgs.forEach(m => {
       if (m.role==='user') {
@@ -707,7 +710,7 @@ function colSend(modelId, inputEl) {
   const chat = getCurrentChat();
   if (!chat) return;
   
-  chat.messages.push({role:'user', content: text, ts: Date.now()});
+  chat.messages.push({role:'user', content: text, ts: Date.now(), targetModelId: modelId});
   saveChats();
   
   streamToModel(modelId, chat, getHistory(chat, modelId));
@@ -715,7 +718,10 @@ function colSend(modelId, inputEl) {
 }
 
 function getHistory(chat, modelId) {
-  const relevant = chat.messages.filter(m => m.role==='user' || m.modelId===modelId);
+  const relevant = chat.messages.filter(m => {
+    if (m.role === 'user') return !m.targetModelId || m.targetModelId === modelId;
+    return m.modelId === modelId;
+  });
   const recent = relevant.slice(-HISTORY_LIMIT * 2);
   return recent.map(m => ({role: m.role === 'user' ? 'user' : 'assistant', content: m.content}));
 }
