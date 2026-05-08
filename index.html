@@ -121,8 +121,8 @@ button{font-family:inherit;border:none;background:none;cursor:pointer;color:inhe
 [data-theme="dark"] .mcard:hover{box-shadow:0 2px 8px rgba(0,0,0,.2)}
 .mcard--sel{border-left:3px solid var(--accent);background:var(--accent-light)}
 .mcard--sel:hover{border-color:var(--accent)}
-.mcard-icon{width:36px;height:36px;border-radius:10px;background:var(--bg-tertiary);display:flex;align-items:center;justify-content:center;flex-shrink:0;border:1px solid var(--border)}
-.mcard-icon svg{width:20px;height:20px}
+.mcard-icon{width:36px;height:36px;border-radius:10px;background:var(--bg-tertiary);display:flex;align-items:center;justify-content:center;flex-shrink:0;border:1px solid var(--border);overflow:hidden}
+.mcard-icon img{width:22px;height:22px;object-fit:contain}
 .mcard-info{flex:1;min-width:0}
 .mcard-name{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .mcard-tags{display:flex;gap:4px;margin-top:3px;flex-wrap:wrap}
@@ -477,21 +477,21 @@ button{font-family:inherit;border:none;background:none;cursor:pointer;color:inhe
 // ===== MODEL DATA =====
 const MODELS=[
   {tier:'S',tierName:'旗舰级',tierDesc:'顶尖能力',tierIcon:'🏆',models:[
-    {id:'silicon/Qwen3-235B-A22B',name:'Qwen3-235B-A22B',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18" stroke-opacity=".4"/><path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8z"/></svg>',tags:['推理强','中文佳','免费'],provider:'硅基'},
-    {id:'silicon/DeepSeek-R1',name:'DeepSeek R1',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><path d="M4 14c0-4 3.5-7 8-7s8 3 8 7"/><circle cx="12" cy="16" r="3"/><path d="M9 10c1-2 2-3 3-3s2 1 3 3"/></svg>',tags:['推理强','代码强','免费'],provider:'硅基'},
-    {id:'silicon/Llama-4-Maverick',name:'Llama 4 Maverick',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="#0070f3" stroke-width="2"><path d="M12 3c-5 0-8 4-8 8 0 5 3 10 8 10s8-5 8-10c0-4-3-8-8-8z"/><path d="M8 12h8M12 8v8"/></svg>',tags:['英文佳','代码强','免费'],provider:'硅基'},
-    {id:'silicon/DeepSeek-V3',name:'DeepSeek V3',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><path d="M4 14c0-4 3.5-7 8-7s8 3 8 7"/><circle cx="12" cy="16" r="3"/><path d="M9 10c1-2 2-3 3-3s2 1 3 3"/></svg>',tags:['推理强','中文佳','免费'],provider:'硅基'}
+    {id:'silicon/Qwen3-235B-A22B',name:'Qwen3-235B-A22B',icon:'<img src="https://chat.qwen.ai/favicon.ico" alt="Qwen" onerror="this.style.display=\'none\';this.parentElement.innerHTML=\'<span style=color:#7c3aed;font-size:18px>●</span>\'">',tags:['推理强','中文佳','免费'],provider:'硅基'},
+    {id:'silicon/DeepSeek-R1',name:'DeepSeek R1',icon:'<img src="https://chat.deepseek.com/favicon.ico" alt="DeepSeek" onerror="this.style.display=\'none\';this.parentElement.innerHTML=\'<span style=color:#4D6BFE;font-size:18px>●</span>\'">',tags:['推理强','代码强','免费'],provider:'硅基'},
+    {id:'silicon/Llama-4-Maverick',name:'Llama 4 Maverick',icon:'<img src="https://llama.meta.com/favicon.ico" alt="Meta" onerror="this.style.display=\'none\';this.parentElement.innerHTML=\'<span style=color:#0668E1;font-size:18px>∞</span>\'">',tags:['英文佳','代码强','免费'],provider:'硅基'},
+    {id:'silicon/DeepSeek-V3',name:'DeepSeek V3',icon:'<img src="https://chat.deepseek.com/favicon.ico" alt="DeepSeek" onerror="this.style.display=\'none\';this.parentElement.innerHTML=\'<span style=color:#4D6BFE;font-size:18px>●</span>\'">',tags:['推理强','中文佳','免费'],provider:'硅基'}
   ]},
   {tier:'A',tierName:'主力级',tierDesc:'快+强平衡',tierIcon:'⚡',models:[
-    {id:'silicon/DeepSeek-V4-Flash',name:'DeepSeek V4 Flash',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><path d="M4 14c0-4 3.5-7 8-7s8 3 8 7"/><circle cx="12" cy="16" r="3"/><path d="M9 10c1-2 2-3 3-3s2 1 3 3"/></svg>',tags:['极速','推理强','免费'],provider:'硅基'},
-    {id:'silicon/Qwen3-32B',name:'Qwen3-32B',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18" stroke-opacity=".4"/><path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8z"/></svg>',tags:['推理强','长文本'],provider:'硅基'},
-    {id:'kimi/moonshot-v1-32k',name:'Kimi 32K',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2"><path d="M21 12A9 9 0 1 1 12 3"/><path d="M12 3a6.5 6.5 0 0 1 0 13"/><circle cx="12" cy="12" r="2"/></svg>',tags:['长文本','中文佳'],provider:'Kimi'}
+    {id:'silicon/DeepSeek-V4-Flash',name:'DeepSeek V4 Flash',icon:'<img src="https://chat.deepseek.com/favicon.ico" alt="DeepSeek" onerror="this.style.display=\'none\';this.parentElement.innerHTML=\'<span style=color:#4D6BFE;font-size:18px>●</span>\'">',tags:['极速','推理强','免费'],provider:'硅基'},
+    {id:'silicon/Qwen3-32B',name:'Qwen3-32B',icon:'<img src="https://chat.qwen.ai/favicon.ico" alt="Qwen" onerror="this.style.display=\'none\';this.parentElement.innerHTML=\'<span style=color:#7c3aed;font-size:18px>●</span>\'">',tags:['推理强','长文本'],provider:'硅基'},
+    {id:'kimi/moonshot-v1-32k',name:'Kimi 32K',icon:'<img src="https://kimi.moonshot.cn/favicon.ico" alt="Kimi" onerror="this.style.display=\'none\';this.parentElement.innerHTML=\'<span style=color:#000;font-size:18px>☾</span>\'">',tags:['长文本','中文佳'],provider:'Kimi'}
   ]},
   {tier:'B',tierName:'轻量级',tierDesc:'日常够用 · 完全免费',tierIcon:'💡',models:[
-    {id:'silicon/Qwen3-30B-A3B',name:'Qwen3-30B-A3B',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18" stroke-opacity=".4"/><path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8z"/></svg>',tags:['极速','免费'],provider:'硅基'},
-    {id:'zhipu/glm-4-flash',name:'GLM-4 Flash',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M9 9h6M9 12h6M9 15h3"/></svg>',tags:['中文佳','免费'],provider:'智谱'},
-    {id:'zhipu/glm-4.7-flash',name:'GLM-4.7 Flash',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M9 9h6M9 12h6M9 15h3"/></svg>',tags:['中文佳','免费'],provider:'智谱'},
-    {id:'kimi/moonshot-v1-8k',name:'Kimi 8K',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2"><path d="M21 12A9 9 0 1 1 12 3"/><path d="M12 3a6.5 6.5 0 0 1 0 13"/><circle cx="12" cy="12" r="2"/></svg>',tags:['免费','中文佳'],provider:'Kimi'}
+    {id:'silicon/Qwen3-30B-A3B',name:'Qwen3-30B-A3B',icon:'<img src="https://chat.qwen.ai/favicon.ico" alt="Qwen" onerror="this.style.display=\'none\';this.parentElement.innerHTML=\'<span style=color:#7c3aed;font-size:18px>●</span>\'">',tags:['极速','免费'],provider:'硅基'},
+    {id:'zhipu/glm-4-flash',name:'GLM-4 Flash',icon:'<img src="https://chatglm.cn/favicon.ico" alt="GLM" onerror="this.style.display=\'none\';this.parentElement.innerHTML=\'<span style=color:#10b981;font-size:18px>◆</span>\'">',tags:['中文佳','免费'],provider:'智谱'},
+    {id:'zhipu/glm-4.7-flash',name:'GLM-4.7 Flash',icon:'<img src="https://chatglm.cn/favicon.ico" alt="GLM" onerror="this.style.display=\'none\';this.parentElement.innerHTML=\'<span style=color:#10b981;font-size:18px>◆</span>\'">',tags:['中文佳','免费'],provider:'智谱'},
+    {id:'kimi/moonshot-v1-8k',name:'Kimi 8K',icon:'<img src="https://kimi.moonshot.cn/favicon.ico" alt="Kimi" onerror="this.style.display=\'none\';this.parentElement.innerHTML=\'<span style=color:#000;font-size:18px>☾</span>\'">',tags:['免费','中文佳'],provider:'Kimi'}
   ]}
 ];
 
