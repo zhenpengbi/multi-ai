@@ -393,7 +393,7 @@ button{font-family:inherit;border:none;background:none;cursor:pointer;color:inhe
     <button class="btn-topbar" onclick="exportChat()" title="导出"><svg viewBox="0 0 20 20"><path d="M10 3v10M10 13l-4-4M10 13l4-4"/><path d="M4 17h12"/></svg></button>
     <button class="model-trigger" onclick="openModelPanel()"><svg viewBox="0 0 20 20" style="width:14px;height:14px"><path d="M3 3h6v6H3zM11 3h6v6h-6zM3 11h6v6H3zM11 11h6v6h-6z"/></svg><span id="modelTriggerText">选择模型</span></button>
   </div>
-  <div class="chat-area" id="chatArea"><div class="empty"><div class="ei"><svg viewBox="0 0 24 24"><path d="M12 3L3 7v6l9 5 9-5V7l-9-4z"/><path d="M12 12l9-5M12 12v10M12 12L3 7"/></svg></div><div class="et">选择模型，开始对话</div><div class="es">支持多模型并排对比 · 深度思考</div></div></div>
+  <div class="chat-area" id="chatArea"><div class="empty" onclick="openModelPanel()" style="cursor:pointer"><div class="ei"><svg viewBox="0 0 24 24"><path d="M12 3L3 7v6l9 5 9-5V7l-9-4z"/><path d="M12 12l9-5M12 12v10M12 12L3 7"/></svg></div><div class="et">选择模型，开始对话</div><div class="es">支持多模型并排对比 · 深度思考</div></div></div>
   <div class="input-area">
     <div id="ctxWarnContainer"></div>
     <div class="input-wrap">
@@ -996,8 +996,23 @@ function renderChatArea(){
     renderFolderDetail(area);return;
   }
   const chat=getCurrentChat();
+  // Try to restore models from chat data if selectedModels is empty
+  if(chat&&!state.selectedModels.length){
+    if(chat.selectedModels&&chat.selectedModels.length){
+      state.selectedModels=chat.selectedModels.slice();
+      updateModelSelectorUI();
+    } else if(chat.messages&&chat.messages.length){
+      // Infer from message targetModels or AI responses
+      const inferred=new Set();
+      chat.messages.forEach(m=>{
+        if(m.targetModels)m.targetModels.forEach(id=>inferred.add(id));
+        if(m.modelId)inferred.add(m.modelId);
+      });
+      if(inferred.size){state.selectedModels=[...inferred];chat.selectedModels=state.selectedModels.slice();saveChats();updateModelSelectorUI();}
+    }
+  }
   if(!chat||!state.selectedModels.length){
-    area.innerHTML='<div class="empty"><div class="ei"><svg viewBox="0 0 24 24"><path d="M12 3L3 7v6l9 5 9-5V7l-9-4z"/><path d="M12 12l9-5M12 12v10M12 12L3 7"/></svg></div><div class="et">选择模型，开始对话</div><div class="es">支持多模型并排对比 · 深度思考</div></div>';
+    area.innerHTML='<div class="empty" onclick="openModelPanel()" style="cursor:pointer"><div class="ei"><svg viewBox="0 0 24 24"><path d="M12 3L3 7v6l9 5 9-5V7l-9-4z"/><path d="M12 12l9-5M12 12v10M12 12L3 7"/></svg></div><div class="et">选择模型，开始对话</div><div class="es">支持多模型并排对比 · 深度思考</div></div>';
     area.style.padding='24px';return;
   }
   if(state.selectedModels.length===1){area.style.padding='24px';renderSingleMode(area,chat)}
