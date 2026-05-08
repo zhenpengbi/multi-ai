@@ -1030,7 +1030,7 @@ function renderMultiMode(area,chat){
   state.selectedModels.forEach(modelId=>{
     const msgs=chat.messages.filter(m=>{
       if(m.role==='system')return false;
-      if(m.role==='user')return!m.targetModelId||m.targetModelId===modelId;
+      if(m.role==='user'){if(m.targetModelId)return m.targetModelId===modelId;if(m.targetModels)return m.targetModels.includes(modelId);return true;}
       return m.modelId===modelId;
     });
     let msgsHtml='';
@@ -1215,7 +1215,7 @@ function sendMessage(){
   if(chat.title==='新对话'&&text.length>0)chat.title=text.slice(0,20)+(text.length>20?'...':'');
   const hasImage=!!state.pendingImage;
   const msgContent=hasImage?text:text;
-  chat.messages.push({role:'user',content:text,ts:Date.now(),image:hasImage?state.pendingImage:undefined});
+  chat.messages.push({role:'user',content:text,ts:Date.now(),image:hasImage?state.pendingImage:undefined,targetModels:state.selectedModels.slice()});
   saveChats();renderSidebar();
   input.value='';autoResize(input);updateSendBtn();
   state.activeTools=[];renderToolBadges();
@@ -1252,7 +1252,7 @@ function colSend(modelId,inputEl){
 function getHistory(chat,modelId){
   const relevant=chat.messages.filter(m=>{
     if(m.role==='system')return true;
-    if(m.role==='user')return!m.targetModelId||m.targetModelId===modelId;
+    if(m.role==='user'){if(m.targetModelId)return m.targetModelId===modelId;if(m.targetModels)return m.targetModels.includes(modelId);return true;}
     return m.modelId===modelId;
   });
   // Keep system messages + last N exchanges
