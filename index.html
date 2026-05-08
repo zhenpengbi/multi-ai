@@ -189,10 +189,10 @@ button{font-family:inherit;border:none;background:none;cursor:pointer;color:inhe
 #mainInput{width:100%;border:none;background:none;resize:none;font-size:15px;line-height:1.6;color:var(--text-primary);outline:none;min-height:26px;max-height:150px;font-family:inherit}
 #mainInput::placeholder{color:var(--text-tertiary)}
 .input-toolbar{display:flex;align-items:center;gap:6px;margin-top:10px;padding-top:8px;border-top:1px solid var(--border)}
-.itb-btn{display:flex;align-items:center;gap:5px;padding:5px 12px;border-radius:18px;font-size:13px;color:var(--text-secondary);transition:all .2s;user-select:none}
-.itb-btn:hover{background:var(--bg-tertiary);color:var(--text-primary)}
-.itb-btn.active{background:var(--accent-light);color:var(--accent);font-weight:500}
-.itb-btn svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.itb-btn{display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:12px;font-size:13px;color:var(--text-secondary);transition:all .2s;user-select:none;border:1.5px solid var(--border-color)}
+.itb-btn:hover{background:var(--bg-tertiary);color:var(--text-primary);border-color:var(--text-tertiary)}
+.itb-btn.active{background:var(--accent-light);color:var(--accent);font-weight:500;border-color:var(--accent)}
+.itb-btn svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
 .itb-right{margin-left:auto;display:flex;align-items:center;gap:6px}
 .send-btn{width:34px;height:34px;background:var(--bg-tertiary);color:var(--text-tertiary);border-radius:50%;display:flex;align-items:center;justify-content:center;transition:all .2s}
 .send-btn.active{background:var(--accent);color:#fff}
@@ -408,8 +408,8 @@ button{font-family:inherit;border:none;background:none;cursor:pointer;color:inhe
         <div class="input-toolbar">
           <button class="itb-btn" onclick="document.getElementById('imgUpload').click()"><svg viewBox="0 0 20 20"><rect x="3" y="4" width="14" height="12" rx="2"/><circle cx="8" cy="9" r="1.5"/><path d="M4 14l4-4 3 3 2-2 4 4"/></svg><span class="hide-c">图片</span></button>
           <input type="file" id="imgUpload" accept="image/*" hidden onchange="handleImgUpload(event)">
-          <button class="itb-btn" id="deepThinkBtn" onclick="toggleDeepThink()"><svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="3"/><circle cx="10" cy="10" r="7" stroke-dasharray="3 3"/><path d="M10 3v2M10 15v2M3 10h2M15 10h2"/></svg><span class="hide-c">深度思考</span></button>
-          <button class="itb-btn" onclick="toggleToolMenu(event)"><svg viewBox="0 0 20 20"><path d="M5 3h10v2H5zM4 5h12v12a2 2 0 01-2 2H6a2 2 0 01-2-2V5z"/><path d="M8 9h4M8 12h4"/></svg><span class="hide-c">工具</span><svg viewBox="0 0 12 12" style="width:10px;height:10px;margin-left:2px"><path d="M3 5l3 3 3-3"/></svg></button>
+          <button class="itb-btn" id="deepThinkBtn" onclick="toggleDeepThink()"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="2.5" fill="currentColor" stroke="none"/><ellipse cx="12" cy="12" rx="9" ry="4"/><ellipse cx="12" cy="12" rx="9" ry="4" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="9" ry="4" transform="rotate(-60 12 12)"/></svg><span class="hide-c">深度思考</span></button>
+          <button class="itb-btn" onclick="toggleToolMenu(event)"><svg viewBox="0 0 24 24"><rect x="2" y="8" width="20" height="13" rx="2"/><path d="M8 8V6a2 2 0 012-2h4a2 2 0 012 2v2"/><path d="M12 12v4"/></svg><span class="hide-c">工具</span><svg viewBox="0 0 12 12" style="width:10px;height:10px;margin-left:2px"><path d="M3 5l3 3 3-3"/></svg></button>
           <div class="itb-right"><button class="send-btn" id="sendBtn" onclick="sendMessage()"><svg viewBox="0 0 20 20"><path d="M10 16V4M10 4l-5 5M10 4l5 5"/></svg></button></div>
         </div>
       </div>
@@ -639,6 +639,12 @@ function updateModelTrigger(){
   if(names.length===1)el.innerHTML=names[0];
   else el.innerHTML=`${names[0]} <span class="cnt">+${names.length-1}</span>`;
 }
+function updateModelSelectorUI(){
+  updateModelTrigger();
+  // Refresh checkboxes if panel is open
+  const panel=document.getElementById('modelPanel');
+  if(panel&&panel.style.display!=='none')openModelPanel();
+}
 function getModelName(id){
   for(const t of MODELS)for(const m of t.models)if(m.id===id)return m.name;
   return id.split('/').pop();
@@ -706,7 +712,16 @@ function createNewChat(folderId){
   closeMobileSidebar();
 }
 function selectChat(id){
+  // Save current chat's model selection before switching
+  const prevChat=getCurrentChat();
+  if(prevChat&&state.selectedModels.length)prevChat.selectedModels=state.selectedModels.slice();
   state.currentChatId=id;state.currentFolderId=null;
+  // Restore model selection from the target chat
+  const chat=getCurrentChat();
+  if(chat&&chat.selectedModels&&chat.selectedModels.length){
+    state.selectedModels=chat.selectedModels.slice();
+    updateModelSelectorUI();
+  }
   renderSidebar();renderChatArea();updateTopTitle();
   closeMobileSidebar();
 }
@@ -1211,7 +1226,9 @@ function sendMessage(){
     if(state.activeTools.length)text=`[${state.activeTools.join(',')}] ${text}`;
   }
   let chat=getCurrentChat();
-  if(!chat){createNewChat();chat=getCurrentChat()}
+  // Save model selection to chat for restoration on re-open
+  if(chat)chat.selectedModels=state.selectedModels.slice();
+  if(!chat){createNewChat();chat=getCurrentChat();chat.selectedModels=state.selectedModels.slice()}
   if(chat.title==='新对话'&&text.length>0)chat.title=text.slice(0,20)+(text.length>20?'...':'');
   const hasImage=!!state.pendingImage;
   const msgContent=hasImage?text:text;
