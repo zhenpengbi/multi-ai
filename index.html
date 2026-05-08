@@ -1297,7 +1297,9 @@ async function streamToModel(modelId,chat,history,retryCount=0,hasFallback=false
   }else{
     key=localStorage.getItem('multi_ai_key');
     if(!key){addError(chat,modelId,'请先设置 OpenRouter API Key');renderChatArea();return}
-    endpoint='https://openrouter.ai/api/v1/chat/completions';
+    // Use local proxy on Vercel to bypass China GFW blocking openrouter.ai
+    const isVercel=location.hostname.includes('vercel.app')||location.hostname.includes('vercel.sh');
+    endpoint=isVercel?'/api/proxy':'https://openrouter.ai/api/v1/chat/completions';
     headers={'Content-Type':'application/json','Authorization':`Bearer ${key}`,'HTTP-Referer':location.href};
     bodyModel=effectiveId;
   }
