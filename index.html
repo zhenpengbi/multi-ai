@@ -810,8 +810,10 @@ function selectChat(id){
   closeMobileSidebar();
 }
 function getCurrentChat(){return state.chats.find(c=>c.id===state.currentChatId)}
-function deleteChat(id,e){
-  e&&e.stopPropagation();if(!confirm('确认删除该对话？'))return;
+async function deleteChat(id,e){
+  e&&e.stopPropagation();
+  const ok=await showDialog({title:'确认删除该对话？',mode:'confirm'});
+  if(!ok)return;
   state.chats=state.chats.filter(c=>c.id!==id);
   if(state.currentChatId===id)state.currentChatId=state.chats[0]?.id||null;
   saveChats();renderSidebar();renderChatArea();updateTopTitle();
