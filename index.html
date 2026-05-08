@@ -288,6 +288,20 @@ button{font-family:inherit;border:none;background:none;cursor:pointer;color:inhe
 .collapse-grp-btn{display:flex;align-items:center;gap:6px;padding:6px 10px;margin:4px 8px;border-radius:var(--radius-sm);font-size:12px;color:var(--text-tertiary);cursor:pointer;transition:all .15s}
 .collapse-grp-btn:hover{background:var(--bg-tertiary);color:var(--text-secondary)}
 .collapse-grp-btn svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+/* Custom dialog (元宝风格) */
+.cdlg-bg{position:fixed;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:600}
+.cdlg-bg.show{display:flex}
+.cdlg{background:var(--bg-primary);border-radius:14px;padding:24px 24px 20px;width:360px;max-width:88vw;box-shadow:0 8px 32px rgba(0,0,0,.25);animation:modalIn .2s ease}
+.cdlg-title{font-size:15px;font-weight:600;margin-bottom:16px}
+.cdlg-input{width:100%;padding:10px 12px;border:none;border-bottom:2px solid var(--border);background:var(--bg-secondary);color:var(--text-primary);font-size:14px;border-radius:6px 6px 0 0;outline:none;transition:border-color .2s}
+.cdlg-input:focus{border-bottom-color:var(--accent)}
+.cdlg-msg{font-size:14px;color:var(--text-secondary);line-height:1.6}
+.cdlg-acts{display:flex;justify-content:flex-end;gap:10px;margin-top:20px}
+.cdlg-acts button{padding:8px 20px;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;border:none;transition:all .15s}
+.cdlg-acts .cdlg-cancel{background:var(--bg-tertiary);color:var(--text-secondary)}
+.cdlg-acts .cdlg-cancel:hover{background:var(--border)}
+.cdlg-acts .cdlg-ok{background:var(--accent);color:#fff}
+.cdlg-acts .cdlg-ok:hover{opacity:.85}
 /* System prompt modal */
 .sp-modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.35);backdrop-filter:blur(3px);display:none;align-items:center;justify-content:center;z-index:500}
 .sp-modal-bg.show{display:flex}
@@ -473,7 +487,45 @@ button{font-family:inherit;border:none;background:none;cursor:pointer;color:inhe
     <div class="sp-acts"><button class="mbtn sec" onclick="hideSpModal()">取消</button><button class="mbtn pri" onclick="saveSystemPrompt()">保存</button></div>
   </div>
 </div>
+<!-- Custom Dialog (元宝风格) -->
+<div class="cdlg-bg" id="cdlgBg" onclick="cdlgCancel()">
+  <div class="cdlg" onclick="event.stopPropagation()">
+    <div class="cdlg-title" id="cdlgTitle"></div>
+    <input class="cdlg-input" id="cdlgInput" type="text" autocomplete="off">
+    <div class="cdlg-msg" id="cdlgMsg"></div>
+    <div class="cdlg-acts">
+      <button class="cdlg-cancel" onclick="cdlgCancel()">取消</button>
+      <button class="cdlg-ok" onclick="cdlgOk()">确定</button>
+    </div>
+  </div>
+</div>
 <script>
+// ===== CUSTOM DIALOG (元宝风格) =====
+let _cdlgResolve=null;
+function showDialog({title='',defaultVal='',mode='prompt'}){
+  return new Promise(resolve=>{
+    _cdlgResolve=resolve;
+    const bg=document.getElementById('cdlgBg');
+    const inp=document.getElementById('cdlgInput');
+    const msg=document.getElementById('cdlgMsg');
+    document.getElementById('cdlgTitle').textContent=title;
+    if(mode==='prompt'){inp.style.display='';msg.style.display='none';inp.value=defaultVal;
+    }else{inp.style.display='none';msg.style.display='';msg.textContent=title;}
+    bg.classList.add('show');
+    if(mode==='prompt')setTimeout(()=>inp.focus(),50);
+  });
+}
+function cdlgOk(){
+  const bg=document.getElementById('cdlgBg');bg.classList.remove('show');
+  const inp=document.getElementById('cdlgInput');
+  if(_cdlgResolve){_cdlgResolve(inp.style.display===''?inp.value.trim():true);_cdlgResolve=null;}
+}
+function cdlgCancel(){
+  document.getElementById('cdlgBg').classList.remove('show');
+  if(_cdlgResolve){_cdlgResolve(null);_cdlgResolve=null;}
+}
+document.getElementById('cdlgInput').addEventListener('keydown',e=>{if(e.key==='Enter')cdlgOk();if(e.key==='Escape')cdlgCancel();});
+
 // ===== MODEL DATA =====
 const MODELS=[
   {tier:'S',tierName:'旗舰级',tierDesc:'顶尖能力',tierIcon:'🏆',models:[
@@ -789,18 +841,20 @@ function updateTopTitle(){
 }
 
 // ===== FOLDERS / GROUPS =====
-function createFolder(){
-  const name=prompt('分组名称：');if(!name)return;
+async function createFolder(){
+  const name=await showDialog({title:'分组名称：',mode:'prompt'});
+  if(!name)return;
   state.folders.push({id:Date.now().toString(),name,collapsed:false});
   saveFolders();renderSidebar();
 }
-function renameFolder(id){
+async function renameFolder(id){
   const f=state.folders.find(x=>x.id===id);
-  const name=prompt('重命名分组：',f.name);
+  const name=await showDialog({title:'重命名分组：',defaultVal:f.name,mode:'prompt'});
   if(name){f.name=name;saveFolders();renderSidebar();}
 }
-function deleteFolder(id){
-  if(!confirm('删除分组？（对话会移出）'))return;
+async function deleteFolder(id){
+  const ok=await showDialog({title:'删除分组？（对话会移出）',mode:'confirm'});
+  if(!ok)return;
   state.chats.forEach(c=>{if(c.folderId===id)c.folderId=null});
   state.folders=state.folders.filter(f=>f.id!==id);
   saveFolders();saveChats();renderSidebar();
