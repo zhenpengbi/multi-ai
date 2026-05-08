@@ -96,18 +96,47 @@ button{font-family:inherit;border:none;background:none;cursor:pointer;color:inhe
 @keyframes fadeScale{from{transform:scale(.96);opacity:0}to{transform:scale(1);opacity:1}}
 @media(max-width:768px){.model-panel{align-items:flex-end}.model-panel-body{border-radius:var(--radius-lg) var(--radius-lg) 0 0;max-width:100%;animation:slideUp .25s ease}}
 @keyframes slideUp{from{transform:translateY(16px);opacity:0}to{transform:translateY(0);opacity:1}}
+.mp-top-line{height:3px;background:linear-gradient(90deg,#667eea,#764ba2);border-radius:var(--radius-lg) var(--radius-lg) 0 0;margin:-24px -24px 20px}
 .mp-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
 .mp-hdr h3{font-size:16px;font-weight:600}
+.mp-subtitle{display:block;font-size:12px;color:var(--text-tertiary);margin-top:2px}
+.mp-footer{margin-top:18px;text-align:right}
+.mp-confirm{padding:8px 28px;background:var(--accent);color:#fff;border-radius:20px;font-size:13px;font-weight:500;transition:all .2s;border:none;cursor:pointer}
+.mp-confirm:hover{background:#4a5aad;box-shadow:var(--shadow-sm)}
+/* Tier headers */
+.tier-hdr{display:flex;align-items:center;gap:6px;padding:8px 12px;border-radius:var(--radius-sm);margin-bottom:10px;font-size:12px;font-weight:600}
+.tier-hdr-icon{font-size:14px}
+.tier-hdr-name{font-weight:700;font-size:13px}
+.tier-hdr-sep{color:var(--text-tertiary);font-weight:400}
+.tier-hdr-desc{font-weight:400;color:var(--text-secondary);font-size:12px}
+.tier-hdr--s{background:linear-gradient(135deg,rgba(255,215,0,.12),rgba(255,165,0,.08));color:#b8860b}
+[data-theme="dark"] .tier-hdr--s{background:linear-gradient(135deg,rgba(255,215,0,.1),rgba(255,165,0,.06));color:#ffd700}
+.tier-hdr--a{background:rgba(59,130,246,.08);color:#2563eb}
+[data-theme="dark"] .tier-hdr--a{background:rgba(59,130,246,.1);color:#60a5fa}
+.tier-hdr--b{background:var(--bg-tertiary);color:var(--text-secondary)}
+/* Model cards */
+.tier-cards{display:flex;flex-direction:column;gap:6px}
+.mcard{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:12px;border:1px solid var(--border);background:var(--bg-primary);cursor:pointer;transition:all .2s;height:56px;user-select:none}
+.mcard:hover{box-shadow:0 2px 8px rgba(0,0,0,.06);border-color:var(--text-tertiary)}
+[data-theme="dark"] .mcard:hover{box-shadow:0 2px 8px rgba(0,0,0,.2)}
+.mcard--sel{border-left:3px solid var(--accent);background:var(--accent-light)}
+.mcard--sel:hover{border-color:var(--accent)}
+.mcard-icon{width:34px;height:34px;border-radius:50%;background:var(--bg-tertiary);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.mcard-info{flex:1;min-width:0}
+.mcard-name{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mcard-tags{display:flex;gap:4px;margin-top:3px;flex-wrap:wrap}
+.mtag{font-size:10px;padding:1px 6px;border-radius:10px;background:var(--bg-tertiary);color:var(--text-secondary);white-space:nowrap}
+.mcard--sel .mtag{background:rgba(91,106,191,.1);color:var(--accent)}
+.mcard-check{width:22px;height:22px;flex-shrink:0}
+.mcard-check svg{width:22px;height:22px}
+.mcard-check svg circle{fill:none;stroke:var(--border);stroke-width:1.5}
+.mcard-check--on svg circle{fill:var(--accent);stroke:var(--accent)}
+.mcard-check--on svg path{stroke:#fff;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+@media(max-width:768px){.mcard{height:auto;padding:10px 12px}}
 .mp-close{padding:6px;border-radius:var(--radius-sm);color:var(--text-tertiary);transition:all .2s}
 .mp-close:hover{background:var(--bg-tertiary);color:var(--text-primary)}
 .mp-close svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .tier{margin-bottom:14px}.tier:last-child{margin-bottom:0}
-.tier-label{font-size:12px;font-weight:600;color:var(--text-tertiary);margin-bottom:6px}
-.tier-chips{display:flex;flex-wrap:wrap;gap:8px}
-.chip{padding:6px 14px;border:1px solid var(--border);border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;transition:all .2s;color:var(--text-secondary);background:var(--bg-primary);user-select:none;display:flex;align-items:center;gap:4px}
-.chip:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-light)}
-.chip.sel{border-color:var(--accent);background:var(--accent);color:#fff}
-.chip .prov{font-size:10px;opacity:.7}
 /* Chat Area */
 .chat-area{flex:1;overflow-y:auto;padding:24px;display:flex;flex-direction:column;align-items:center;scrollbar-width:thin}
 .chat-area::-webkit-scrollbar{width:6px}
@@ -446,38 +475,22 @@ button{font-family:inherit;border:none;background:none;cursor:pointer;color:inhe
 <script>
 // ===== MODEL DATA =====
 const MODELS=[
-  {tier:'🏆 旗舰级（对标GPT-4o/Claude）',models:[
-    {id:'silicon/Qwen3-235B-A22B',name:'Qwen3 235B（通义旗舰）',provider:'硅基'},
-    {id:'silicon/DeepSeek-R1',name:'DeepSeek R1（深度推理）',provider:'硅基'},
-    {id:'silicon/Llama-4-Maverick',name:'Llama 4 Maverick（Meta最新）',provider:'硅基'},
-    {id:'silicon/DeepSeek-V3',name:'DeepSeek V3',provider:'硅基'}
+  {tier:'S',tierName:'旗舰级',tierDesc:'顶尖能力',tierIcon:'🏆',models:[
+    {id:'silicon/Qwen3-235B-A22B',name:'Qwen3-235B-A22B',icon:'🔮',tags:['推理强','中文佳','免费'],provider:'硅基'},
+    {id:'silicon/DeepSeek-R1',name:'DeepSeek R1',icon:'🔵',tags:['推理强','代码强','免费'],provider:'硅基'},
+    {id:'silicon/Llama-4-Maverick',name:'Llama 4 Maverick',icon:'🦙',tags:['英文佳','代码强','免费'],provider:'硅基'},
+    {id:'silicon/DeepSeek-V3',name:'DeepSeek V3',icon:'🔵',tags:['推理强','中文佳','免费'],provider:'硅基'}
   ]},
-  {tier:'⚡ 主力级（快+强）',models:[
-    {id:'silicon/DeepSeek-V4-Flash',name:'DeepSeek V4 Flash',provider:'硅基'},
-    {id:'silicon/Qwen3-32B',name:'Qwen3 32B',provider:'硅基'},
-    {id:'silicon/Qwen3-30B-A3B',name:'Qwen3 30B-A3B（极速）',provider:'硅基'},
-    {id:'kimi/moonshot-v1-32k',name:'Kimi 32K',provider:'Kimi'}
+  {tier:'A',tierName:'主力级',tierDesc:'快+强平衡',tierIcon:'⚡',models:[
+    {id:'silicon/DeepSeek-V4-Flash',name:'DeepSeek V4 Flash',icon:'🔵',tags:['极速','推理强','免费'],provider:'硅基'},
+    {id:'silicon/Qwen3-32B',name:'Qwen3-32B',icon:'🔮',tags:['推理强','长文本'],provider:'硅基'},
+    {id:'kimi/moonshot-v1-32k',name:'Kimi 32K',icon:'💎',tags:['长文本','中文佳'],provider:'Kimi'}
   ]},
-  {tier:'📝 中文写作',models:[
-    {id:'silicon/Qwen3-235B-A22B',name:'Qwen3 235B',provider:'硅基'},
-    {id:'silicon/DeepSeek-V3',name:'DeepSeek V3',provider:'硅基'},
-    {id:'silicon/Qwen3-32B',name:'Qwen3 32B',provider:'硅基'},
-    {id:'zhipu/glm-4-flash',name:'GLM-4 Flash',provider:'智谱'},
-    {id:'kimi/moonshot-v1-8k',name:'Kimi 8K',provider:'Kimi'}
-  ]},
-  {tier:'🌐 英文/代码',models:[
-    {id:'silicon/Llama-4-Maverick',name:'Llama 4 Maverick',provider:'硅基'},
-    {id:'silicon/DeepSeek-V3',name:'DeepSeek V3',provider:'硅基'},
-    {id:'silicon/DeepSeek-R1',name:'DeepSeek R1',provider:'硅基'}
-  ]},
-  {tier:'🆓 完全免费',models:[
-    {id:'silicon/DeepSeek-V3',name:'DeepSeek V3',provider:'硅基'},
-    {id:'silicon/DeepSeek-R1',name:'DeepSeek R1',provider:'硅基'},
-    {id:'silicon/Qwen3-30B-A3B',name:'Qwen3 30B-A3B',provider:'硅基'},
-    {id:'zhipu/glm-4-flash',name:'GLM-4 Flash',provider:'智谱'},
-    {id:'zhipu/glm-4.7-flash',name:'GLM-4.7 Flash',provider:'智谱'},
-    {id:'kimi/moonshot-v1-8k',name:'Kimi 8K',provider:'Kimi'},
-    {id:'kimi/moonshot-v1-32k',name:'Kimi 32K',provider:'Kimi'}
+  {tier:'B',tierName:'轻量级',tierDesc:'日常够用 · 完全免费',tierIcon:'💡',models:[
+    {id:'silicon/Qwen3-30B-A3B',name:'Qwen3-30B-A3B',icon:'🔮',tags:['极速','免费'],provider:'硅基'},
+    {id:'zhipu/glm-4-flash',name:'GLM-4 Flash',icon:'🟢',tags:['中文佳','免费'],provider:'智谱'},
+    {id:'zhipu/glm-4.7-flash',name:'GLM-4.7 Flash',icon:'🟢',tags:['中文佳','免费'],provider:'智谱'},
+    {id:'kimi/moonshot-v1-8k',name:'Kimi 8K',icon:'💎',tags:['免费','中文佳'],provider:'Kimi'}
   ]}
 ];
 
@@ -626,15 +639,19 @@ function updateKeyStatus(){
 function openModelPanel(){
   const panel=document.getElementById('modelPanel');
   const body=document.getElementById('modelPanelBody');
-  let html='<div class="mp-hdr"><h3>选择模型</h3><button class="mp-close" onclick="closeModelPanel()"><svg viewBox="0 0 20 20"><path d="M5 5l10 10M15 5L5 15"/></svg></button></div>';
+  const selCount=state.selectedModels.length;
+  let html=`<div class="mp-top-line"></div><div class="mp-hdr"><div><h3>选择 AI 模型</h3><span class="mp-subtitle">已选 ${selCount} 个模型</span></div><button class="mp-close" onclick="closeModelPanel()"><svg viewBox="0 0 20 20"><path d="M5 5l10 10M15 5L5 15"/></svg></button></div>`;
   MODELS.forEach(tier=>{
-    html+=`<div class="tier"><div class="tier-label">${tier.tier}</div><div class="tier-chips">`;
+    const tierClass='tier-hdr tier-hdr--'+tier.tier.toLowerCase();
+    html+=`<div class="tier"><div class="${tierClass}"><span class="tier-hdr-icon">${tier.tierIcon}</span><span class="tier-hdr-name">${tier.tierName}</span><span class="tier-hdr-sep">·</span><span class="tier-hdr-desc">${tier.tierDesc}</span></div><div class="tier-cards">`;
     tier.models.forEach(m=>{
       const sel=state.selectedModels.includes(m.id);
-      html+=`<div class="chip${sel?' sel':''}" onclick="toggleModel('${m.id}')">${sel?'✓ ':''}${m.name}<span class="prov">${m.provider}</span></div>`;
+      const tagsHtml=m.tags.map(t=>`<span class="mtag">${t}</span>`).join('');
+      html+=`<div class="mcard${sel?' mcard--sel':''}" onclick="toggleModel('${m.id}')"><div class="mcard-icon">${m.icon}</div><div class="mcard-info"><div class="mcard-name">${m.name}</div><div class="mcard-tags">${tagsHtml}</div></div><div class="mcard-check${sel?' mcard-check--on':''}"><svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="9"/>${sel?'<path d="M6 10l3 3 5-5"/>':''}</svg></div></div>`;
     });
     html+='</div></div>';
   });
+  html+=`<div class="mp-footer"><button class="mp-confirm" onclick="closeModelPanel()">确认</button></div>`;
   body.innerHTML=html;
   panel.classList.add('show');
 }
