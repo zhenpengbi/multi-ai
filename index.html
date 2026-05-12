@@ -476,7 +476,7 @@ button{font-family:inherit;border:none;background:none;cursor:pointer;color:inhe
     <div class="mf"><label>智谱 AI Key</label><input class="modal-input" id="keyInputZhipu" placeholder="智谱 API Key..."></div>
     <div class="mf"><label>Kimi / 月之暗面 Key</label><input class="modal-input" id="keyInputKimi" placeholder="Kimi API Key..."></div>
     <div class="mf"><label>硅基流动 Key</label><input class="modal-input" id="keyInputSilicon" placeholder="硅基流动 API Key..."></div>
-    <div class="modal-acts"><button class="mbtn sec" onclick="hideModal()">取消</button><button class="mbtn pri" onclick="saveKey()">保存</button></div>
+    <div class="modal-acts"><button class="mbtn sec" onclick="shareKeys()">🔗 分享配置</button><button class="mbtn sec" onclick="hideModal()">取消</button><button class="mbtn pri" onclick="saveKey()">保存</button></div>
   </div>
 </div>
 <!-- System Prompt Modal -->
@@ -691,6 +691,27 @@ function updateKeyStatus(){
   if(localStorage.getItem('multi_ai_key_kimi'))parts.push('Kimi✓');
   if(localStorage.getItem('multi_ai_key_silicon'))parts.push('硅基✓');
   document.getElementById('keyStatus').textContent=parts.length?parts.join(' '):' 未设置';
+}
+function shareKeys(){
+  const keys={or:localStorage.getItem('multi_ai_key')||'',zp:localStorage.getItem('multi_ai_key_zhipu')||'',km:localStorage.getItem('multi_ai_key_kimi')||'',sf:localStorage.getItem('multi_ai_key_silicon')||''};
+  if(!keys.or&&!keys.zp&&!keys.km&&!keys.sf){alert('没有可分享的 Key');return}
+  const encoded=btoa(unescape(encodeURIComponent(JSON.stringify(keys))));
+  const url=location.origin+location.pathname+'#keys='+encoded;
+  navigator.clipboard.writeText(url).then(()=>alert('✅ 分享链接已复制到剪贴板\n\n朋友打开链接即可自动导入配置')).catch(()=>{prompt('复制下面的链接发给朋友：',url)});
+}
+function importKeysFromHash(){
+  const hash=location.hash;
+  if(!hash.startsWith('#keys='))return;
+  try{
+    const json=decodeURIComponent(escape(atob(hash.slice(6))));
+    const keys=JSON.parse(json);
+    let imported=0;
+    if(keys.or){localStorage.setItem('multi_ai_key',keys.or);imported++}
+    if(keys.zp){localStorage.setItem('multi_ai_key_zhipu',keys.zp);imported++}
+    if(keys.km){localStorage.setItem('multi_ai_key_kimi',keys.km);imported++}
+    if(keys.sf){localStorage.setItem('multi_ai_key_silicon',keys.sf);imported++}
+    if(imported>0){history.replaceState(null,'',location.pathname);updateKeyStatus()}
+  }catch(e){}
 }
 
 // ===== MODEL PANEL =====
@@ -1594,7 +1615,7 @@ function compressImage(dataUrl,maxWidth=800,quality=0.8){
 
 // ===== INIT =====
 function init(){
-  initTheme();updateKeyStatus();renderSidebar();
+  importKeysFromHash();initTheme();updateKeyStatus();renderSidebar();
   if(state.sidebarCollapsed)document.getElementById('sidebar').classList.add('collapsed');
   if(state.chats.length===0)createNewChat();
   else{state.currentChatId=state.chats[0].id;renderSidebar()}
