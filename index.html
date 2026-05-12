@@ -553,6 +553,7 @@ const MODELS=[
     {id:'kimi/moonshot-v1-8k',name:'Kimi 8K',icon:ICON_KIMI,tags:['免费','中文佳'],provider:'Kimi'}
   ]}
 ];
+const VALID_MODEL_IDS=new Set(MODELS.flatMap(t=>t.models.map(m=>m.id)));
 
 // Deep think model mapping
 const DEEP_THINK_MAP={
@@ -829,10 +830,11 @@ function selectChat(id){
   const prevChat=getCurrentChat();
   if(prevChat&&state.selectedModels.length)prevChat.selectedModels=state.selectedModels.slice();
   state.currentChatId=id;state.currentFolderId=null;
-  // Restore model selection from the target chat
+  // Restore model selection from the target chat (filter out removed models)
   const chat=getCurrentChat();
   if(chat&&chat.selectedModels&&chat.selectedModels.length){
-    state.selectedModels=chat.selectedModels.slice();
+    state.selectedModels=chat.selectedModels.filter(id=>VALID_MODEL_IDS.has(id));
+    chat.selectedModels=state.selectedModels.slice();
     updateModelSelectorUI();
   }
   renderSidebar();renderChatArea();updateTopTitle();
@@ -1114,14 +1116,15 @@ function renderChatArea(){
   // Try to restore models from chat data if selectedModels is empty
   if(chat&&!state.selectedModels.length){
     if(chat.selectedModels&&chat.selectedModels.length){
-      state.selectedModels=chat.selectedModels.slice();
+      state.selectedModels=chat.selectedModels.filter(id=>VALID_MODEL_IDS.has(id));
+      chat.selectedModels=state.selectedModels.slice();
       updateModelSelectorUI();
     } else if(chat.messages&&chat.messages.length){
       // Infer from message targetModels or AI responses
       const inferred=new Set();
       chat.messages.forEach(m=>{
-        if(m.targetModels)m.targetModels.forEach(id=>inferred.add(id));
-        if(m.modelId)inferred.add(m.modelId);
+        if(m.targetModels)m.targetModels.forEach(id=>{if(VALID_MODEL_IDS.has(id))inferred.add(id)});
+        if(m.modelId&&VALID_MODEL_IDS.has(m.modelId))inferred.add(m.modelId);
       });
       if(inferred.size){state.selectedModels=[...inferred];chat.selectedModels=state.selectedModels.slice();saveChats();updateModelSelectorUI();}
     }
