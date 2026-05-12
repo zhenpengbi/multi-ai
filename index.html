@@ -535,13 +535,14 @@ const ICON_KIMI=`<svg viewBox="0 0 36 36" width="22" height="22" xmlns="http://w
 const ICON_GLM=`<svg viewBox="0 0 36 36" width="22" height="22" xmlns="http://www.w3.org/2000/svg"><circle cx="18" cy="18" r="17" fill="#10b981"/><text x="18" y="23" text-anchor="middle" font-size="14" font-weight="bold" fill="#fff" font-family="Arial,sans-serif">G</text></svg>`;
 const MODELS=[
   {tier:'S',tierName:'旗舰级',tierDesc:'顶尖能力',tierIcon:'🏆',models:[
+    {id:'silicon/Qwen3.5-397B',name:'Qwen3.5-397B',icon:ICON_QWEN,tags:['最新旗舰','推理强','免费'],provider:'硅基'},
     {id:'silicon/Qwen3-235B-A22B',name:'Qwen3-235B-A22B',icon:ICON_QWEN,tags:['推理强','中文佳','免费'],provider:'硅基'},
     {id:'silicon/DeepSeek-R1',name:'DeepSeek R1',icon:ICON_DS,tags:['推理强','代码强','免费'],provider:'硅基'},
-    {id:'silicon/Llama-4-Maverick',name:'Llama 4 Maverick',icon:ICON_LLAMA,tags:['英文佳','代码强','免费'],provider:'硅基'},
-    {id:'silicon/DeepSeek-V3',name:'DeepSeek V3',icon:ICON_DS,tags:['推理强','中文佳','免费'],provider:'硅基'}
+    {id:'silicon/DeepSeek-V3.2',name:'DeepSeek V3.2',icon:ICON_DS,tags:['推理强','中文佳','免费'],provider:'硅基'}
   ]},
   {tier:'A',tierName:'主力级',tierDesc:'快+强平衡',tierIcon:'⚡',models:[
     {id:'silicon/DeepSeek-V4-Flash',name:'DeepSeek V4 Flash',icon:ICON_DS,tags:['极速','推理强','免费'],provider:'硅基'},
+    {id:'silicon/DeepSeek-V3',name:'DeepSeek V3',icon:ICON_DS,tags:['稳定','中文佳','免费'],provider:'硅基'},
     {id:'silicon/Qwen3-32B',name:'Qwen3-32B',icon:ICON_QWEN,tags:['推理强','长文本'],provider:'硅基'},
     {id:'kimi/moonshot-v1-32k',name:'Kimi 32K',icon:ICON_KIMI,tags:['长文本','中文佳'],provider:'Kimi'}
   ]},
@@ -583,12 +584,13 @@ const FALLBACK_MAP={
 
 const SILICON_MODEL_MAP={
   'DeepSeek-V3':'deepseek-ai/DeepSeek-V3',
+  'DeepSeek-V3.2':'deepseek-ai/DeepSeek-V3.2',
   'DeepSeek-R1':'deepseek-ai/DeepSeek-R1',
   'Qwen3-32B':'Qwen/Qwen3-32B',
   'Qwen3-30B-A3B':'Qwen/Qwen3-30B-A3B-Instruct-2507',
   'DeepSeek-V4-Flash':'deepseek-ai/DeepSeek-V4-Flash',
-  'Qwen3-235B-A22B':'Qwen/Qwen3-235B-A22B',
-  'Llama-4-Maverick':'meta-llama/Llama-4-Maverick-17B-128E-Instruct'
+  'Qwen3-235B-A22B':'Qwen/Qwen3-235B-A22B-Instruct-2507',
+  'Qwen3.5-397B':'Qwen/Qwen3.5-397B-A17B'
 };
 
 const MAX_RETRIES=2,RETRY_DELAY=1500,TIMEOUT_MS=30000,HISTORY_LIMIT=10;
