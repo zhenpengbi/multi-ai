@@ -1244,9 +1244,16 @@ function renderMultiMode(area,chat){
   }
 })();
 function copyCode(btn){const pre=btn.parentElement.querySelector('pre');navigator.clipboard.writeText(pre.textContent);btn.textContent='已复制';setTimeout(()=>btn.textContent='复制',1500)}
+// Detect and neutralize hallucinated external links in AI responses
+const SUSPECT_LINK_RE=/https?:\/\/(pastebin\.com|gist\.github\.com|drive\.google\.com|docs\.google\.com|bit\.ly|tinyurl\.com|paste\.ee|hastebin\.com|rentry\.co|ghostbin\.com|dpaste\.org|ideone\.com|codeshare\.io|replit\.com\/@)[^\s)"\]<]*/gi;
+function sanitizeHallucinatedLinks(text){
+  return text.replace(SUSPECT_LINK_RE,(url)=>`~~${url}~~ ⚠️`);
+}
 function renderMd(text){
   if(!text)return'';
   try{
+    // Pre-process: strike through likely hallucinated external links
+    text=sanitizeHallucinatedLinks(text);
     let html=typeof marked!=='undefined'?marked.parse(text):text.replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
     // Wrap code blocks with copy button
     html=html.replace(/<pre><code([^>]*)>/g,'<div class="code-wrap"><button class="code-copy" onclick="copyCode(this)">复制</button><pre><code$1>');
@@ -1496,10 +1503,15 @@ async function streamToModel(modelId,chat,history,retryCount=0,hasFallback=false
         }catch(e){}
       }
     }
-    const finalText=state.streaming[modelId].text;
+    let finalText=state.streaming[modelId].text;
     const finalReasoning=state.streaming[modelId].reasoning;
     const startTime=state.streaming[modelId].startTime;
     delete state.streaming[modelId];delete state.abortControllers[modelId];
+    // Detect hallucinated external links and append warning
+    if(SUSPECT_LINK_RE.test(finalText)){
+      SUSPECT_LINK_RE.lastIndex=0;
+      finalText+='\n\n> ⚠️ **注意**：上述外部链接可能由 AI 虚构，请勿点击访问。内容以当前回复为准。';
+    }
     const msg={role:'assistant',modelId,content:finalText,ts:Date.now()};
     if(finalReasoning){msg.reasoning=finalReasoning;msg.thinkStart=startTime}
     chat.messages.push(msg);saveChats();renderChatArea();
