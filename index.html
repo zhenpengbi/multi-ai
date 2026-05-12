@@ -384,7 +384,7 @@ button{font-family:inherit;border:none;background:none;cursor:pointer;color:inhe
 .date-sep{padding:8px 12px 4px;font-size:11px;color:var(--text-tertiary);font-weight:500}
 .no-result{text-align:center;padding:20px;color:var(--text-tertiary);font-size:13px}
 .typing-indicator{display:flex;gap:4px;padding:8px 0}.typing-indicator span{width:6px;height:6px;border-radius:50%;background:var(--text-tertiary);animation:typing 1.4s infinite}.typing-indicator span:nth-child(2){animation-delay:.2s}.typing-indicator span:nth-child(3){animation-delay:.4s}@keyframes typing{0%,80%,100%{opacity:.3;transform:translateY(0)}40%{opacity:1;transform:translateY(-4px)}}
-.ctx-warn{padding:6px 14px;background:var(--warning);color:#333;font-size:12px;text-align:center;border-radius:var(--radius-sm);margin:0 24px 8px}
+.ctx-warn{padding:8px 16px;background:rgba(255,165,0,0.08);border:1px solid rgba(255,165,0,0.25);color:var(--text-secondary);font-size:12px;text-align:center;border-radius:var(--radius-sm);margin:0 24px 8px;backdrop-filter:blur(4px)}
 .img-preview{display:flex;align-items:center;gap:8px;padding:8px;border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:8px}.img-preview img{height:60px;border-radius:4px}.img-preview button{padding:2px 6px;border-radius:50%;background:var(--bg-tertiary);color:var(--text-secondary);font-size:14px}
 /* highlight.js overrides */
 .bubble .code-wrap pre{background:var(--bg-tertiary);border:1px solid var(--border);padding:14px 16px;border-radius:var(--radius-sm);overflow-x:auto;margin:10px 0}
@@ -1246,7 +1246,14 @@ function renderMultiMode(area,chat){
 function copyCode(btn){const pre=btn.parentElement.querySelector('pre');navigator.clipboard.writeText(pre.textContent);btn.textContent='已复制';setTimeout(()=>btn.textContent='复制',1500)}
 // Detect and neutralize hallucinated external links in AI responses
 const SUSPECT_LINK_RE=/https?:\/\/(pastebin\.com|gist\.github\.com|drive\.google\.com|docs\.google\.com|bit\.ly|tinyurl\.com|paste\.ee|hastebin\.com|rentry\.co|ghostbin\.com|dpaste\.org|ideone\.com|codeshare\.io|replit\.com\/@)[^\s)"\]<]*/gi;
+// Detect "click here for full content" hallucination patterns
+const HALLUCINATION_PHRASES_RE=/(\*{0,2}注意\*{0,2}[：:]?\s*).{0,20}(完整[内內]容|完整版|全文|剩余部分).{0,80}(请[点击访问打开]).{0,200}(https?:\/\/[^\s)"\]<]+)/gi;
+const TRUNCATION_HALLUCINATION_RE=/(?:(?:由于|因为)(?:篇幅|字数|长度|输出)(?:限制|有限|较长)|(?:以[上下]|剩余|完整|全部)(?:内容|部分|章节).{0,30}(?:请|可以?|点击|访问|查看|前往|获取)).{0,100}(https?:\/\/[^\s)"\]<]+)/gi;
 function sanitizeHallucinatedLinks(text){
+  // Remove truncation hallucination blocks (entire paragraph containing fake link)
+  text=text.replace(TRUNCATION_HALLUCINATION_RE,(match)=>'> ⚠️ ~~[AI 幻觉内容已过滤：声称有外部完整版链接，实际为虚构]~~');
+  text=text.replace(HALLUCINATION_PHRASES_RE,(match)=>'> ⚠️ ~~[AI 幻觉内容已过滤：声称有外部完整版链接，实际为虚构]~~');
+  // Still catch remaining bare suspect URLs
   return text.replace(SUSPECT_LINK_RE,(url)=>`~~${url}~~ ⚠️`);
 }
 function renderMd(text){
@@ -1507,10 +1514,12 @@ async function streamToModel(modelId,chat,history,retryCount=0,hasFallback=false
     const finalReasoning=state.streaming[modelId].reasoning;
     const startTime=state.streaming[modelId].startTime;
     delete state.streaming[modelId];delete state.abortControllers[modelId];
-    // Detect hallucinated external links and append warning
-    if(SUSPECT_LINK_RE.test(finalText)){
-      SUSPECT_LINK_RE.lastIndex=0;
-      finalText+='\n\n> ⚠️ **注意**：上述外部链接可能由 AI 虚构，请勿点击访问。内容以当前回复为准。';
+    // Detect and sanitize hallucinated external links
+    SUSPECT_LINK_RE.lastIndex=0;HALLUCINATION_PHRASES_RE.lastIndex=0;TRUNCATION_HALLUCINATION_RE.lastIndex=0;
+    const hadHallucination=SUSPECT_LINK_RE.test(finalText)||HALLUCINATION_PHRASES_RE.test(finalText)||TRUNCATION_HALLUCINATION_RE.test(finalText);
+    if(hadHallucination){
+      SUSPECT_LINK_RE.lastIndex=0;HALLUCINATION_PHRASES_RE.lastIndex=0;TRUNCATION_HALLUCINATION_RE.lastIndex=0;
+      finalText=sanitizeHallucinatedLinks(finalText);
     }
     const msg={role:'assistant',modelId,content:finalText,ts:Date.now()};
     if(finalReasoning){msg.reasoning=finalReasoning;msg.thinkStart=startTime}
