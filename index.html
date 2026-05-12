@@ -450,7 +450,7 @@ button{font-family:inherit;border:none;background:none;cursor:pointer;color:inhe
       </div>
       <div class="img-preview" id="imgPreview" style="display:none"></div>
       <div class="input-box">
-        <textarea id="mainInput" placeholder="输入消息..." rows="1" onkeydown="handleInputKeyDown(event)" onkeyup="handleInputKeyUp(event)" oninput="autoResize(this);updateSendBtn()" onpaste="handlePaste(event)"></textarea>
+        <textarea id="mainInput" placeholder="输入消息...  Enter 发送 / Shift+Enter 换行" rows="1" onkeydown="handleInputKeyDown(event)" onkeyup="handleInputKeyUp(event)" oninput="autoResize(this);updateSendBtn()" onpaste="handlePaste(event)"></textarea>
         <div class="input-toolbar">
           <button class="itb-btn" onclick="document.getElementById('imgUpload').click()"><svg viewBox="0 0 20 20"><rect x="3" y="4" width="14" height="12" rx="2"/><circle cx="8" cy="9" r="1.5"/><path d="M4 14l4-4 3 3 2-2 4 4"/></svg><span class="hide-c">图片</span></button>
           <input type="file" id="imgUpload" accept="image/*" hidden onchange="handleImgUpload(event)">
@@ -938,7 +938,7 @@ function renderFolderDetail(area){
     html+=`<div class="fd-chat-item" onclick="selectChat('${c.id}')"><span class="fdc-title">${c.title}</span></div>`;
   });
   // Input area for new chat in this folder
-  html+=`<div class="fd-input-area"><div class="input-wrap"><div class="input-box"><textarea id="folderInput" placeholder="在此分组中新建对话..." rows="1" onkeydown="handleFolderInputKeyDown(event)" oninput="autoResize(this)"></textarea></div></div></div>`;
+  html+=`<div class="fd-input-area"><div class="input-wrap"><div class="input-box"><textarea id="folderInput" placeholder="在此分组中新建对话...  Enter 发送 / Shift+Enter 换行" rows="1" onkeydown="handleFolderInputKeyDown(event)" oninput="autoResize(this)"></textarea></div></div></div>`;
   html+=`</div></div>`;
   area.innerHTML=html;area.style.padding='0';
 }
