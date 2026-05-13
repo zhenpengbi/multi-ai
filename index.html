@@ -92,7 +92,7 @@ button{font-family:inherit;border:none;background:none;cursor:pointer;color:inhe
 .model-panel{position:fixed;inset:0;z-index:300;display:none;align-items:center;justify-content:center}
 .model-panel.show{display:flex}
 .model-panel-bg{position:absolute;inset:0;background:rgba(0,0,0,.35);backdrop-filter:blur(2px)}
-.model-panel-body{position:relative;background:var(--bg-primary);border-radius:var(--radius-lg);width:100%;max-width:580px;max-height:70vh;overflow-y:auto;padding:24px;box-shadow:var(--shadow-md);animation:fadeScale .2s ease}
+.model-panel-body{position:relative;background:var(--bg-primary);border-radius:var(--radius-lg);width:100%;max-width:900px;max-height:80vh;overflow-y:auto;padding:24px;box-shadow:var(--shadow-md);animation:fadeScale .2s ease}
 @keyframes fadeScale{from{transform:scale(.96);opacity:0}to{transform:scale(1);opacity:1}}
 @media(max-width:768px){.model-panel{align-items:flex-end}.model-panel-body{border-radius:var(--radius-lg) var(--radius-lg) 0 0;max-width:100%;animation:slideUp .25s ease}}
 @keyframes slideUp{from{transform:translateY(16px);opacity:0}to{transform:translateY(0);opacity:1}}
@@ -137,6 +137,9 @@ button{font-family:inherit;border:none;background:none;cursor:pointer;color:inhe
 .mp-close{padding:6px;border-radius:var(--radius-sm);color:var(--text-tertiary);transition:all .2s}
 .mp-close:hover{background:var(--bg-tertiary);color:var(--text-primary)}
 .mp-close svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.tiers-row{display:flex;gap:16px}
+.tiers-row .tier{flex:1;min-width:0;margin-bottom:0}
+@media(max-width:768px){.tiers-row{flex-direction:column}.tiers-row .tier{margin-bottom:14px}.tiers-row .tier:last-child{margin-bottom:0}}
 .tier{margin-bottom:14px}.tier:last-child{margin-bottom:0}
 /* Chat Area */
 .chat-area{flex:1;overflow-y:auto;padding:24px;display:flex;flex-direction:column;align-items:center;scrollbar-width:thin}
@@ -727,6 +730,7 @@ function openModelPanel(){
   const body=document.getElementById('modelPanelBody');
   const selCount=state.selectedModels.length;
   let html=`<div class="mp-top-line"></div><div class="mp-hdr"><div><h3>选择 AI 模型</h3><span class="mp-subtitle">已选 ${selCount} 个模型</span></div><button class="mp-close" onclick="closeModelPanel()"><svg viewBox="0 0 20 20"><path d="M5 5l10 10M15 5L5 15"/></svg></button></div>`;
+  html+='<div class="tiers-row">';
   MODELS.forEach(tier=>{
     const tierClass='tier-hdr tier-hdr--'+tier.tier.toLowerCase();
     html+=`<div class="tier"><div class="${tierClass}"><span class="tier-hdr-icon">${tier.tierIcon}</span><span class="tier-hdr-name">${tier.tierName}</span><span class="tier-hdr-sep">·</span><span class="tier-hdr-desc">${tier.tierDesc}</span></div><div class="tier-cards">`;
@@ -737,6 +741,7 @@ function openModelPanel(){
     });
     html+='</div></div>';
   });
+  html+='</div>';
   html+=`<div class="mp-footer"><button class="mp-confirm" onclick="closeModelPanel()">确认</button></div>`;
   body.innerHTML=html;
   panel.classList.add('show');
