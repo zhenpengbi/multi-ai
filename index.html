@@ -227,7 +227,10 @@ button{font-family:inherit;border:none;background:none;cursor:pointer;color:inhe
 .input-wrap{max-width:800px;margin:0 auto;position:relative}
 .input-box{background:var(--bg-secondary);border:1px solid var(--border);border-radius:20px;padding:12px 16px;transition:border-color .2s,box-shadow .2s;box-shadow:0 2px 12px rgba(0,0,0,.04)}
 .input-box:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px rgba(91,106,191,.08)}
-#mainInput{width:100%;border:none;background:none;resize:none;font-size:15px;line-height:1.6;color:var(--text-primary);outline:none;min-height:26px;max-height:150px;font-family:inherit}
+.input-row{display:flex;align-items:flex-start;gap:0;width:100%}
+#toolTag:empty{display:none}
+#toolTag{display:inline-flex;align-items:center;flex-shrink:0;padding-top:2px}
+#mainInput{flex:1;min-width:0;border:none;background:none;resize:none;font-size:15px;line-height:1.6;color:var(--text-primary);outline:none;min-height:26px;max-height:150px;font-family:inherit}
 #mainInput::placeholder{color:var(--text-tertiary)}
 .input-toolbar{display:flex;align-items:center;gap:6px;margin-top:10px;padding-top:8px;border-top:1px solid var(--border)}
 .itb-btn{display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:10px;font-size:13px;color:var(--text-secondary);transition:all .2s;user-select:none;border:1px solid var(--border)}
@@ -246,10 +249,18 @@ button{font-family:inherit;border:none;background:none;cursor:pointer;color:inhe
 .tm-item:hover{background:linear-gradient(135deg,var(--accent-light),color-mix(in srgb,var(--accent) 8%,transparent));color:var(--accent);transform:translateX(2px)}
 .tm-item svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;opacity:.8;transition:opacity .15s}
 .tm-item:hover svg{opacity:1}
-.tool-badges{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap}
-.tbadge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;background:var(--accent-light);border:1px solid var(--accent);border-radius:14px;font-size:12px;color:var(--accent);font-weight:500}
-.tbadge .rx{cursor:pointer;font-size:14px;line-height:1;opacity:.6}
-.tbadge .rx:hover{opacity:1}
+.tool-tag{display:inline-flex;align-items:center;gap:4px;padding:2px 10px;border:1px solid;border-radius:12px;font-size:13px;font-weight:500;white-space:nowrap;margin-right:4px;cursor:default;vertical-align:middle}
+.tool-tag .rx{cursor:pointer;font-size:14px;opacity:.6}
+.tool-tag .rx:hover{opacity:1}
+.scene-row{display:flex;gap:10px;overflow-x:auto;padding:10px 0;scrollbar-width:none}
+.scene-row::-webkit-scrollbar{display:none}
+.scene-card{flex:0 0 auto;padding:12px 16px;border:1px solid var(--border);border-radius:12px;cursor:pointer;transition:all .2s;min-width:120px;background:var(--bg-secondary)}
+.scene-card:hover{border-color:var(--accent);background:var(--accent-light)}
+.scene-card.active{border-color:var(--accent);background:var(--accent-light)}
+.scene-card .sc-icon{font-size:18px;margin-bottom:4px}
+.scene-card .sc-name{font-size:13px;font-weight:600;color:var(--text-primary)}
+.scene-card .sc-desc{font-size:11px;color:var(--text-tertiary);margin-top:2px}
+.itb-btn.disabled{opacity:.4;pointer-events:none;text-decoration:line-through}
 .err{color:var(--error);font-size:12px;margin-top:4px;padding:3px 8px;background:rgba(255,77,79,.05);border-radius:4px}
 /* Chat Dropdown (3-dot menu) */
 .chat-dots{display:none;padding:3px 6px;border-radius:4px;color:var(--text-tertiary);transition:all .2s;font-size:16px;line-height:1;letter-spacing:-1px}
@@ -450,16 +461,16 @@ button{font-family:inherit;border:none;background:none;cursor:pointer;color:inhe
   <div class="input-area">
 
     <div class="input-wrap">
-      <div class="tool-badges" id="toolBadges"></div>
       <div class="tool-menu" id="toolMenu">
         <div class="tm-item" onclick="toggleTool('联网搜索')"><svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="7"/><path d="M3 10h14M10 3c-2 2.5-2 11 0 14M10 3c2 2.5 2 11 0 14"/></svg>联网搜索</div>
         <div class="tm-item" onclick="toggleTool('写作')"><svg viewBox="0 0 20 20"><path d="M3 17h14M5 13l8-8 2 2-8 8H5v-2z"/></svg>写作</div>
         <div class="tm-item" onclick="toggleTool('编程')"><svg viewBox="0 0 20 20"><path d="M6 7l-3 3 3 3M14 7l3 3-3 3M11 5l-2 10"/></svg>编程</div>
         <div class="tm-item" onclick="toggleTool('解题')"><svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="7"/><path d="M8 8a2.5 2.5 0 013 2.5c0 1.5-1 2-1 3M10 15v.5"/></svg>解题</div>
       </div>
+      <div class="scene-row" id="sceneRow" style="display:none"></div>
       <div class="img-preview" id="imgPreview" style="display:none"></div>
       <div class="input-box">
-        <textarea id="mainInput" placeholder="输入消息...  Enter 发送 / Shift+Enter 换行" rows="1" onkeydown="handleInputKeyDown(event)" onkeyup="handleInputKeyUp(event)" oninput="autoResize(this);updateSendBtn()" onpaste="handlePaste(event)"></textarea>
+        <div class="input-row"><span id="toolTag"></span><textarea id="mainInput" placeholder="输入消息...  Enter 发送 / Shift+Enter 换行" rows="1" onkeydown="handleInputKeyDown(event)" onkeyup="handleInputKeyUp(event)" oninput="autoResize(this);updateSendBtn()" onpaste="handlePaste(event)"></textarea></div>
         <div class="input-toolbar">
           <button class="itb-btn" onclick="document.getElementById('imgUpload').click()"><svg viewBox="0 0 20 20"><rect x="3" y="4" width="14" height="12" rx="2"/><circle cx="8" cy="9" r="1.5"/><path d="M4 14l4-4 3 3 2-2 4 4"/></svg><span class="hide-c">图片</span></button>
           <input type="file" id="imgUpload" accept="image/*" hidden onchange="handleImgUpload(event)">
@@ -603,6 +614,27 @@ const SILICON_MODEL_MAP={
   'Qwen3.5-397B':'Qwen/Qwen3.5-397B-A17B'
 };
 
+const TOOL_CONFIG={
+  '联网搜索':{color:'#10b981',placeholder:'输入主题，实时获取全网资讯',scenes:[]},
+  '写作':{color:'#f59e0b',placeholder:'输入你的主题，为你创作内容',scenes:[
+    {id:'general',icon:'✍️',name:'通用',desc:'你的全能写作助手'},
+    {id:'novel',icon:'📖',name:'小说',desc:'丝滑顺畅的创作工具'},
+    {id:'marketing',icon:'💰',name:'营销文案',desc:'让文案秒变"印钞机"'},
+    {id:'official',icon:'📋',name:'公文',desc:'零基础写出标准公文'},
+    {id:'paper',icon:'🎓',name:'课程论文',desc:'攻克学术写作'},
+    {id:'speech',icon:'🎤',name:'发言稿',desc:'任何场合自信发言'}
+  ]},
+  '编程':{color:'#3b82f6',placeholder:'说说你的想法，为你生成代码',scenes:[
+    {id:'webpage',icon:'🌐',name:'网页生成',desc:'轻松实现精美网页'},
+    {id:'sql',icon:'🗄️',name:'SQL生成',desc:'高效生成标准SQL'},
+    {id:'fix',icon:'🔧',name:'代码修复',desc:'精准修复代码错误'},
+    {id:'explain',icon:'💡',name:'代码解释',desc:'清晰解读代码逻辑'},
+    {id:'solve',icon:'🧩',name:'编程解题',desc:'巧妙解题理解算法'},
+    {id:'translate',icon:'🔄',name:'代码翻译',desc:'精确实现代码转换'}
+  ]},
+  '解题':{color:'#10b981',placeholder:'输入题目，或上传题目图片',disableDeepThink:true,scenes:[]}
+};
+
 const MAX_RETRIES=2,RETRY_DELAY=1500,TIMEOUT_MS=30000,HISTORY_LIMIT=10;
 
 let state={
@@ -612,6 +644,7 @@ let state={
   currentFolderId:null,
   selectedModels:[],
   activeTools:[],
+  activeScene:null,
   colTools:{},
   deepThink:false,
   abortControllers:{},
@@ -1319,15 +1352,43 @@ function removeColTool(modelId,name){
   renderChatArea();
 }
 function toggleTool(name){
-  if(state.activeTools.includes(name)){state.activeTools=[]}
-  else{state.activeTools=[name]}
-  renderToolBadges();
+  const cfg=TOOL_CONFIG[name];if(!cfg)return;
+  state.activeTools=[name];state.activeScene=null;
+  // Render tag inside input-box
+  document.getElementById('toolTag').innerHTML=`<span class="tool-tag" style="color:${cfg.color};border-color:${cfg.color}">${name} <span class="rx" onclick="clearActiveTool()">×</span></span>`;
+  // Update placeholder
+  document.getElementById('mainInput').placeholder=cfg.placeholder;
+  // Scene row
+  const sceneRow=document.getElementById('sceneRow');
+  if(cfg.scenes&&cfg.scenes.length){
+    sceneRow.innerHTML=cfg.scenes.map(s=>`<div class="scene-card" data-sid="${s.id}" onclick="selectScene('${s.id}')"><div class="sc-icon">${s.icon}</div><div class="sc-name">${s.name}</div><div class="sc-desc">${s.desc}</div></div>`).join('');
+    sceneRow.style.display='flex';
+  }else{sceneRow.innerHTML='';sceneRow.style.display='none'}
+  // Disable deep think if needed
+  if(cfg.disableDeepThink){
+    const btn=document.getElementById('deepThinkBtn');
+    btn.classList.add('disabled');btn.classList.remove('active');
+    state.deepThink=false;
+  }
+  // Close tool menu
   document.getElementById('toolMenu').classList.remove('show');
 }
-function renderToolBadges(){
-  document.getElementById('toolBadges').innerHTML=state.activeTools.map(t=>`<div class="tbadge">${t}<span class="rx" onclick="removeTool('${t}')">×</span></div>`).join('');
+function clearActiveTool(){
+  state.activeTools=[];state.activeScene=null;
+  document.getElementById('toolTag').innerHTML='';
+  document.getElementById('mainInput').placeholder='输入消息...  Enter 发送 / Shift+Enter 换行';
+  document.getElementById('sceneRow').innerHTML='';
+  document.getElementById('sceneRow').style.display='none';
+  // Restore deep think button
+  const btn=document.getElementById('deepThinkBtn');
+  btn.classList.remove('disabled');
 }
-function removeTool(name){state.activeTools=state.activeTools.filter(t=>t!==name);renderToolBadges()}
+function selectScene(sceneId){
+  state.activeScene=sceneId;
+  document.querySelectorAll('#sceneRow .scene-card').forEach(el=>{
+    el.classList.toggle('active',el.dataset.sid===sceneId);
+  });
+}
 
 // ===== IMAGE UPLOAD =====
 function handleImgUpload(event){
@@ -1389,7 +1450,14 @@ function sendMessage(){
   if(!text||!state.selectedModels.length)return;
   // Global tools for single model; per-column tools respected in multi-mode
   if(state.selectedModels.length===1){
-    if(state.activeTools.length)text=`[${state.activeTools.join(',')}] ${text}`;
+    if(state.activeTools.length){
+      const toolName=state.activeTools[0];
+      if(state.activeScene){
+        const cfg=TOOL_CONFIG[toolName];
+        const scene=cfg&&cfg.scenes.find(s=>s.id===state.activeScene);
+        text=`[${toolName}:${scene?scene.name:state.activeScene}] ${text}`;
+      }else{text=`[${toolName}] ${text}`}
+    }
   }
   let chat=getCurrentChat();
   // Save model selection to chat for restoration on re-open
@@ -1401,7 +1469,7 @@ function sendMessage(){
   chat.messages.push({role:'user',content:text,ts:Date.now(),image:hasImage?state.pendingImage:undefined,targetModels:state.selectedModels.slice()});
   saveChats();renderSidebar();
   input.value='';autoResize(input);updateSendBtn();
-  state.activeTools=[];renderToolBadges();
+  clearActiveTool();
   if(hasImage){state.pendingImage=null;clearImage()}
   if(state.selectedModels.length===1){
     streamToModel(state.selectedModels[0],chat,getHistory(chat,state.selectedModels[0]));
