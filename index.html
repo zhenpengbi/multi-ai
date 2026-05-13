@@ -239,7 +239,7 @@ button{font-family:inherit;border:none;background:none;cursor:pointer;color:inhe
 .send-btn.active{background:var(--accent);color:#fff}
 .send-btn.active:hover{background:#3d5ce5;transform:scale(1.05)}
 .send-btn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
-.tool-menu{position:absolute;bottom:100%;left:60px;background:var(--bg-primary);border:1px solid color-mix(in srgb,var(--border) 60%,transparent);border-radius:14px;box-shadow:0 8px 32px rgba(0,0,0,.12),0 2px 8px rgba(0,0,0,.06);padding:8px;display:none;min-width:160px;z-index:200;margin-bottom:8px;backdrop-filter:blur(16px) saturate(1.4)}
+.tool-menu{position:fixed;background:var(--bg-primary);border:1px solid color-mix(in srgb,var(--border) 60%,transparent);border-radius:14px;box-shadow:0 8px 32px rgba(0,0,0,.12),0 2px 8px rgba(0,0,0,.06);padding:8px;display:none;min-width:160px;z-index:200;backdrop-filter:blur(16px) saturate(1.4)}
 .tool-menu.show{display:block;animation:menuIn .2s cubic-bezier(.2,0,.13,1.2)}
 @keyframes menuIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
 .tm-item{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:10px;font-size:13px;transition:all .18s;color:var(--text-secondary);cursor:pointer}
@@ -1282,8 +1282,13 @@ function renderMd(text){
 // ===== TOOLS =====
 function toggleToolMenu(e){
   e.stopPropagation();const menu=document.getElementById('toolMenu');
-  menu.classList.toggle('show');
-  if(menu.classList.contains('show'))setTimeout(()=>document.addEventListener('click',()=>menu.classList.remove('show'),{once:true}),0);
+  const isOpen=menu.classList.contains('show');
+  if(isOpen){menu.classList.remove('show');return}
+  const rect=e.currentTarget.getBoundingClientRect();
+  menu.style.left=rect.left+'px';
+  menu.style.bottom=(window.innerHeight-rect.top+8)+'px';
+  menu.classList.add('show');
+  setTimeout(()=>document.addEventListener('click',()=>menu.classList.remove('show'),{once:true}),0);
 }
 // Per-column tool menu (independent from global)
 let _colToolMenuEl=null;
@@ -1303,8 +1308,8 @@ function toggleColToolMenu(e,modelId){
 }
 function toggleColTool(modelId,name){
   if(!state.colTools[modelId])state.colTools[modelId]=[];
-  const idx=state.colTools[modelId].indexOf(name);
-  if(idx>=0)state.colTools[modelId].splice(idx,1);else state.colTools[modelId].push(name);
+  if(state.colTools[modelId].includes(name)){state.colTools[modelId]=[]}
+  else{state.colTools[modelId]=[name]}
   if(_colToolMenuEl){_colToolMenuEl.remove();_colToolMenuEl=null}
   renderChatArea();
 }
@@ -1314,9 +1319,10 @@ function removeColTool(modelId,name){
   renderChatArea();
 }
 function toggleTool(name){
-  const idx=state.activeTools.indexOf(name);
-  if(idx>=0)state.activeTools.splice(idx,1);else state.activeTools.push(name);
+  if(state.activeTools.includes(name)){state.activeTools=[]}
+  else{state.activeTools=[name]}
   renderToolBadges();
+  document.getElementById('toolMenu').classList.remove('show');
 }
 function renderToolBadges(){
   document.getElementById('toolBadges').innerHTML=state.activeTools.map(t=>`<div class="tbadge">${t}<span class="rx" onclick="removeTool('${t}')">×</span></div>`).join('');
