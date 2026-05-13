@@ -419,9 +419,9 @@ button{font-family:inherit;border:none;background:none;cursor:pointer;color:inhe
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeMobileSidebar()"></div>
 <aside class="sidebar" id="sidebar">
   <div class="sb-top-icons hide-c">
-    <button class="sb-top-icon" onclick="toggleSidebar()" title="收起侧栏"><svg viewBox="0 0 16 16"><path d="M2 3h12M2 8h12M2 13h12"/></svg></button>
-    <button class="sb-top-icon" onclick="createNewChat()" title="新建对话"><svg viewBox="0 0 16 16"><path d="M8 3v10M3 8h10"/></svg></button>
-    <button class="sb-top-icon" onclick="showKeyModal()" title="设置"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="3"/><path d="M8 2v1.5M8 12.5V14M2 8h1.5M12.5 8H14M4.1 4.1l1.1 1.1M10.8 10.8l1.1 1.1M4.1 11.9l1.1-1.1M10.8 5.2l1.1-1.1"/></svg></button>
+    <button class="sb-top-icon" onclick="toggleSidebar()" title="收起侧栏"><svg viewBox="0 0 16 16"><rect x="1" y="1" width="6" height="6" rx="1"/><rect x="9" y="1" width="6" height="6" rx="1"/><rect x="1" y="9" width="6" height="6" rx="1"/><rect x="9" y="9" width="6" height="6" rx="1"/></svg></button>
+    <button class="sb-top-icon" onclick="createNewChat()" title="新建对话"><svg viewBox="0 0 16 16"><path d="M3 2h7l3 3v9a1 1 0 01-1 1H3a1 1 0 01-1-1V3a1 1 0 011-1z"/><path d="M10 2v3h3"/></svg></button>
+    <button class="sb-top-icon" onclick="showKeyModal()" title="设置"><svg viewBox="0 0 16 16"><path d="M2 2l5 5M14 2l-5 5M2 14l5-5M14 14l-5-5"/><rect x="5" y="5" width="6" height="6" rx="1"/></svg></button>
   </div>
   <button class="btn-new show-c" onclick="createNewChat()" title="新建对话"><svg viewBox="0 0 20 20"><path d="M10 4v12M4 10h12"/></svg></button>
   <div class="sb-search hide-c"><svg viewBox="0 0 20 20"><circle cx="9" cy="9" r="5"/><path d="M14 14l3 3"/></svg><input placeholder="搜索对话..." oninput="filterChats(this.value)"></div>
@@ -440,7 +440,6 @@ button{font-family:inherit;border:none;background:none;cursor:pointer;color:inhe
   <div class="top-bar">
     <button class="btn-hamburger" onclick="openMobileSidebar()"><svg viewBox="0 0 20 20"><path d="M3 5h14M3 10h14M3 15h14"/></svg></button>
     <button class="btn-sidebar-toggle" onclick="toggleSidebar()" title="切换侧栏"><svg viewBox="0 0 20 20" id="sidebarToggleIcon"><path d="M4 4h5v5H4zM11 4h5v5h-5zM4 11h5v5H4z"/><path d="M11 11h5v5h-5z" stroke-dasharray="2 1"/></svg></button>
-    <button class="btn-topbar" onclick="createNewChat()" title="新建对话"><svg viewBox="0 0 20 20"><path d="M10 4v12M4 10h12"/></svg></button>
     <span class="top-title" id="topTitle">Multi AI Studio</span>
     <button class="btn-topbar" onclick="exportChat()" title="导出"><svg viewBox="0 0 20 20"><path d="M10 3v10M10 13l-4-4M10 13l4-4"/><path d="M4 17h12"/></svg></button>
     <button class="model-trigger" onclick="openModelPanel()"><svg viewBox="0 0 20 20" style="width:14px;height:14px"><path d="M3 3h6v6H3zM11 3h6v6h-6zM3 11h6v6H3zM11 11h6v6h-6z"/></svg><span id="modelTriggerText">选择模型</span></button>
