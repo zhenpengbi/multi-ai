@@ -204,15 +204,18 @@ button{font-family:inherit;border:none;background:none;cursor:pointer;color:inhe
 .col-send:hover{background:#3d5ce5}
 .col-send svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
 .col-tools{display:flex;gap:4px;margin-top:6px}
-.col-tbtn{padding:4px;border-radius:4px;color:var(--text-tertiary);transition:all .2s}
-.col-tbtn:hover{color:var(--accent);background:var(--accent-light)}
-.col-tbtn.active{color:var(--accent)}
-.col-tbtn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.col-badge{display:inline-flex;align-items:center;gap:2px;padding:2px 8px;border-radius:12px;font-size:11px;color:var(--accent);border:1px solid var(--accent);background:var(--accent-light);margin-left:4px}
-.col-badge .rx{cursor:pointer;margin-left:2px;font-size:12px}
-.col-tool-popup{background:var(--bg-primary);border:1px solid var(--border);border-radius:var(--radius-sm);box-shadow:var(--shadow-md);padding:4px;min-width:80px}
-.ctp-item{padding:6px 12px;font-size:12px;cursor:pointer;border-radius:4px;white-space:nowrap}
+.col-tbtn{display:inline-flex;align-items:center;gap:4px;padding:4px 8px;border-radius:8px;font-size:11px;color:var(--text-tertiary);transition:all .2s;border:1px solid transparent}
+.col-tbtn:hover{color:var(--accent);background:var(--accent-light);border-color:var(--accent)}
+.col-tbtn.active{color:var(--accent);background:var(--accent-light);border-color:var(--accent)}
+.col-tbtn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.col-badge{display:inline-flex;align-items:center;gap:3px;padding:3px 10px;border-radius:14px;font-size:11px;color:var(--accent);border:1px solid color-mix(in srgb,var(--accent) 30%,transparent);background:var(--accent-light);margin-left:4px;font-weight:500;transition:all .2s}
+.col-badge:hover{border-color:var(--accent)}
+.col-badge .rx{cursor:pointer;margin-left:3px;font-size:13px;opacity:.6;transition:opacity .15s}
+.col-badge .rx:hover{opacity:1}
+.col-tool-popup{background:var(--bg-primary);border:1px solid var(--border);border-radius:var(--radius-md);box-shadow:var(--shadow-md);padding:6px;min-width:140px;backdrop-filter:blur(12px);animation:menuIn .15s ease}
+.ctp-item{display:flex;align-items:center;gap:8px;padding:9px 12px;font-size:12px;cursor:pointer;border-radius:var(--radius-sm);white-space:nowrap;color:var(--text-secondary);transition:all .15s}
 .ctp-item:hover{background:var(--accent-light);color:var(--accent)}
+.ctp-item svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 /* Input Area */
 .input-area{padding:14px 24px 20px;background:var(--bg-primary);border-top:1px solid var(--border)}
 .input-wrap{max-width:800px;margin:0 auto;position:relative}
@@ -1154,8 +1157,8 @@ function renderSingleMode(area,chat){
   const sDeep=state.colDeepThink&&state.colDeepThink[modelId];
   const colBadges=(state.colTools[modelId]&&state.colTools[modelId].length)?state.colTools[modelId].map(t=>`<span class="col-badge">${t}<span class="rx" onclick="removeColTool('${modelId}','${t}')">×</span></span>`).join(''):'';
   let html=`<div class="chat-wrap"><div class="col-tools" style="margin-bottom:12px">
-    <button class="col-tbtn${sDeep?' active':''}" onclick="toggleColDeepThink('${modelId}')" title="深度思考"><svg viewBox="0 0 14 14"><circle cx="7" cy="7" r="2.5"/><circle cx="7" cy="7" r="5" stroke-dasharray="2 2"/></svg></button>
-    <button class="col-tbtn" onclick="toggleColToolMenu(event,'${modelId}')" title="工具"><svg viewBox="0 0 14 14"><path d="M3 2h8v1.5H3zM2.5 3.5h9v8.5a1.5 1.5 0 01-1.5 1.5H4a1.5 1.5 0 01-1.5-1.5V3.5z"/><path d="M5.5 6.5h3M5.5 9h3"/></svg></button>
+    <button class="col-tbtn${sDeep?' active':''}" onclick="toggleColDeepThink('${modelId}')" title="深度思考"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="2.5" fill="currentColor" stroke="none"/><ellipse cx="12" cy="12" rx="9" ry="4"/><ellipse cx="12" cy="12" rx="9" ry="4" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="9" ry="4" transform="rotate(-60 12 12)"/></svg></button>
+    <button class="col-tbtn" onclick="toggleColToolMenu(event,'${modelId}')" title="工具"><svg viewBox="0 0 24 24"><rect x="2" y="8" width="20" height="13" rx="2"/><path d="M8 8V6a2 2 0 012-2h4a2 2 0 012 2v2"/><path d="M12 12v4"/></svg></button>
     ${colBadges}
   </div>`;
   chat.messages.forEach((m,i)=>{
@@ -1208,8 +1211,8 @@ function renderMultiMode(area,chat){
         <button class="col-send" onclick="colSend('${modelId}',this.closest('.col-input-wrap').querySelector('input'))"><svg viewBox="0 0 14 14"><path d="M7 11V3M7 3L4 6M7 3l3 3"/></svg></button>
       </div>
       <div class="col-tools">
-        <button class="col-tbtn${colDeepActive?' active':''}" onclick="toggleColDeepThink('${modelId}')" title="深度思考"><svg viewBox="0 0 14 14"><circle cx="7" cy="7" r="2.5"/><circle cx="7" cy="7" r="5" stroke-dasharray="2 2"/></svg></button>
-        <button class="col-tbtn" onclick="toggleColToolMenu(event,'${modelId}')" title="工具"><svg viewBox="0 0 14 14"><path d="M3 2h8v1.5H3zM2.5 3.5h9v8.5a1.5 1.5 0 01-1.5 1.5H4a1.5 1.5 0 01-1.5-1.5V3.5z"/><path d="M5.5 6.5h3M5.5 9h3"/></svg></button>
+        <button class="col-tbtn${colDeepActive?' active':''}" onclick="toggleColDeepThink('${modelId}')" title="深度思考"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="2.5" fill="currentColor" stroke="none"/><ellipse cx="12" cy="12" rx="9" ry="4"/><ellipse cx="12" cy="12" rx="9" ry="4" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="9" ry="4" transform="rotate(-60 12 12)"/></svg></button>
+        <button class="col-tbtn" onclick="toggleColToolMenu(event,'${modelId}')" title="工具"><svg viewBox="0 0 24 24"><rect x="2" y="8" width="20" height="13" rx="2"/><path d="M8 8V6a2 2 0 012-2h4a2 2 0 012 2v2"/><path d="M12 12v4"/></svg></button>
         ${(state.colTools[modelId]&&state.colTools[modelId].length)?state.colTools[modelId].map(t=>`<span class="col-badge">${t}<span class="rx" onclick="removeColTool('${modelId}','${t}')">×</span></span>`).join(''):''}
       </div></div></div>`;
   });
@@ -1283,7 +1286,8 @@ function toggleColToolMenu(e,modelId){
   const tools=['联网搜索','写作','编程','解题'];
   const menu=document.createElement('div');
   menu.className='col-tool-popup';
-  menu.innerHTML=tools.map(t=>`<div class="ctp-item" onclick="toggleColTool('${modelId}','${t}')">${t}</div>`).join('');
+  const toolIcons={'联网搜索':'<svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="7"/><path d="M3 10h14M10 3c-2 2.5-2 11 0 14M10 3c2 2.5 2 11 0 14"/></svg>','写作':'<svg viewBox="0 0 20 20"><path d="M3 17h14M5 13l8-8 2 2-8 8H5v-2z"/></svg>','编程':'<svg viewBox="0 0 20 20"><path d="M6 7l-3 3 3 3M14 7l3 3-3 3M11 5l-2 10"/></svg>','解题':'<svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="7"/><path d="M8 8a2.5 2.5 0 013 2.5c0 1.5-1 2-1 3M10 15v.5"/></svg>'};
+  menu.innerHTML=tools.map(t=>`<div class="ctp-item" onclick="toggleColTool('${modelId}','${t}')">${toolIcons[t]||''}${t}</div>`).join('');
   const rect=e.currentTarget.getBoundingClientRect();
   menu.style.cssText=`position:fixed;left:${rect.left}px;top:${rect.bottom+4}px;z-index:9999`;
   document.body.appendChild(menu);
