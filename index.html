@@ -217,10 +217,11 @@ button{font-family:inherit;border:none;background:none;cursor:pointer;color:inhe
 .col-badge:hover{border-color:var(--accent)}
 .col-badge .rx{cursor:pointer;margin-left:3px;font-size:13px;opacity:.6;transition:opacity .15s}
 .col-badge .rx:hover{opacity:1}
-.col-tool-popup{background:var(--bg-primary);border:1px solid var(--border);border-radius:var(--radius-md);box-shadow:var(--shadow-md);padding:6px;min-width:140px;backdrop-filter:blur(12px);animation:menuIn .15s ease}
-.ctp-item{display:flex;align-items:center;gap:8px;padding:9px 12px;font-size:12px;cursor:pointer;border-radius:var(--radius-sm);white-space:nowrap;color:var(--text-secondary);transition:all .15s}
-.ctp-item:hover{background:var(--accent-light);color:var(--accent)}
-.ctp-item svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.col-tool-popup{background:var(--bg-primary);border:1px solid color-mix(in srgb,var(--border) 60%,transparent);border-radius:14px;box-shadow:0 8px 32px rgba(0,0,0,.12),0 2px 8px rgba(0,0,0,.06);padding:8px;min-width:160px;backdrop-filter:blur(16px) saturate(1.4);animation:menuIn .2s cubic-bezier(.2,0,.13,1.2)}
+.ctp-item{display:flex;align-items:center;gap:10px;padding:10px 14px;font-size:13px;cursor:pointer;border-radius:10px;white-space:nowrap;color:var(--text-secondary);transition:all .18s;font-weight:400}
+.ctp-item:hover{background:linear-gradient(135deg,var(--accent-light),color-mix(in srgb,var(--accent) 8%,transparent));color:var(--accent);transform:translateX(2px)}
+.ctp-item svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;opacity:.8;transition:opacity .15s}
+.ctp-item:hover svg{opacity:1}
 /* Input Area */
 .input-area{padding:14px 24px 20px;background:var(--bg-primary);border-top:1px solid var(--border)}
 .input-wrap{max-width:800px;margin:0 auto;position:relative}
@@ -238,12 +239,13 @@ button{font-family:inherit;border:none;background:none;cursor:pointer;color:inhe
 .send-btn.active{background:var(--accent);color:#fff}
 .send-btn.active:hover{background:#3d5ce5;transform:scale(1.05)}
 .send-btn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
-.tool-menu{position:absolute;bottom:100%;left:60px;background:var(--bg-primary);border:1px solid var(--border);border-radius:var(--radius-md);box-shadow:var(--shadow-md);padding:6px;display:none;min-width:160px;z-index:200;margin-bottom:8px}
-.tool-menu.show{display:block;animation:menuIn .15s ease}
+.tool-menu{position:absolute;bottom:100%;left:60px;background:var(--bg-primary);border:1px solid color-mix(in srgb,var(--border) 60%,transparent);border-radius:14px;box-shadow:0 8px 32px rgba(0,0,0,.12),0 2px 8px rgba(0,0,0,.06);padding:8px;display:none;min-width:160px;z-index:200;margin-bottom:8px;backdrop-filter:blur(16px) saturate(1.4)}
+.tool-menu.show{display:block;animation:menuIn .2s cubic-bezier(.2,0,.13,1.2)}
 @keyframes menuIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
-.tm-item{display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:var(--radius-sm);font-size:13px;transition:background .15s}
-.tm-item:hover{background:var(--accent-light)}
-.tm-item svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.tm-item{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:10px;font-size:13px;transition:all .18s;color:var(--text-secondary);cursor:pointer}
+.tm-item:hover{background:linear-gradient(135deg,var(--accent-light),color-mix(in srgb,var(--accent) 8%,transparent));color:var(--accent);transform:translateX(2px)}
+.tm-item svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;opacity:.8;transition:opacity .15s}
+.tm-item:hover svg{opacity:1}
 .tool-badges{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap}
 .tbadge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;background:var(--accent-light);border:1px solid var(--accent);border-radius:14px;font-size:12px;color:var(--accent);font-weight:500}
 .tbadge .rx{cursor:pointer;font-size:14px;line-height:1;opacity:.6}
@@ -285,7 +287,7 @@ button{font-family:inherit;border:none;background:none;cursor:pointer;color:inhe
 .sb-top-icons{display:flex;align-items:center;gap:4px;padding:10px 14px 6px}
 .sb-top-icon{padding:6px;border-radius:var(--radius-sm);color:var(--text-secondary);transition:all .2s}
 .sb-top-icon:hover{background:var(--bg-tertiary);color:var(--text-primary)}
-.sb-top-icon svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.sb-top-icon svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
 /* Brand entry */
 .sb-brand-entry{display:flex;align-items:center;gap:10px;padding:8px 14px;margin:4px 8px;border-radius:var(--radius-sm);cursor:pointer;transition:background .15s}
 .sb-brand-entry:hover{background:var(--bg-tertiary)}
@@ -419,9 +421,9 @@ button{font-family:inherit;border:none;background:none;cursor:pointer;color:inhe
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeMobileSidebar()"></div>
 <aside class="sidebar" id="sidebar">
   <div class="sb-top-icons hide-c">
-    <button class="sb-top-icon" onclick="toggleSidebar()" title="收起侧栏"><svg viewBox="0 0 16 16"><rect x="1" y="1" width="6" height="6" rx="1"/><rect x="9" y="1" width="6" height="6" rx="1"/><rect x="1" y="9" width="6" height="6" rx="1"/><rect x="9" y="9" width="6" height="6" rx="1"/></svg></button>
-    <button class="sb-top-icon" onclick="createNewChat()" title="新建对话"><svg viewBox="0 0 16 16"><path d="M3 2h7l3 3v9a1 1 0 01-1 1H3a1 1 0 01-1-1V3a1 1 0 011-1z"/><path d="M10 2v3h3"/></svg></button>
-    <button class="sb-top-icon" onclick="showKeyModal()" title="设置"><svg viewBox="0 0 16 16"><path d="M2 2l5 5M14 2l-5 5M2 14l5-5M14 14l-5-5"/><rect x="5" y="5" width="6" height="6" rx="1"/></svg></button>
+    <button class="sb-top-icon" onclick="toggleSidebar()" title="收起侧栏"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></button>
+    <button class="sb-top-icon" onclick="createNewChat()" title="新建对话"><svg viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8z"/><polyline points="14 3 14 8 19 8"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></svg></button>
+    <button class="sb-top-icon" onclick="showKeyModal()" title="设置"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></button>
   </div>
   <button class="btn-new show-c" onclick="createNewChat()" title="新建对话"><svg viewBox="0 0 20 20"><path d="M10 4v12M4 10h12"/></svg></button>
   <div class="sb-search hide-c"><svg viewBox="0 0 20 20"><circle cx="9" cy="9" r="5"/><path d="M14 14l3 3"/></svg><input placeholder="搜索对话..." oninput="filterChats(this.value)"></div>
@@ -462,7 +464,7 @@ button{font-family:inherit;border:none;background:none;cursor:pointer;color:inhe
           <button class="itb-btn" onclick="document.getElementById('imgUpload').click()"><svg viewBox="0 0 20 20"><rect x="3" y="4" width="14" height="12" rx="2"/><circle cx="8" cy="9" r="1.5"/><path d="M4 14l4-4 3 3 2-2 4 4"/></svg><span class="hide-c">图片</span></button>
           <input type="file" id="imgUpload" accept="image/*" hidden onchange="handleImgUpload(event)">
           <button class="itb-btn" id="deepThinkBtn" onclick="toggleDeepThink()"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="2.5" fill="currentColor" stroke="none"/><ellipse cx="12" cy="12" rx="9" ry="4"/><ellipse cx="12" cy="12" rx="9" ry="4" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="9" ry="4" transform="rotate(-60 12 12)"/></svg><span class="hide-c">深度思考</span></button>
-          <button class="itb-btn" onclick="toggleToolMenu(event)"><svg viewBox="0 0 24 24"><rect x="2" y="8" width="20" height="13" rx="2"/><path d="M8 8V6a2 2 0 012-2h4a2 2 0 012 2v2"/><path d="M12 12v4"/></svg><span class="hide-c">工具</span><svg viewBox="0 0 12 12" style="width:10px;height:10px;margin-left:2px"><path d="M3 5l3 3 3-3"/></svg></button>
+          <button class="itb-btn" onclick="toggleToolMenu(event)"><svg viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.6-3.6a5 5 0 01-7-7l3.4 3.6z"/><path d="M5.3 17.7a1 1 0 000-1.4l-1.6-1.6a1 1 0 00-1.4 0L1 17.3a5 5 0 007 7l-2.7-6.6z"/><path d="M14.7 6.3L5.3 17.7"/></svg><span class="hide-c">工具</span><svg viewBox="0 0 12 12" style="width:10px;height:10px;margin-left:2px"><path d="M3 5l3 3 3-3"/></svg></button>
           <div class="itb-right"><button class="send-btn" id="sendBtn" onclick="sendMessage()"><svg viewBox="0 0 20 20"><path d="M10 16V4M10 4l-5 5M10 4l5 5"/></svg></button></div>
         </div>
       </div>
@@ -842,9 +844,17 @@ function selectChat(id){
   // Restore model selection from the target chat (filter out removed models)
   const chat=getCurrentChat();
   if(chat&&chat.selectedModels&&chat.selectedModels.length){
-    state.selectedModels=chat.selectedModels.filter(id=>VALID_MODEL_IDS.has(id));
+    state.selectedModels=chat.selectedModels.filter(mid=>VALID_MODEL_IDS.has(mid));
     chat.selectedModels=state.selectedModels.slice();
     updateModelSelectorUI();
+  } else if(chat&&chat.messages&&chat.messages.length&&!state.selectedModels.length){
+    // Chat has messages but no saved models — infer from messages
+    const inferred=new Set();
+    chat.messages.forEach(m=>{
+      if(m.targetModels)m.targetModels.forEach(mid=>{if(VALID_MODEL_IDS.has(mid))inferred.add(mid)});
+      if(m.modelId&&VALID_MODEL_IDS.has(m.modelId))inferred.add(m.modelId);
+    });
+    if(inferred.size){state.selectedModels=[...inferred];chat.selectedModels=state.selectedModels.slice();updateModelSelectorUI();}
   }
   renderSidebar();renderChatArea();updateTopTitle();
   closeMobileSidebar();
@@ -1207,11 +1217,11 @@ function renderMultiMode(area,chat){
         <input class="col-input" placeholder="追问..." onkeydown="if(event.isComposing||event.keyCode===229){_imeActive=true;return}if(event.key==='Enter'&&!_imeActive){colSend('${modelId}',this);event.preventDefault()}" onkeyup="if(event.key==='Enter')_imeActive=false">
         <button class="col-send" onclick="colSend('${modelId}',this.closest('.col-input-wrap').querySelector('input'))"><svg viewBox="0 0 14 14"><path d="M7 11V3M7 3L4 6M7 3l3 3"/></svg></button>
       </div>
-      <div class="col-tools">
+      ${state.selectedModels.length>1?`<div class="col-tools">
         <button class="col-tbtn${colDeepActive?' active':''}" onclick="toggleColDeepThink('${modelId}')" title="深度思考"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="2.5" fill="currentColor" stroke="none"/><ellipse cx="12" cy="12" rx="9" ry="4"/><ellipse cx="12" cy="12" rx="9" ry="4" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="9" ry="4" transform="rotate(-60 12 12)"/></svg></button>
         <button class="col-tbtn" onclick="toggleColToolMenu(event,'${modelId}')" title="工具"><svg viewBox="0 0 24 24"><rect x="2" y="8" width="20" height="13" rx="2"/><path d="M8 8V6a2 2 0 012-2h4a2 2 0 012 2v2"/><path d="M12 12v4"/></svg></button>
         ${(state.colTools[modelId]&&state.colTools[modelId].length)?state.colTools[modelId].map(t=>`<span class="col-badge">${t}<span class="rx" onclick="removeColTool('${modelId}','${t}')">×</span></span>`).join(''):''}
-      </div></div></div>`;
+      </div>`:''}</div></div>`;
   });
   html+='</div>';area.innerHTML=html;
   state.selectedModels.forEach(id=>{
